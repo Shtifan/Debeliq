@@ -9,14 +9,15 @@ module.exports = {
 
     async execute(interaction) {
         const player = useMasterPlayer();
+
         const channel = interaction.member.voice.channel;
         if (!channel)
             return interaction.reply({
                 content: 'You are not connected to a voice channel',
                 ephemeral: true,
             });
-        const query = interaction.options.getString('song', true);
 
+        const query = interaction.options.getString('song', true);
         await interaction.deferReply();
         const searchResult = await player.search(query, {
             requestedBy: interaction.user,

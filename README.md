@@ -1,1 +1,7 @@
-These are old files written in 2022. I was not able to restore everything. The music doesn't work. There is no index.js file, no games and the versions of discord-player and discord.js are outdated.
+# Debeliq
+
+Debeliq is a general purpose discord bot that can play music, manage messages, play games and more.
+
+# In this version
+
+Debeliq now supports music and can play games. It also has updated dependencies and better working slash commands.

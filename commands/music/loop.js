@@ -26,7 +26,6 @@ module.exports = {
             });
 
         const queue = useQueue(interaction.guild.id);
-
         if (!queue || !queue.node.isPlaying())
             return interaction.reply({
                 content: `There is no music currently playing`,

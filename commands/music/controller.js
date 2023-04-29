@@ -1,82 +1,72 @@
-const { ApplicationCommandOptionType, ActionRowBuilder, ButtonBuilder, EmbedBuilder, PermissionsBitField } = require('discord.js')
+const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder } = require('discord.js');
+const { useQueue } = require('discord-player');
 
 module.exports = {
-    name: 'controller',
-    description: "set controller channel ",
-    voiceChannel: false,
-    permissions: PermissionsBitField.Flags.ManageMessages,
-    options: [
-        {
-            name: 'channel',
-            description: 'the channel you want to send it to',
-            type: ApplicationCommandOptionType.Channel,
-            required: true,
-        }
-    ],
-    async execute({ inter, client }) {
-        let Channel = inter.options.getChannel('channel')
-        if (Channel.type !== 0) return inter.reply({ content: `you have to send it to a text channel.. ❌`, ephemeral: true })
+    data: new SlashCommandBuilder().setName('controller').setDescription('Control your music from the buttons below'),
 
+    async execute(interaction) {
+        const channel = interaction.member.voice.channel;
+        if (!channel)
+            return interaction.reply({
+                content: 'You are not connected to a voice channel',
+                ephemeral: true,
+            });
 
-        const embed = new EmbedBuilder()
-            .setTitle('Control your music from the buttons below')
-            .setImage(inter.guild.iconURL({ size: 4096, dynamic: true }))
-            .setColor('#ec4444')
-
-        inter.reply({ content: `sending controller to ${Channel}... ✅`, ephemeral: true })
+        const queue = useQueue(interaction.guild.id);
+        if (!queue || !queue.node.isPlaying())
+            return interaction.reply({
+                content: `There is no music currently playing`,
+                ephemeral: true,
+            });
 
         const back = new ButtonBuilder()
             .setLabel('Back')
             .setCustomId(JSON.stringify({ ffb: 'back' }))
-            .setStyle('Primary')
+            .setStyle('Primary');
 
         const skip = new ButtonBuilder()
             .setLabel('Skip')
             .setCustomId(JSON.stringify({ ffb: 'skip' }))
-            .setStyle('Primary')
+            .setStyle('Primary');
 
         const resumepause = new ButtonBuilder()
             .setLabel('Resume & Pause')
             .setCustomId(JSON.stringify({ ffb: 'resume&pause' }))
-            .setStyle('Danger')
+            .setStyle('Danger');
 
         const save = new ButtonBuilder()
             .setLabel('Save')
             .setCustomId(JSON.stringify({ ffb: 'savetrack' }))
-            .setStyle('Success')
+            .setStyle('Success');
 
         const volumeup = new ButtonBuilder()
             .setLabel('Volume up')
             .setCustomId(JSON.stringify({ ffb: 'volumeup' }))
-            .setStyle('Primary')
+            .setStyle('Primary');
 
         const volumedown = new ButtonBuilder()
             .setLabel('Volume Down')
             .setCustomId(JSON.stringify({ ffb: 'volumedown' }))
-            .setStyle('Primary')
+            .setStyle('Primary');
 
         const loop = new ButtonBuilder()
             .setLabel('Loop')
             .setCustomId(JSON.stringify({ ffb: 'loop' }))
-            .setStyle('Danger')
+            .setStyle('Danger');
 
         const np = new ButtonBuilder()
             .setLabel('Now Playing')
             .setCustomId(JSON.stringify({ ffb: 'nowplaying' }))
-            .setStyle('Secondary')
+            .setStyle('Secondary');
 
         const queuebutton = new ButtonBuilder()
             .setLabel('Queue')
             .setCustomId(JSON.stringify({ ffb: 'queue' }))
-            .setStyle('Secondary')
+            .setStyle('Secondary');
 
+        const row1 = new ActionRowBuilder().addComponents(back, queuebutton, resumepause, np, skip);
+        const row2 = new ActionRowBuilder().addComponents(volumedown, loop, save, volumeup);
 
-        const row1 = new ActionRowBuilder().addComponents(back, queuebutton, resumepause, np, skip)
-        const row2 = new ActionRowBuilder().addComponents(volumedown, loop, save, volumeup)
-
-
-
-        Channel.send({ embeds: [embed], components: [row1, row2] })
-
+        await interaction.reply({ components: [row1, row2] });
     },
-}
+};
