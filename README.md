@@ -1,0 +1,1 @@
+These are old files written in 2022. I was not able to restore everything. The music doesn't work. There is no index.js file, no games and the versions of discord-player and discord.js are outdated.
