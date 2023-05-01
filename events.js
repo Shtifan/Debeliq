@@ -1,8 +1,4 @@
 const client = require('./index');
-const { useMasterPlayer } = require('discord-player');
-const player = useMasterPlayer();
-
-// non-slash commands
 
 const prefix = 'debel ';
 let gamecb = false;
@@ -77,7 +73,8 @@ client.on('messageCreate', async message => {
     }
 });
 
-// music
+const { useMasterPlayer } = require('discord-player');
+const player = useMasterPlayer();
 
 player.events.on('error', (queue, error) => {
     console.log(`General player error event: ${error.message}`);

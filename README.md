@@ -4,4 +4,4 @@ Debeliq is a general purpose discord bot that can play music, manage messages, p
 
 # In this version
 
-Debeliq now supports music and can play games. It also has updated dependencies and better working slash commands.
+Debeliq now supports discord-player 6.3.0. You have to manually install ffmpeg!
