@@ -18,11 +18,11 @@ module.exports = {
             });
 
         const query = interaction.options.getString('song', true);
-        await interaction.deferReply();
         const searchResult = await player.search(query, {
             requestedBy: interaction.user,
         });
 
+        await interaction.deferReply();
         if (!searchResult.hasTracks()) {
             return interaction.editReply({
                 content: `I found no tracks for ${query}`,
