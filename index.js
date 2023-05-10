@@ -15,7 +15,7 @@ const client = new Client({
 });
 module.exports = client;
 
-const player = new Player(client);
+const player = Player.singleton(client);
 player.extractors.loadDefault();
 
 client.commands = new Collection();
