@@ -13,16 +13,15 @@ module.exports = {
             .addFields([
                 {
                     name: 'Cows and Bulls',
-                    value: "**```debel cb```**",
+                    value: '**```debel cb```**',
                 },
             ])
             .addFields([
                 {
                     name: 'Koi te e pital',
-                    value: "**```koi```**",
+                    value: '**```koi```**',
                 },
-            ])
-            .addFields([{ name: 'Version', value: '**2.0.0**' }]);
+            ]);
         await interaction.reply({ embeds: [embed] });
     },
 };
