@@ -73,8 +73,8 @@ client.on('messageCreate', async message => {
     }
 });
 
-const { useMasterPlayer } = require('discord-player');
-const player = useMasterPlayer();
+const { useMainPlayer } = require('discord-player');
+const player = useMainPlayer();
 
 player.events.on('error', (queue, error) => {
     console.log(`General player error event: ${error.message}`);
