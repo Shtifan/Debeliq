@@ -1,7 +1,7 @@
 {
   "name": "debeliq",
   "version": "1.0.0",
-  "description": "",
+  "description": "Debeliq is a general purpose discord bot that can play music, manage messages, play games and more.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -10,10 +10,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@discord-player/extractor": "^4.3.1",
+    "@discord-player/extractor": "^4.4.0",
     "@discordjs/opus": "^0.9.0",
-    "discord-player": "^6.5.0",
+    "discord-player": "^6.6.1",
     "discord.js": "^14.11.0",
+    "ffmpeg-static": "^5.1.0",
     "ytdl-core": "^4.11.4"
   }
 }

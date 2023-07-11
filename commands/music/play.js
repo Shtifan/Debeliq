@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const { useMasterPlayer } = require('discord-player');
+const { useMainPlayer } = require('discord-player');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -8,7 +8,7 @@ module.exports = {
         .addStringOption(option => option.setName('song').setDescription('Name or URL of the song').setRequired(true)),
 
     async execute(interaction) {
-        const player = useMasterPlayer();
+        const player = useMainPlayer();
 
         const channel = interaction.member.voice.channel;
         if (!channel)
