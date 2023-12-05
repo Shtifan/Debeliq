@@ -57,6 +57,6 @@ client.on('interactionCreate', async interaction => {
     }
 });
 
-require('./events');
+require('./events.js');
 
 client.login(token);
