@@ -1,4 +1,4 @@
-const client = require('./index');
+const client = require('./index.js');
 
 const prefix = 'debel ';
 let gamecb = false;
@@ -38,7 +38,7 @@ function getNumberEnding(number) {
 client.on('messageCreate', async message => {
     if (message.author.bot) return;
 
-    if (message.content === 'koi') {
+    if (message.content.includes('koi') || message.content.includes('koj')) {
         message.reply('te e pital');
     }
 
