@@ -1,4 +1,4 @@
-const client = require('./index.js');
+const client = require('./main.js');
 
 const prefix = 'debel ';
 let gamecb = false;
