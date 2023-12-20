@@ -50,6 +50,10 @@ function cb(number, input) {
     return [bulls, cows];
 }
 
+let number = 0;
+let guesses = 0;
+let gamecb = false;
+
 module.exports = {
     data: new SlashCommandBuilder().setName('cb').setDescription('Play cows and bulls'),
 
