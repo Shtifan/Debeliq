@@ -1,14 +1,5 @@
-const client = require('./main.js');
 const { useMainPlayer } = require('discord-player');
 const player = useMainPlayer();
-
-client.on('messageCreate', async message => {
-    if (message.author.bot) return;
-
-    if (message.content.includes('koi') || message.content.includes('koj')) {
-        message.reply('te e pital');
-    }
-});
 
 player.events.on('error', (queue, error) => {
     console.log(`General player error event: ${error.message}`);
