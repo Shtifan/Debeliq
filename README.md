@@ -4,4 +4,4 @@ Debeliq is a general purpose discord bot that can play music, manage messages, p
 
 ## Instalation
 
-To use this discord bot code, clone it and run the `npm run dev` command.
+To use this discord bot, clone it and input your token in the `config.js` file. Then run the `npm run dev` command and you are done.
