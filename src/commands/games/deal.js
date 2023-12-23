@@ -38,12 +38,12 @@ function shuffle(arr) {
 }
 
 function remove(number, arr) {
-    const index = arr.findIndex(_case => _case.number == number);
+    const index = arr.findIndex(c => c.number == number);
     arr.splice(index, 1);
 }
 
 function getOffer(cases) {
-    const totalValue = cases.reduce((sum, _case) => sum + _case.value, 0);
+    const totalValue = cases.reduce((sum, c) => sum + c.value, 0);
     const averageValue = totalValue / cases.length;
 
     const offerPercentage = 0.8;
@@ -54,10 +54,10 @@ function getOffer(cases) {
 }
 
 function remainingCases(cases) {
-    let remainingValues = cases.map(_case => _case.value);
+    let remainingValues = cases.map(c => c.value);
     let sortedValues = remainingValues
         .sort((a, b) => a - b)
-        .map(_case => `$${_case}`)
+        .map(c => `$${c}`)
         .join('\n');
 
     return `Remaining values:\n${sortedValues}`;
@@ -66,8 +66,8 @@ function remainingCases(cases) {
 function remainingNumbers(cases) {
     let numbers = '';
 
-    cases.forEach(_case => {
-        numbers += `${_case.number}, `;
+    cases.forEach(c => {
+        numbers += `${c.number}, `;
     });
 
     numbers = numbers.slice(0, -2);
@@ -97,38 +97,33 @@ client.on('messageCreate', async message => {
     if (message.author.bot) return;
     if (!gamedeal) return;
 
-    if (message.content.toLowerCase() == 'yes') {
-        if (cases.length == 1) {
-            let finalCase = cases[0].number;
-            let index = cases.findIndex(_case => _case.number == finalCase);
+    let special = [20, 15, 11, 8, 5];
+    if (message.content.toLowerCase() == 'yes' && (special.includes(cases.length) || cases.length == 2)) {
+        if (cases.length == 2) {
+            let index = cases.findIndex(c => c.number == cases[0].number);
             message.channel.send(`Congratulations! You win $${cases[index].value}`);
             gamedeal = false;
         } else {
             message.channel.send(`Congratulations! You win $${getOffer(cases)}`);
             gamedeal = false;
         }
-    } else if (message.content.toLowerCase() == 'no') {
-        if (cases.length == 1) {
-            let index = cases.findIndex(_case => _case.number == yourCase);
+    } else if (message.content.toLowerCase() == 'no' && (special.includes(cases.length) || cases.length == 2)) {
+        if (cases.length == 2) {
+            let index = cases.findIndex(c => c.number == yourCase);
             message.channel.send(`Congratulations! You win $${cases[index].value}`);
             gamedeal = false;
         } else {
-            let special = [20, 15, 11, 8, 5, 2];
-            if (special.includes(cases.length)) {
-                let remainingCases = cases.length - special[special.indexOf(cases.length) + 1];
-                message.channel.send(`Now choose ${remainingCases} more cases:`);
-            } else {
-                message.channel.send('You declined the dealer offer');
-                gamedeal = false;
-            }
+            message.channel.send(`You declined the dealer's offer`);
+            let remainingCases = cases.length - special[special.indexOf(cases.length) + 1];
+            message.channel.send(`Now choose ${remainingCases} more cases:`);
         }
     } else {
         let input = parseInt(message.content);
         if (isNaN(message.content) || input < 1 || input > 26) return;
 
         let index = 0;
-        if (cases.findIndex(_case => _case.number == input) == -1) return;
-        else index = cases.findIndex(_case => _case.number == input);
+        if (cases.findIndex(c => c.number == input) == -1) return;
+        else index = cases.findIndex(c => c.number == input);
 
         if (input == yourCase) return;
 
@@ -139,15 +134,14 @@ client.on('messageCreate', async message => {
             message.channel.send(`Behind case ${input} there were $${cases[index].value}`);
             remove(input, cases);
 
-            let special = [20, 15, 11, 8, 5, 2];
             if (special.includes(cases.length)) {
                 message.channel.send(`The banker offer is $${getOffer(cases)}`);
                 message.channel.send('Do you accept the deal?');
             }
 
-            if (cases.length == 1) message.channel.send('Do you want to switch your case with the last remaining?');
+            if (cases.length == 2) message.channel.send('Do you want to switch your case with the last remaining?');
 
-            if (!(special.includes(cases.length) || cases.length == 1)) {
+            if (!(special.includes(cases.length) || cases.length == 2)) {
                 let remaining = remainingCases(cases);
                 message.channel.send(remaining);
                 let numbers = remainingNumbers(cases);
