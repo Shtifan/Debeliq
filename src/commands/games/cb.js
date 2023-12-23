@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require('discord.js');
 const client = require('../../main.js');
 
 function hasDuplicates(array) {
-    return new Set(array).size !== array.length;
+    return new Set(array).size != array.length;
 }
 
 function ending(number) {
@@ -68,17 +68,16 @@ module.exports = {
 
 client.on('messageCreate', async message => {
     if (message.author.bot) return;
+    if (!gamecb) return;
 
-    if (gamecb) {
-        let input = message.content.split('').map(Number);
-        if (isNaN(message.content) || input.length != 4 || hasDuplicates(input)) return;
-        guesses++;
+    let input = message.content.split('').map(Number);
+    if (isNaN(message.content) || input.length != 4 || hasDuplicates(input)) return;
+    guesses++;
 
-        let [bulls, cows] = cb(number, input);
-        message.channel.send(`${bulls} bull${bulls !== 1 ? 's' : ''} ${cows} cow${cows !== 1 ? 's' : ''}`);
-        if (bulls == 4) {
-            message.channel.send(`Well done, you guessed the number from the ${guesses + ending(guesses)} guess`);
-            gamecb = false;
-        }
+    let [bulls, cows] = cb(number, input);
+    message.channel.send(`${bulls} bull${bulls != 1 ? 's' : ''} ${cows} cow${cows != 1 ? 's' : ''}`);
+    if (bulls == 4) {
+        message.channel.send(`Well done, you guessed the number from the ${guesses + ending(guesses)} guess`);
+        gamecb = false;
     }
 });
