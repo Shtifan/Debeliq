@@ -62,7 +62,7 @@ module.exports = {
         console.log(number);
         guesses = 0;
         gamecb = true;
-        interaction.reply("I'm ready");
+        interaction.reply(`I'm ready`);
     },
 };
 

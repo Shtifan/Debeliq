@@ -32,7 +32,7 @@ player.events.on('disconnect', queue => {
 });
 
 player.events.on('emptyChannel', queue => {
-    queue.metadata.channel.send("I'm leaving because there's no one in the voice channel");
+    queue.metadata.channel.send(`I'm leaving because there's no one in the voice channel`);
 });
 
 player.events.on('emptyQueue', queue => {
