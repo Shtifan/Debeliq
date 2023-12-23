@@ -84,12 +84,12 @@ module.exports = {
     async execute(interaction) {
         gamedeal = true;
         await interaction.reply('The deal or no deal game has started.');
-        await interaction.channel.send('These are all the briefcases:');
+        interaction.channel.send('These are all the briefcases:');
         let remaining = remainingCases(cases);
-        await interaction.channel.send(remaining);
+        interaction.channel.send(remaining);
         shuffle(cases);
-        await interaction.channel.send('The briefcases have been shuffled.');
-        await interaction.channel.send('Choose your briefcase:');
+        interaction.channel.send('The briefcases have been shuffled.');
+        interaction.channel.send('Choose your briefcase:');
     },
 };
 
