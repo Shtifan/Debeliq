@@ -108,15 +108,9 @@ client.on('messageCreate', async message => {
     if (input < 1 || input > 26) return;
 
     let index = 0;
-    let flag = false;
-    try {
-        index = cases.findIndex(_case => _case.number == input);
-        test = cases[index].number;
-    } catch (error) {
-        flag = true;
-    }
+    if (cases.findIndex(_case => _case.number == input) == -1) return;
+    else index = cases.findIndex(_case => _case.number == input);
 
-    if (flag) return;
     if (input == yourCase) return;
 
     if (yourCase == 0) {
