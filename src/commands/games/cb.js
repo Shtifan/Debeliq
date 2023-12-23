@@ -59,7 +59,6 @@ module.exports = {
 
     async execute(interaction) {
         number = generate();
-        console.log(number);
         guesses = 0;
         gamecb = true;
         interaction.reply(`I'm ready`);
