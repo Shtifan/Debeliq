@@ -84,9 +84,9 @@ module.exports = {
     data: new SlashCommandBuilder().setName('deal').setDescription('Play deal or no deal'),
 
     async execute(interaction) {
+        gamedeal = true;
         yourCase = 0;
         resetCases();
-        gamedeal = true;
         await interaction.reply('The deal or no deal game has started.');
 
         interaction.channel.send('These are all the briefcases:');
