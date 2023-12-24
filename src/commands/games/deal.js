@@ -77,12 +77,14 @@ function remainingNumbers(cases) {
 }
 
 let gamedeal = false;
+let cases = 0;
 let yourCase = 0;
 
 module.exports = {
     data: new SlashCommandBuilder().setName('deal').setDescription('Play deal or no deal'),
 
     async execute(interaction) {
+        yourCase = 0;
         resetCases();
         gamedeal = true;
         await interaction.reply('The deal or no deal game has started.');
