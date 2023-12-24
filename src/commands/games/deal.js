@@ -1,35 +1,6 @@
 const { SlashCommandBuilder } = require('discord.js');
 const client = require('../../main.js');
 
-let cases = [
-    { number: 1, value: 0.01 },
-    { number: 2, value: 1 },
-    { number: 3, value: 5 },
-    { number: 4, value: 10 },
-    { number: 5, value: 25 },
-    { number: 6, value: 50 },
-    { number: 7, value: 75 },
-    { number: 8, value: 100 },
-    { number: 9, value: 200 },
-    { number: 10, value: 300 },
-    { number: 11, value: 400 },
-    { number: 12, value: 500 },
-    { number: 13, value: 750 },
-    { number: 14, value: 1000 },
-    { number: 15, value: 5000 },
-    { number: 16, value: 10000 },
-    { number: 17, value: 25000 },
-    { number: 18, value: 50000 },
-    { number: 19, value: 75000 },
-    { number: 20, value: 100000 },
-    { number: 21, value: 200000 },
-    { number: 22, value: 300000 },
-    { number: 23, value: 400000 },
-    { number: 24, value: 500000 },
-    { number: 25, value: 750000 },
-    { number: 26, value: 1000000 },
-];
-
 function shuffle(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -51,6 +22,36 @@ function getOffer(cases) {
     const bankerOffer = averageValue * offerPercentage;
 
     return Math.floor((bankerOffer * 100) / 100);
+}
+function resetCases() {
+    cases = [
+        { number: 1, value: 0.01 },
+        { number: 2, value: 1 },
+        { number: 3, value: 5 },
+        { number: 4, value: 10 },
+        { number: 5, value: 25 },
+        { number: 6, value: 50 },
+        { number: 7, value: 75 },
+        { number: 8, value: 100 },
+        { number: 9, value: 200 },
+        { number: 10, value: 300 },
+        { number: 11, value: 400 },
+        { number: 12, value: 500 },
+        { number: 13, value: 750 },
+        { number: 14, value: 1000 },
+        { number: 15, value: 5000 },
+        { number: 16, value: 10000 },
+        { number: 17, value: 25000 },
+        { number: 18, value: 50000 },
+        { number: 19, value: 75000 },
+        { number: 20, value: 100000 },
+        { number: 21, value: 200000 },
+        { number: 22, value: 300000 },
+        { number: 23, value: 400000 },
+        { number: 24, value: 500000 },
+        { number: 25, value: 750000 },
+        { number: 26, value: 1000000 },
+    ];
 }
 
 function remainingCases(cases) {
@@ -82,6 +83,7 @@ module.exports = {
     data: new SlashCommandBuilder().setName('deal').setDescription('Play deal or no deal'),
 
     async execute(interaction) {
+        resetCases();
         gamedeal = true;
         await interaction.reply('The deal or no deal game has started.');
 
@@ -91,7 +93,7 @@ module.exports = {
 
         shuffle(cases);
         interaction.channel.send('The briefcases have been shuffled.');
-        interaction.channel.send('Choose your briefcase:');
+        interaction.channel.send('Choose your briefcase (1-26):');
     },
 };
 
@@ -119,7 +121,7 @@ client.on('messageCreate', async message => {
             let remainingCases = cases.length - special[special.indexOf(cases.length) + 1];
             message.channel.send(`Now choose ${remainingCases} more cases:`);
         }
-    } else {
+    } else if (!(special.includes(cases.length) || cases.length == 2)) {
         let input = parseInt(message.content);
         if (isNaN(message.content) || input < 1 || input > 26) return;
 
