@@ -105,7 +105,7 @@ client.on('messageCreate', async message => {
     if (message.author.bot) return;
     if (!gamedeal) return;
 
-    let special = [20, 15, 11, 8, 5];
+    const special = [20, 15, 11, 8, 5];
     if (message.content.toLowerCase() == 'yes' && acceptingDeal) {
         if (special.includes(cases.length)) {
             message.channel.send(`Congratulations! You win $${getOffer(cases)}!`);
