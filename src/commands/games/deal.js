@@ -99,12 +99,14 @@ module.exports = {
     },
 };
 
+let acceptingDeal = false;
+
 client.on('messageCreate', async message => {
     if (message.author.bot) return;
     if (!gamedeal) return;
 
     let special = [20, 15, 11, 8, 5];
-    if (message.content.toLowerCase() == 'yes') {
+    if (message.content.toLowerCase() == 'yes' && acceptingDeal) {
         if (special.includes(cases.length)) {
             message.channel.send(`Congratulations! You win $${getOffer(cases)}!`);
             gamedeal = false;
@@ -115,18 +117,19 @@ client.on('messageCreate', async message => {
             message.channel.send(`In your case there were $${cases[yourCaseIndex].value}`);
             gamedeal = false;
         }
-    } else if (message.content.toLowerCase() == 'no') {
+    } else if (message.content.toLowerCase() == 'no' && acceptingDeal) {
         if (special.includes(cases.length)) {
             message.channel.send(`You declined the dealer's offer`);
             let remainingCases = cases.length - special[special.indexOf(cases.length) + 1];
             message.channel.send(`Now choose ${remainingCases} more cases:`);
+            acceptingDeal = false;
         } else if (cases.length == 2) {
             let index = cases.findIndex(c => c.number == yourCase);
             message.channel.send(`Congratulations! You win $${cases[index].value}!`);
             gamedeal = false;
         }
     } else {
-        //if (special.includes(cases.length) || cases.length == 2) return;
+        if (acceptingDeal) return;
 
         let input = parseInt(message.content);
         if (isNaN(message.content) || input < 1 || input > 26) return;
@@ -147,6 +150,7 @@ client.on('messageCreate', async message => {
             if (special.includes(cases.length)) {
                 message.channel.send(`The banker offer is $${getOffer(cases)}`);
                 message.channel.send('Do you accept the deal?');
+                acceptingDeal = true;
             } else if (cases.length == 2) {
                 message.channel.send('Do you want to switch your case with the last remaining?');
             } else {
