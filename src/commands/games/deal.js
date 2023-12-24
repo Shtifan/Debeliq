@@ -73,7 +73,7 @@ function remainingNumbers(cases) {
 
     numbers = numbers.slice(0, -2);
 
-    return `Remaining numbers: ${numbers}`;
+    return `Remaining cases numbers: ${numbers}`;
 }
 
 let gamedeal = false;
@@ -104,26 +104,30 @@ client.on('messageCreate', async message => {
     if (!gamedeal) return;
 
     let special = [20, 15, 11, 8, 5];
-    if (message.content.toLowerCase() == 'yes' && (special.includes(cases.length) || cases.length == 2)) {
-        if (cases.length == 2) {
-            let index = cases.findIndex(c => c.number == cases[0].number);
-            message.channel.send(`Congratulations! You win $${cases[index].value}`);
+    if (message.content.toLowerCase() == 'yes') {
+        if (special.includes(cases.length)) {
+            message.channel.send(`Congratulations! You win $${getOffer(cases)}!`);
             gamedeal = false;
-        } else {
-            message.channel.send(`Congratulations! You win $${getOffer(cases)}`);
+        } else if (cases.length == 2) {
+            let index = cases.findIndex(c => c.number == cases[0].number);
+            let yourCaseIndex = cases.findIndex(c => c.number == yourCase);
+            message.channel.send(`Congratulations! You win $${cases[index].value}!`);
+            message.channel.send(`In your case there were $${cases[yourCaseIndex].value}`);
             gamedeal = false;
         }
-    } else if (message.content.toLowerCase() == 'no' && (special.includes(cases.length) || cases.length == 2)) {
-        if (cases.length == 2) {
-            let index = cases.findIndex(c => c.number == yourCase);
-            message.channel.send(`Congratulations! You win $${cases[index].value}`);
-            gamedeal = false;
-        } else {
+    } else if (message.content.toLowerCase() == 'no') {
+        if (special.includes(cases.length)) {
             message.channel.send(`You declined the dealer's offer`);
             let remainingCases = cases.length - special[special.indexOf(cases.length) + 1];
             message.channel.send(`Now choose ${remainingCases} more cases:`);
+        } else if (cases.length == 2) {
+            let index = cases.findIndex(c => c.number == yourCase);
+            message.channel.send(`Congratulations! You win $${cases[index].value}!`);
+            gamedeal = false;
         }
-    } else if (!(special.includes(cases.length) || cases.length == 2)) {
+    } else {
+        //if (special.includes(cases.length) || cases.length == 2) return;
+
         let input = parseInt(message.content);
         if (isNaN(message.content) || input < 1 || input > 26) return;
 
@@ -143,11 +147,9 @@ client.on('messageCreate', async message => {
             if (special.includes(cases.length)) {
                 message.channel.send(`The banker offer is $${getOffer(cases)}`);
                 message.channel.send('Do you accept the deal?');
-            }
-
-            if (cases.length == 2) message.channel.send('Do you want to switch your case with the last remaining?');
-
-            if (!(special.includes(cases.length) || cases.length == 2)) {
+            } else if (cases.length == 2) {
+                message.channel.send('Do you want to switch your case with the last remaining?');
+            } else {
                 let remaining = remainingCases(cases);
                 message.channel.send(remaining);
                 let numbers = remainingNumbers(cases);
