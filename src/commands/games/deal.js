@@ -13,16 +13,6 @@ function remove(number, arr) {
     arr.splice(index, 1);
 }
 
-function getOffer(cases) {
-    const totalValue = cases.reduce((sum, c) => sum + c.value, 0);
-    const averageValue = totalValue / cases.length;
-
-    const offerPercentage = 0.8;
-
-    const bankerOffer = averageValue * offerPercentage;
-
-    return Math.floor((bankerOffer * 100) / 100);
-}
 function resetCases() {
     cases = [
         { number: 1, value: 0.01 },
@@ -76,6 +66,21 @@ function remainingNumbers(cases) {
     return `Remaining cases numbers: ${numbers}`;
 }
 
+function getOffer(cases) {
+    const averageValue = cases.reduce((total, c) => total + c.value, 0) / cases.length;
+
+    let offerPercentage;
+    if (cases.length > 10) {
+        offerPercentage = 0.2;
+    } else {
+        offerPercentage = 0.1;
+    }
+
+    const offer = averageValue * offerPercentage;
+
+    return offer.toFixed(2);
+}
+
 let gamedeal = false;
 let cases = 0;
 let yourCase = 0;
@@ -120,7 +125,10 @@ client.on('messageCreate', async message => {
     } else if (message.content.toLowerCase() == 'no' && acceptingDeal) {
         if (special.includes(cases.length)) {
             message.channel.send(`You declined the dealer's offer`);
-            let remainingCases = cases.length - special[special.indexOf(cases.length) + 1];
+            special.push(2);
+            let index = special.findIndex(s => s == cases.length);
+            let remainingCases = cases.length - special[index + 1];
+            special.pop();
             message.channel.send(`Now choose ${remainingCases} more cases:`);
             acceptingDeal = false;
         } else if (cases.length == 2) {
@@ -153,6 +161,7 @@ client.on('messageCreate', async message => {
                 acceptingDeal = true;
             } else if (cases.length == 2) {
                 message.channel.send('Do you want to switch your case with the last remaining?');
+                acceptingDeal = true;
             } else {
                 let remaining = remainingCases(cases);
                 message.channel.send(remaining);
