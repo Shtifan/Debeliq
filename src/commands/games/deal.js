@@ -117,9 +117,7 @@ client.on('messageCreate', async message => {
             gamedeal = false;
         } else if (cases.length == 2) {
             let index = cases.findIndex(c => c.number == cases[0].number);
-            let yourCaseIndex = cases.findIndex(c => c.number == yourCase);
             message.channel.send(`Congratulations! You win $${cases[index].value}!`);
-            message.channel.send(`In your case there were $${cases[yourCaseIndex].value}`);
             gamedeal = false;
         }
     } else if (message.content.toLowerCase() == 'no' && acceptingDeal) {
