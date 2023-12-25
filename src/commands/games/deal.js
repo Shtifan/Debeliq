@@ -84,6 +84,7 @@ function getOffer(cases) {
 let gamedeal = false;
 let cases = 0;
 let yourCase = 0;
+let acceptingDeal = false;
 
 module.exports = {
     data: new SlashCommandBuilder().setName('deal').setDescription('Play deal or no deal'),
@@ -92,6 +93,7 @@ module.exports = {
         gamedeal = true;
         yourCase = 0;
         resetCases();
+        acceptingDeal = false;
         await interaction.reply('The deal or no deal game has started.');
 
         interaction.channel.send('These are all the briefcases:');
@@ -103,8 +105,6 @@ module.exports = {
         interaction.channel.send('Choose your briefcase (1-26):');
     },
 };
-
-let acceptingDeal = false;
 
 client.on('messageCreate', async message => {
     if (message.author.bot) return;
