@@ -126,7 +126,7 @@ client.on('messageCreate', async message => {
         if (special.includes(cases.length)) {
             message.channel.send(`You declined the dealer's offer`);
             special.push(2);
-            let index = special.findIndex(s => s == cases.length);
+            let index = special.indexOf(cases.length);
             let remainingCases = cases.length - special[index + 1];
             special.pop();
             message.channel.send(`Now choose ${remainingCases} more cases:`);
