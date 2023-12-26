@@ -11,9 +11,9 @@ module.exports = {
                 .setDescription('What action you want to preform on the loop')
                 .setRequired(true)
                 .addChoices(
-                    { name: 'Song', value: 'enable_loop_song' },
-                    { name: 'Queue', value: 'enable_loop_queue' },
-                    { name: 'Disabled', value: 'disable_loop' }
+                    { name: 'Song', value: 'song' },
+                    { name: 'Queue', value: 'queue' },
+                    { name: 'Disabled', value: 'off' }
                 )
         ),
 
@@ -33,21 +33,21 @@ module.exports = {
             });
 
         switch (interaction.options.getString('action')) {
-            case 'enable_loop_song': {
+            case 'song': {
                 queue.setRepeatMode(QueueRepeatMode.TRACK);
 
                 return interaction.reply(
                     `Repeat mode **enabled**. The current song will be repeated endlessly (you can end the loop with **/loop Disable**) 🔁`
                 );
             }
-            case 'enable_loop_queue': {
+            case 'queue': {
                 queue.setRepeatMode(QueueRepeatMode.QUEUE);
 
                 return interaction.reply(
                     `Repeat mode **enabled** for the whole queue. It will be repeated endlessly (you can end the loop with **/loop Disable**) 🔁`
                 );
             }
-            case 'disable_loop': {
+            case 'off': {
                 queue.setRepeatMode(QueueRepeatMode.OFF);
 
                 return interaction.reply(`Repeat mode **disabled**`);
