@@ -19,8 +19,8 @@ module.exports = {
                 overTitle: 'Game Over',
             },
             emojis: {
-                xButton: '❌',
-                oButton: '🔵',
+                xButton: '✖️',
+                oButton: '⭕',
                 blankButton: '➖',
             },
             mentionUser: true,
