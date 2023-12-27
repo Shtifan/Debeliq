@@ -16,21 +16,17 @@ module.exports = {
                 content: 'You are not connected to a voice channel',
                 ephemeral: true,
             });
-            
+
         const query = interaction.options.getString('query', true);
 
         await interaction.deferReply();
 
-        try {
-            const { track } = await player.play(channel, query, {
-                nodeOptions: {
-                    metadata: interaction,
-                },
-            });
+        await player.play(channel, query, {
+            nodeOptions: {
+                metadata: interaction,
+            },
+        });
 
-            return interaction.followUp(`Loading track **${track.title}**...`);
-        } catch (e) {
-            return interaction.followUp(`Something went wrong: ${e}`);
-        }
+        return interaction.followUp(`Loading track...`);
     },
 };
