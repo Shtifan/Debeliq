@@ -76,6 +76,6 @@ module.exports = {
 
         await interaction.reply(check(correctGuesses));
         const sortedNumbers = numbers.sort((a, b) => a - b);
-        interaction.channel.send(`The numbers are: ${sortedNumbers.join(', ')}`);
+        interaction.channel.send(`The winning numbers are: ${sortedNumbers.join(', ')}`);
     },
 };
