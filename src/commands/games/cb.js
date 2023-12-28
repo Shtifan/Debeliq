@@ -50,18 +50,16 @@ function cb(number, input) {
     return [bulls, cows];
 }
 
-let number = 0;
-let guesses = 0;
 let gamecb = false;
 
 module.exports = {
     data: new SlashCommandBuilder().setName('cb').setDescription('Play cows and bulls'),
 
     async execute(interaction) {
+        gamecb = true;
         number = generate();
         guesses = 0;
-        gamecb = true;
-        interaction.reply(`I'm ready`);
+        await interaction.reply(`I'm ready`);
     },
 };
 
