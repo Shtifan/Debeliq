@@ -78,6 +78,6 @@ module.exports = {
         const winningNumbers = sortedNumbers.map(number => (userNumbers.includes(number) ? `***${number}***` : number));
 
         await interaction.reply(check(correctGuesses));
-        interaction.channel.send(`The winning numbers are: ${winningNumbers.join(', ')}`);
+        interaction.channel.send(`The winning numbers were: ${winningNumbers.join(', ')}`);
     },
 };
