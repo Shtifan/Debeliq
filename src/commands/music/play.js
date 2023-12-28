@@ -21,12 +21,12 @@ module.exports = {
 
         await interaction.deferReply();
 
-        await player.play(channel, query, {
+        const { track } = await player.play(channel, query, {
             nodeOptions: {
                 metadata: interaction,
             },
         });
 
-        return interaction.followUp(`Loading track...`);
+        return interaction.followUp(`Track **${track.title}** added to queue ✅`);
     },
 };
