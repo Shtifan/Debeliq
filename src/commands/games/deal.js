@@ -78,6 +78,8 @@ function resetCases() {
     ];
 }
 
+let gamedeal = false;
+
 module.exports = {
     data: new SlashCommandBuilder().setName('deal').setDescription('Play deal or no deal'),
 
@@ -161,4 +163,3 @@ client.on('messageCreate', async message => {
         }
     }
 });
-
