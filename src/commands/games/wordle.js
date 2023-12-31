@@ -10,7 +10,7 @@ module.exports = {
             isSlashGame: true,
             embed: {
                 title: 'Wordle',
-                color: '#5865F2',
+                color: '#000000',
             },
             customWord: null,
             timeoutTime: 60000,
