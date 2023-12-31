@@ -27,6 +27,6 @@ module.exports = {
             },
         });
 
-        return interaction.followUp(`Track **${track.title}** added to queue ✅`);
+        return interaction.followUp(`Track **${track.title}** added to queue`);
     },
 };

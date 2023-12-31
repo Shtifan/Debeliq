@@ -21,6 +21,6 @@ module.exports = {
 
         queue.node.skip();
 
-        return interaction.reply(`Skipping **${queue.currentTrack.title}** ⏩`);
+        return interaction.reply(`Skipping **${queue.currentTrack.title}**`);
     },
 };

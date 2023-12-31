@@ -37,14 +37,14 @@ module.exports = {
                 queue.setRepeatMode(QueueRepeatMode.TRACK);
 
                 return interaction.reply(
-                    `Repeat mode **enabled**. The current song will be repeated endlessly (you can end the loop with **/loop Disable**) 🔁`
+                    `Repeat mode **enabled**. The current song will be repeated endlessly (you can end the loop with **/loop Disable**)`
                 );
             }
             case 'queue': {
                 queue.setRepeatMode(QueueRepeatMode.QUEUE);
 
                 return interaction.reply(
-                    `Repeat mode **enabled** for the whole queue. It will be repeated endlessly (you can end the loop with **/loop Disable**) 🔁`
+                    `Repeat mode **enabled** for the whole queue. It will be repeated endlessly (you can end the loop with **/loop Disable**)`
                 );
             }
             case 'off': {
