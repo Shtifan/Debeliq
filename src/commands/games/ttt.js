@@ -14,7 +14,7 @@ module.exports = {
             opponent: interaction.options.getUser('user'),
             embed: {
                 title: 'Tic Tac Toe',
-                color: '#5865F2',
+                color: '#000000',
                 statusTitle: 'Status',
                 overTitle: 'Game Over',
             },

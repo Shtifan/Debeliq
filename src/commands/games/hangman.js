@@ -10,7 +10,7 @@ module.exports = {
             isSlashGame: true,
             embed: {
                 title: 'Hangman',
-                color: '#5865F2',
+                color: '#000000',
             },
             hangman: { hat: '🎩', head: '😟', shirt: '👕', pants: '🩳', boots: '👞👞' },
             customWord: null,

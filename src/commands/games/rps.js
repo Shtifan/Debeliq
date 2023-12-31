@@ -14,7 +14,7 @@ module.exports = {
             opponent: interaction.options.getUser('user'),
             embed: {
                 title: 'Rock Paper Scissors',
-                color: '#5865F2',
+                color: '#000000',
                 description: 'Press a button below to make a choice.',
             },
             buttons: {
