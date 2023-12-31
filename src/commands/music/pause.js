@@ -1,8 +1,10 @@
 const { SlashCommandBuilder } = require('discord.js');
 const { useQueue } = require('discord-player');
 
+let isPaused = false;
+
 module.exports = {
-    data: new SlashCommandBuilder().setName('stop').setDescription('Stops the music'),
+    data: new SlashCommandBuilder().setName('pause').setDescription('Pause or resume the queue'),
 
     async execute(interaction) {
         const channel = interaction.member.voice.channel;
@@ -13,14 +15,20 @@ module.exports = {
             });
 
         const queue = useQueue(interaction.guild.id);
-        if (!queue || !queue.node.isPlaying())
+        if (!queue)
             return interaction.reply({
                 content: `There is no music currently playing`,
                 ephemeral: true,
             });
 
-        queue.delete();
-
-        return interaction.reply('Music stopped in the server, see you next time');
+        if (!isPaused) {
+            queue.node.pause();
+            isPaused = true;
+            return interaction.reply('Music was paused successfully');
+        } else {
+            queue.node.resume();
+            isPaused = false;
+            return interaction.reply('Music was resumed successfully');
+        }
     },
 };
