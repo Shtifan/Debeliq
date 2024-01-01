@@ -88,15 +88,17 @@ module.exports = {
         resetCases();
         yourCase = 0;
         acceptingDeal = false;
-        await interaction.reply('The deal or no deal game has started.');
-
-        interaction.channel.send('These are all the briefcases:');
-        let remaining = remainingValues(cases);
-        interaction.channel.send(remaining);
-
         shuffle(cases);
-        interaction.channel.send('The briefcases have been shuffled.');
-        interaction.channel.send('Choose your briefcase (1-26):');
+
+        let reply = '';
+        reply += 'The deal or no deal game has started.\n';
+        reply += 'These are all the briefcases:\n';
+        let remaining = remainingValues(cases);
+        reply += remaining;
+        reply += '\nThe briefcases have been shuffled.\n';
+        reply += 'Choose your briefcase (1-26):';
+
+        return interaction.reply(reply);
     },
 };
 

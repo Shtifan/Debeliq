@@ -75,9 +75,12 @@ module.exports = {
         const correctGuesses = numbers.filter(number => userNumbers.includes(number)).length;
 
         const sortedNumbers = numbers.sort((a, b) => a - b);
-        const winningNumbers = sortedNumbers.map(number => (userNumbers.includes(number) ? `***${number}***` : number));
+        const winningNumbers = sortedNumbers.map(number => (userNumbers.includes(number) ? `**${number}**` : number));
 
-        await interaction.reply(check(correctGuesses));
-        interaction.channel.send(`The winning numbers were: ${winningNumbers.join(', ')}`);
+        let reply = '';
+        reply += check(correctGuesses);
+        reply += `\nThe winning numbers were: ${winningNumbers.join(', ')}`;
+
+        return interaction.reply(reply);
     },
 };
