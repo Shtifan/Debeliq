@@ -19,17 +19,17 @@ module.exports = {
                 ephemeral: true,
             });
 
-        let arr = [];
-
         const embed = new EmbedBuilder()
             .setColor(0x000000)
             .setTitle('**Queue**')
-            .addFields(
-                { value: `**${arr[0]}**` },
-                { value: `**${arr[1]}**` },
-                { value: `**${arr[2]}**` },
-                { value: `**${arr[3]}**` },
-                { value: `**${arr[4]}**` }
+            .setDescription(
+                `**Current**: ${queue.currentTrack.title} | ${queue.currentTrack.author}\n\n` +
+                    queue.tracks
+                        .map((track, i) => {
+                            return `**#${i + 1}** - Title: **${track.title}** | Uploaded by: **${track.author}**`;
+                        })
+                        .slice(0, 5)
+                        .join('\n')
             );
 
         return interaction.reply({ embeds: [embed] });
