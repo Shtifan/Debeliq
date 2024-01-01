@@ -16,7 +16,7 @@ const client = new Client({
 module.exports = client;
 
 const player = new Player(client);
-player.extractors.loadDefault((ext) => ext !== 'YouTubeExtractor');
+player.extractors.loadDefault();
 
 client.commands = new Collection();
 const foldersPath = path.join(__dirname, 'commands');

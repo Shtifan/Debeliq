@@ -59,7 +59,8 @@ module.exports = {
         gamecb = true;
         number = generate();
         guesses = 0;
-        await interaction.reply(`I'm ready`);
+        
+        return interaction.reply(`I'm ready`);
     },
 };
 

@@ -13,6 +13,6 @@ client.on('messageCreate', async message => {
     if (message.author.bot) return;
 
     if (message.content.includes('koi') || message.content.includes('koj')) {
-        message.reply('te e pital');
+        return message.reply('te e pital');
     }
 });
