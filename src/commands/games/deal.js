@@ -93,8 +93,7 @@ module.exports = {
         let reply = '';
         reply += 'The deal or no deal game has started.\n';
         reply += 'These are all the briefcases:\n';
-        let remaining = remainingValues(cases).split('\n').slice(1).join('\n');
-        reply += remaining;
+        reply += remainingValues(cases).split('\n').slice(1).join('\n');
         reply += '\nThe briefcases have been shuffled.\n';
         reply += 'Choose your briefcase (1-26):';
 
