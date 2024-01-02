@@ -17,13 +17,17 @@ function generate() {
 function check(correctGuesses) {
   if (correctGuesses == 6) {
     return 'Congratulations! You win $7,000,000.';
-  } else if (correctGuesses == 5) {
+  }
+  else if (correctGuesses == 5) {
     return 'Congratulations! You win $7,000.';
-  } else if (correctGuesses == 4) {
+  }
+  else if (correctGuesses == 4) {
     return 'Congratulations! You win $70.';
-  } else if (correctGuesses == 3) {
+  }
+  else if (correctGuesses == 3) {
     return 'Congratulations! You win $7.';
-  } else {
+  }
+  else {
     return `Sorry, you didn't win anything.`;
   }
 }
