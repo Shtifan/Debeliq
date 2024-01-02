@@ -167,7 +167,7 @@ client.on('messageCreate', async message => {
         reply += 'Do you accept the deal?\n';
         acceptingDeal = true;
       }
-
+      
       else if (cases.length == 2) {
         reply += 'Do you want to switch your case with the last remaining?\n';
         acceptingDeal = true;
