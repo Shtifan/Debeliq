@@ -47,48 +47,44 @@ function getOffer(cases) {
   return offer.toFixed(2);
 }
 
-function resetCases() {
-  cases = [
-    { number: 1, value: 0.01 },
-    { number: 2, value: 1 },
-    { number: 3, value: 5 },
-    { number: 4, value: 10 },
-    { number: 5, value: 25 },
-    { number: 6, value: 50 },
-    { number: 7, value: 75 },
-    { number: 8, value: 100 },
-    { number: 9, value: 200 },
-    { number: 10, value: 300 },
-    { number: 11, value: 400 },
-    { number: 12, value: 500 },
-    { number: 13, value: 750 },
-    { number: 14, value: 1000 },
-    { number: 15, value: 5000 },
-    { number: 16, value: 10000 },
-    { number: 17, value: 25000 },
-    { number: 18, value: 50000 },
-    { number: 19, value: 75000 },
-    { number: 20, value: 100000 },
-    { number: 21, value: 200000 },
-    { number: 22, value: 300000 },
-    { number: 23, value: 400000 },
-    { number: 24, value: 500000 },
-    { number: 25, value: 750000 },
-    { number: 26, value: 1000000 },
-  ];
-}
-
 let gamedeal = false;
 
 module.exports = {
   data: new SlashCommandBuilder().setName('deal').setDescription('Play deal or no deal'),
 
   async execute(interaction) {
-    gamedeal = true;
-    resetCases();
-    yourCase = 0;
-    acceptingDeal = false;
+    cases = [
+      { number: 1, value: 0.01 },
+      { number: 2, value: 1 },
+      { number: 3, value: 5 },
+      { number: 4, value: 10 },
+      { number: 5, value: 25 },
+      { number: 6, value: 50 },
+      { number: 7, value: 75 },
+      { number: 8, value: 100 },
+      { number: 9, value: 200 },
+      { number: 10, value: 300 },
+      { number: 11, value: 400 },
+      { number: 12, value: 500 },
+      { number: 13, value: 750 },
+      { number: 14, value: 1000 },
+      { number: 15, value: 5000 },
+      { number: 16, value: 10000 },
+      { number: 17, value: 25000 },
+      { number: 18, value: 50000 },
+      { number: 19, value: 75000 },
+      { number: 20, value: 100000 },
+      { number: 21, value: 200000 },
+      { number: 22, value: 300000 },
+      { number: 23, value: 400000 },
+      { number: 24, value: 500000 },
+      { number: 25, value: 750000 },
+      { number: 26, value: 1000000 },
+    ];
     shuffle(cases);
+    yourCase = 0;
+    gamedeal = true;
+    acceptingDeal = false;
 
     let reply = '';
     reply += 'The deal or no deal game has started.\n';
@@ -167,7 +163,7 @@ client.on('messageCreate', async message => {
         reply += 'Do you accept the deal?\n';
         acceptingDeal = true;
       }
-      
+
       else if (cases.length == 2) {
         reply += 'Do you want to switch your case with the last remaining?\n';
         acceptingDeal = true;
