@@ -36,7 +36,7 @@ for (const folder of commandFolders) {
 
 client.once('ready', client => {
   client.application.commands.set(commands);
-  console.log(`Ready on ${client.guilds.cache.size} servers!`);
+  console.log(`Ready on ${client.guilds.cache.size} server${client.guilds.cache.size != 1 ? 's' : ''}!`);
 });
 
 client.on('interactionCreate', async interaction => {
