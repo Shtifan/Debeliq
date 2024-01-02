@@ -59,7 +59,7 @@ module.exports = {
         gamecb = true;
         number = generate();
         guesses = 0;
-        
+
         return interaction.reply(`I'm ready`);
     },
 };
@@ -73,9 +73,12 @@ client.on('messageCreate', async message => {
     guesses++;
 
     let [bulls, cows] = cb(number, input);
-    message.channel.send(`${bulls} bull${bulls != 1 ? 's' : ''} ${cows} cow${cows != 1 ? 's' : ''}`);
+
+    let reply = '';
+    reply += `${bulls} bull${bulls != 1 ? 's' : ''} ${cows} cow${cows != 1 ? 's' : ''}\n`;
     if (bulls == 4) {
-        message.channel.send(`Well done, you guessed the number from the ${guesses + ending(guesses)} guess`);
+        reply += `Well done, you guessed the number from the ${guesses + ending(guesses)} guess\n`;
         gamecb = false;
     }
+    message.channel.send(reply);
 });
