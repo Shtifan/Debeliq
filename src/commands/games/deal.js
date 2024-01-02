@@ -106,27 +106,29 @@ client.on('messageCreate', async message => {
     if (!gamedeal) return;
 
     let special = [20, 15, 11, 8, 5];
+    let reply = '';
+
     if (message.content.toLowerCase() == 'yes' && acceptingDeal) {
         if (special.includes(cases.length)) {
-            message.channel.send(`Congratulations! You win $${getOffer(cases).toLocaleString()}!`);
+            reply += `Congratulations! You win $${getOffer(cases).toLocaleString()}!\n`;
             gamedeal = false;
         } else if (cases.length == 2) {
             let index = cases.findIndex(c => c.number == cases[0].number);
-            message.channel.send(`Congratulations! You win $${cases[index].value.toLocaleString()}!`);
+            reply += `Congratulations! You win $${cases[index].value.toLocaleString()}!\n`;
             gamedeal = false;
         }
     } else if (message.content.toLowerCase() == 'no' && acceptingDeal) {
         if (special.includes(cases.length)) {
-            message.channel.send(`You declined the dealer's offer`);
+            reply += `You declined the offer\n`;
             special.push(2);
             let index = special.indexOf(cases.length);
             let remaining = cases.length - special[index + 1];
             special.pop();
-            message.channel.send(`Now choose ${remaining} more cases:`);
+            reply += `Now choose ${remaining} more cases:\n`;
             acceptingDeal = false;
         } else if (cases.length == 2) {
             let index = cases.findIndex(c => c.number == yourCase);
-            message.channel.send(`Congratulations! You win $${cases[index].value.toLocaleString()}!`);
+            reply += `Congratulations! You win $${cases[index].value.toLocaleString()}!\n`;
             gamedeal = false;
         }
     } else {
@@ -143,24 +145,23 @@ client.on('messageCreate', async message => {
 
         if (yourCase == 0) {
             yourCase = input;
-            message.channel.send('Now choose 6 briefcases to reveal:');
+            reply += 'Now choose 6 briefcases to reveal:\n';
         } else {
-            message.channel.send(`Behind case ${input} there were $${cases[index].value.toLocaleString()}`);
+            reply += `Behind case ${input} there were $${cases[index].value.toLocaleString()}\n`;
             remove(input, cases);
+            reply += `${remainingValues(cases)}\n`;
+            reply += `${remainingNumbers(cases)}\n`;
 
             if (special.includes(cases.length)) {
-                message.channel.send(`The banker offer is $${getOffer(cases).toLocaleString()}`);
-                message.channel.send('Do you accept the deal?');
+                reply += `The banker offer is $${getOffer(cases).toLocaleString()}\n`;
+                reply += 'Do you accept the deal?\n';
                 acceptingDeal = true;
             } else if (cases.length == 2) {
-                message.channel.send('Do you want to switch your case with the last remaining?');
+                reply += 'Do you want to switch your case with the last remaining?\n';
                 acceptingDeal = true;
-            } else {
-                let remaining = remainingValues(cases);
-                message.channel.send(remaining);
-                let numbers = remainingNumbers(cases);
-                message.channel.send(numbers);
             }
         }
     }
+
+    message.channel.send(reply);
 });
