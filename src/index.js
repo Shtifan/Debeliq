@@ -50,7 +50,7 @@ client.on('interactionCreate', async interaction => {
     } catch (error) {
         console.error(error);
         await interaction.deferReply();
-        await interaction.editReply({
+        return interaction.editReply({
             content: 'There was an error while executing this command',
             ephemeral: true,
         });
