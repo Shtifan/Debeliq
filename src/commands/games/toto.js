@@ -16,16 +16,22 @@ function generate() {
 
 function check(correctGuesses) {
   if (correctGuesses == 6) {
-    return 'Congratulations! You win $7,000,000.';
+    return 'Congratulations! You win $7,000,000!';
   }
   else if (correctGuesses == 5) {
-    return 'Congratulations! You win $7,000.';
+    return 'Congratulations! You win $10,000!';
   }
   else if (correctGuesses == 4) {
-    return 'Congratulations! You win $70.';
+    return 'Congratulations! You win $100!';
   }
   else if (correctGuesses == 3) {
-    return 'Congratulations! You win $7.';
+    return 'Congratulations! You win $10!';
+  }
+  else if (correctGuesses == 2) {
+    return 'Congratulations! You win $1!';
+  }
+  else if (correctGuesses == 1) {
+    return 'Congratulations! You win $0.01!';
   }
   else {
     return `Sorry, you didn't win anything.`;
@@ -44,12 +50,12 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName('toto')
     .setDescription('Play toto 6/49')
-    .addIntegerOption(option => option.setName('1st').setDescription('Numbers must be unique').setRequired(true))
-    .addIntegerOption(option => option.setName('2nd').setDescription('Numbers must be unique').setRequired(true))
-    .addIntegerOption(option => option.setName('3rd').setDescription('Numbers must be unique').setRequired(true))
-    .addIntegerOption(option => option.setName('4th').setDescription('Numbers must be unique').setRequired(true))
-    .addIntegerOption(option => option.setName('5th').setDescription('Numbers must be unique').setRequired(true))
-    .addIntegerOption(option => option.setName('6th').setDescription('Numbers must be unique').setRequired(true)),
+    .addIntegerOption(option => option.setName('1st').setDescription('Numbers must be unique and in the range of 1 to 49').setRequired(true))
+    .addIntegerOption(option => option.setName('2nd').setDescription('Numbers must be unique and in the range of 1 to 49').setRequired(true))
+    .addIntegerOption(option => option.setName('3rd').setDescription('Numbers must be unique and in the range of 1 to 49').setRequired(true))
+    .addIntegerOption(option => option.setName('4th').setDescription('Numbers must be unique and in the range of 1 to 49').setRequired(true))
+    .addIntegerOption(option => option.setName('5th').setDescription('Numbers must be unique and in the range of 1 to 49').setRequired(true))
+    .addIntegerOption(option => option.setName('6th').setDescription('Numbers must be unique and in the range of 1 to 49').setRequired(true)),
 
   async execute(interaction) {
     const userNumbers = [
