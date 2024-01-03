@@ -8,7 +8,7 @@ module.exports = {
         .addStringOption((option) => option.setName("query").setDescription("Name or URL of the song").setRequired(true)),
 
     async execute(interaction) {
-        const player = useMainPlayer();z
+        const player = useMainPlayer();
 
         const channel = interaction.member.voice.channel;
         if (!channel)
