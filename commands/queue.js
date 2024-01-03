@@ -2,7 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { useQueue } = require('discord-player');
 
 module.exports = {
-  data: new SlashCommandBuilder().setName('queue').setDescription('Shows the next 5 songs in the queue'),
+  data: new SlashCommandBuilder().setName('queue').setDescription('Shows the next 10 songs in the queue'),
 
   async execute(interaction) {
     const channel = interaction.member.voice.channel;
@@ -28,7 +28,7 @@ module.exports = {
           .map((track, i) => {
             return `**#${i + 1}** - Title: **${track.title}** | Uploaded by: **${track.author}**`;
           })
-          .slice(0, 5)
+          .slice(0, 10)
           .join('\n')
       );
 
