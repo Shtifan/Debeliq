@@ -75,9 +75,9 @@ client.on('messageCreate', async message => {
   let [bulls, cows] = cb(number, input);
 
   let reply = '';
-  reply += `${bulls} bull${bulls != 1 ? 's' : ''} ${cows} cow${cows != 1 ? 's' : ''}\n`;
+  reply += `**${bulls}** bull${bulls != 1 ? 's' : ''} **${cows}** cow${cows != 1 ? 's' : ''}\n`;
   if (bulls == 4) {
-    reply += `Well done, you guessed the number from the ${guesses + ending(guesses)} guess\n`;
+    reply += `Well done, you guessed the number from the **${guesses + ending(guesses)}** attempt!\n`;
     gamecb = false;
   }
 
