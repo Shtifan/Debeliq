@@ -19,14 +19,12 @@ module.exports = {
 
     const query = interaction.options.getString('query', true);
 
-    await interaction.deferReply();
-
-    const { track } = await player.play(channel, query, {
+    await player.play(channel, query, {
       nodeOptions: {
         metadata: interaction,
       },
     });
 
-    return interaction.followUp(`Track **${track.title}** added to queue`);
+    return interaction.reply('Successfully completed your request');
   },
 };

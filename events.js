@@ -5,6 +5,10 @@ player.events.on('playerStart', (queue, track) => {
   queue.metadata.channel.send(`Started playing **${track.title}**`);
 });
 
+player.events.on('audioTrackAdd', (queue, track) => {
+  queue.metadata.channel.send(`Track **${track.title}** queued`);
+});
+
 player.events.on('audioTracksAdd', (queue, track) => {
   queue.metadata.channel.send(`Multiple tracks queued`);
 });
