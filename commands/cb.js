@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require('discord.js');
-const client = require('../../index.js');
+const client = require('../index.js');
 
 function hasDuplicates(array) {
   return new Set(array).size != array.length;
@@ -80,6 +80,6 @@ client.on('messageCreate', async message => {
     reply += `Well done, you guessed the number from the ${guesses + ending(guesses)} guess\n`;
     gamecb = false;
   }
-  
+
   message.channel.send(reply);
 });
