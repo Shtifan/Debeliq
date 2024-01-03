@@ -106,13 +106,13 @@ client.on('messageCreate', async message => {
 
   if (message.content.toLowerCase() == 'yes' && acceptingDeal) {
     if (special.includes(cases.length)) {
-      reply += `Congratulations! You win $${getOffer(cases).toLocaleString()}!\n`;
+      reply += `Congratulations! You win **$${getOffer(cases).toLocaleString()}**!\n`;
       gamedeal = false;
     }
 
     else if (cases.length == 2) {
       let index = cases.findIndex(c => c.number == cases[0].number);
-      reply += `Congratulations! You win $${cases[index].value.toLocaleString()}!\n`;
+      reply += `Congratulations! You win **$${cases[index].value.toLocaleString()}**!\n`;
       gamedeal = false;
     }
   }
@@ -124,13 +124,13 @@ client.on('messageCreate', async message => {
       let index = special.indexOf(cases.length);
       let remaining = cases.length - special[index + 1];
       special.pop();
-      reply += `Now choose ${remaining} more cases:\n`;
+      reply += `Now choose **${remaining}** more cases:\n`;
       acceptingDeal = false;
     }
 
     else if (cases.length == 2) {
       let index = cases.findIndex(c => c.number == yourCase);
-      reply += `Congratulations! You win $${cases[index].value.toLocaleString()}!\n`;
+      reply += `Congratulations! You win **$${cases[index].value.toLocaleString()}**!\n`;
       gamedeal = false;
     }
   }
@@ -149,17 +149,17 @@ client.on('messageCreate', async message => {
 
     if (yourCase == 0) {
       yourCase = input;
-      reply += 'Now choose 6 briefcases to reveal:\n';
+      reply += 'Now choose **6** briefcases to reveal:\n';
     }
 
     else {
-      reply += `Behind case ${input} there were $${cases[index].value.toLocaleString()}\n`;
+      reply += `Behind case **${input}** there were **$${cases[index].value.toLocaleString()}**\n`;
       remove(input, cases);
       reply += `${remainingValues(cases)}\n`;
       reply += `${remainingNumbers(cases)}\n`;
 
       if (special.includes(cases.length)) {
-        reply += `The banker offer is $${getOffer(cases).toLocaleString()}\n`;
+        reply += `The banker offer is **$${getOffer(cases).toLocaleString()}**\n`;
         reply += 'Do you accept the deal?\n';
         acceptingDeal = true;
       }

@@ -16,22 +16,22 @@ function generate() {
 
 function check(correctGuesses) {
   if (correctGuesses == 6) {
-    return 'Congratulations! You win $7,000,000!';
+    return 'Congratulations! You win **$7,000,000**!';
   }
   else if (correctGuesses == 5) {
-    return 'Congratulations! You win $10,000!';
+    return 'Congratulations! You win **$10,000**!';
   }
   else if (correctGuesses == 4) {
-    return 'Congratulations! You win $100!';
+    return 'Congratulations! You win **$100**!';
   }
   else if (correctGuesses == 3) {
-    return 'Congratulations! You win $10!';
+    return 'Congratulations! You win **$10**!';
   }
   else if (correctGuesses == 2) {
-    return 'Congratulations! You win $1!';
+    return 'Congratulations! You win **$1**!';
   }
   else if (correctGuesses == 1) {
-    return 'Congratulations! You win $0.01!';
+    return 'Congratulations! You win **$0.01**!';
   }
   else {
     return `Sorry, you didn't win anything.`;
