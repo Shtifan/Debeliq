@@ -1,18 +1,18 @@
-const { SlashCommandBuilder } = require('discord.js');
-const client = require('../index.js');
+const { SlashCommandBuilder } = require("discord.js");
+const client = require("../index.js");
 
 module.exports = {
-  data: new SlashCommandBuilder().setName('koj').setDescription('Test command'),
+    data: new SlashCommandBuilder().setName("koj").setDescription("Test command"),
 
-  async execute(interaction) {
-    await interaction.reply('te e pital');
-  },
+    async execute(interaction) {
+        await interaction.reply("te e pital");
+    },
 };
 
-client.on('messageCreate', async message => {
-  if (message.author.bot) return;
+client.on("messageCreate", async (message) => {
+    if (message.author.bot) return;
 
-  if (message.content.includes('koi') || message.content.includes('koj')) {
-    return message.reply('te e pital');
-  }
+    if (message.content.includes("koi") || message.content.includes("koj")) {
+        return message.reply("te e pital");
+    }
 });
