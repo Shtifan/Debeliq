@@ -31,7 +31,7 @@ for (const file of commandFiles) {
     client.commands.set(command.data.name, command);
 }
 
-client.once("ready", (client) => {
+client.on("ready", (client) => {
     client.application.commands.set(commands);
     console.log(`Ready on ${client.guilds.cache.size} server${client.guilds.cache.size != 1 ? "s" : ""}!`);
 });

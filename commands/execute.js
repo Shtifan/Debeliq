@@ -36,7 +36,7 @@ function execute(code, language) {
             fs.unlinkSync(filePath);
             return Promise.resolve(`Error: ${error.message}`);
         }
-    } else if (language === "cpp") {
+    } else if (language == "cpp") {
         const compilerPath = "C:/MinGW/bin/g++";
         const executablePath = path.resolve("temp.exe");
 
@@ -97,18 +97,18 @@ client.on("messageCreate", async (message) => {
 
     const codeBlockRegex = /```([\s\S]+)```/;
 
-    if (codeBlockRegex.test(message.content)) {
-        const code = message.content.match(codeBlockRegex)[1];
+    if (codeBlockRegex.test(message.content)) return;
 
-        let language;
-        if (message.content.startsWith("js")) {
-            language = "js";
-        } else if (message.content.startsWith("cpp")) {
-            language = "cpp";
-        } else return;
+    const code = message.content.match(codeBlockRegex)[1];
 
-        execute(code, language)
-            .then((result) => message.reply("```" + result + "```"))
-            .catch((error) => message.reply("```" + error + "```"));
-    }
+    let language;
+    if (message.content.startsWith("js")) {
+        language = "js";
+    } else if (message.content.startsWith("cpp")) {
+        language = "cpp";
+    } else return;
+
+    execute(code, language)
+        .then((result) => message.reply("```" + result + "```"))
+        .catch((error) => message.reply("```" + error + "```"));
 });
