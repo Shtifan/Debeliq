@@ -60,8 +60,6 @@ function execute(code, language) {
                 }
             });
         });
-    } else {
-        return Promise.resolve("Unsupported language");
     }
 }
 
