@@ -1,7 +1,7 @@
 {
   "name": "debeliq",
   "version": "1.0.0",
-  "description": "Debeliq is a general purpose discord bot that can play music, manage messages, play games and more.",
+  "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
