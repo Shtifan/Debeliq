@@ -2,7 +2,6 @@ const { Client, GatewayIntentBits, Collection } = require("discord.js");
 const { Player } = require("discord-player");
 const fs = require("fs");
 const path = require("path");
-require('dotenv').config();
 
 const client = new Client({
     intents: [
@@ -54,6 +53,7 @@ client.on("interactionCreate", async (interaction) => {
     }
 });
 
-require("./events.js");
+require("./player.js");
 
+require("dotenv").config();
 client.login(process.env.DISCORD_TOKEN);
