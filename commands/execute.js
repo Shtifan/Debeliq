@@ -4,7 +4,25 @@ const path = require("path");
 const { exec } = require("child_process");
 const client = require("../index.js");
 
-function execute(code, language) {
+function isDockerRunning() {
+    return new Promise((resolve) => {
+        exec("docker info", (error, stdout, stderr) => {
+            if (error) {
+                resolve(false);
+            } else {
+                resolve(true);
+            }
+        });
+    });
+}
+
+async function execute(code, language) {
+    const dockerRunning = await isDockerRunning();
+
+    if (!dockerRunning) {
+        return Promise.resolve("Docker is not running. Please start Docker and try again.");
+    }
+
     const fileExtension = {
         js: "js",
         cpp: "cpp",
@@ -95,7 +113,6 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("execute")
         .setDescription("Executes code")
-        .addStringOption((option) => option.setName("code").setDescription("Paste the whole code here").setRequired(true))
         .addStringOption((option) =>
             option
                 .setName("language")
@@ -107,7 +124,8 @@ module.exports = {
                     { name: "Python", value: "py" },
                     { name: "Rust", value: "rs" }
                 )
-        ),
+        )
+        .addStringOption((option) => option.setName("code").setDescription("Paste the whole code here").setRequired(true)),
     async execute(interaction) {
         let code = interaction.options.getString("code");
         let language = interaction.options.getString("language");
@@ -121,7 +139,7 @@ module.exports = {
 client.on("messageCreate", async (message) => {
     if (message.author.bot) return;
 
-    const match = message.content.match(/^(\w+)\s```([\s\S]+)```$/);
+    const match = message.content.match(/(\w{2,})\s*```([\s\S]+)```/);
     if (!match) return;
 
     const language = match[1].toLowerCase();

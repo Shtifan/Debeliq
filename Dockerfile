@@ -26,3 +26,6 @@ RUN npm install
 
 # Command to run your application
 CMD ["node", "index.js"]
+
+# docker build -t debeliq .
+# docker run debeliq
