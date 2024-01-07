@@ -30,14 +30,11 @@ async function execute(code, language) {
         rs: "rs",
     }[language];
 
-    if (!fileExtension) {
-        return Promise.resolve("Unsupported language");
-    }
-
     const fileName = `temp.${fileExtension}`;
     fs.writeFileSync(fileName, code);
     const filePath = path.resolve(fileName);
 
+    // Python and js dont output he first row of the command
     if (language == "js") {
         return new Promise((resolve) => {
             exec(`node ${filePath}`, (error, stdout, stderr) => {
