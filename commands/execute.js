@@ -20,7 +20,7 @@ async function execute(code, language) {
     const dockerRunning = await isDockerRunning();
 
     if (!dockerRunning) {
-        return Promise.resolve("Docker is not running. Please start Docker and try again.");
+        return "Docker is not running";
     }
 
     const fileExtension = {
@@ -46,6 +46,7 @@ async function execute(code, language) {
                 } else {
                     resolve(`${stdout}`);
                 }
+                
                 fs.unlinkSync(filePath);
             });
         });
@@ -57,6 +58,7 @@ async function execute(code, language) {
                 } else {
                     resolve(`${stdout}`);
                 }
+
                 fs.unlinkSync(filePath);
             });
         });
@@ -76,6 +78,7 @@ async function execute(code, language) {
                 }
 
                 fs.unlinkSync(filePath);
+
                 if (fs.existsSync(executablePath)) {
                     fs.unlinkSync(executablePath);
                 }
@@ -98,9 +101,11 @@ async function execute(code, language) {
                 }
 
                 fs.unlinkSync(filePath);
+
                 if (fs.existsSync(executablePath)) {
                     fs.unlinkSync(executablePath);
                 }
+
                 if (fs.existsSync(pdbPath)) {
                     fs.unlinkSync(pdbPath);
                 }
