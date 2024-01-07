@@ -46,9 +46,10 @@ async function execute(code, language) {
                 } else {
                     resolve(`${stdout}`);
                 }
-                
+
                 fs.unlinkSync(filePath);
             });
+            
         });
     } else if (language == "py") {
         return new Promise((resolve) => {
