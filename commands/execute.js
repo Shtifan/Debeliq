@@ -1,8 +1,8 @@
 const { SlashCommandBuilder } = require("discord.js");
+const client = require("../index.js");
 const fs = require("fs");
 const path = require("path");
 const { exec } = require("child_process");
-const client = require("../index.js");
 
 function isDockerRunning() {
     return new Promise((resolve) => {
@@ -51,7 +51,7 @@ async function execute(code, language) {
         });
     } else if (language == "py") {
         return new Promise((resolve) => {
-            exec(`python3 ${filePath}`, (error, stdout, stderr) => {
+            exec(`python ${filePath}`, (error, stdout, stderr) => {
                 if (error) {
                     resolve(`Error: ${stderr}`);
                 } else {
