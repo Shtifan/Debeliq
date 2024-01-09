@@ -34,7 +34,6 @@ async function execute(code, language) {
     fs.writeFileSync(fileName, code);
     const filePath = path.resolve(fileName);
 
-    // Python and js dont output he first row of the command
     if (language == "js") {
         return new Promise((resolve) => {
             exec(`node ${filePath}`, (error, stdout, stderr) => {
