@@ -3,36 +3,50 @@ const client = require("../index.js");
 const fetch = require("node-fetch");
 const fs = require("fs");
 const { exec } = require("child_process");
+const os = require("os");
+
+function execute() {
+    exec("python ./chessbot/main.py", (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Error executing main.py: ${error.message}`);
+            return;
+        }
+        if (stderr) {
+            console.error(`Error executing main.py: ${stderr}`);
+            return;
+        }
+    });
+}
+
+function isWindows() {
+    return os.platform() == "win32";
+}
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName("stockfish")
+        .setName("chessbot")
         .setDescription("Gives the best chess move based on an image")
         .addAttachmentOption((option) =>
             option.setName("image").setDescription("Attach a chess board image").setRequired(true)
         ),
 
     async execute(interaction) {
-        // Retrieve the image from the interaction options
+        if (isWindows)
+            return interaction.reply({
+                content: "You can use this command only when debeliq is running in linux",
+                ephemeral: true,
+            });
+
         const image = interaction.options.getAttachment("image");
         const res = await fetch(image.url);
         const buffer = await res.buffer();
-        const imagePath = `./stockfish/board.png`;
+        const imagePath = `./chessbot/board.png`;
 
         fs.writeFileSync(imagePath, buffer);
 
-        exec("python ./stockfish/main.py", (error, stdout, stderr) => {
-            if (error) {
-                console.error(`Error executing main.py: ${error.message}`);
-                return;
-            }
-            if (stderr) {
-                console.error(`Error executing main.py: ${stderr}`);
-                return;
-            }
-        });
+        execute();
 
-        const input = fs.readFileSync("./stockfish/best_moves.txt", "utf-8");
+        const input = fs.readFileSync("./chessbot/best_moves.txt", "utf-8");
         const arr = input.split("\n");
 
         let reply = "";
@@ -47,6 +61,7 @@ module.exports = {
 };
 
 client.on("messageCreate", async (message) => {
+    if (isWindows) return;
     if (message.author.bot) return;
 
     const image = message.attachments.first();
@@ -54,22 +69,13 @@ client.on("messageCreate", async (message) => {
 
     const res = await fetch(image.url);
     const buffer = await res.buffer();
-    const imagePath = `./stockfish/board.png`;
+    const imagePath = `./chessbot/board.png`;
 
     fs.writeFileSync(imagePath, buffer);
 
-    exec("python ./stockfish/main.py", (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Error executing main.py: ${error.message}`);
-            return;
-        }
-        if (stderr) {
-            console.error(`Error executing main.py: ${stderr}`);
-            return;
-        }
-    });
+    execute();
 
-    const input = fs.readFileSync("./stockfish/best_moves.txt", "utf-8");
+    const input = fs.readFileSync("./chessbot/best_moves.txt", "utf-8");
     const arr = input.split("\n");
 
     if (!input.trim()) return;
