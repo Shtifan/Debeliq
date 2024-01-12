@@ -2,19 +2,17 @@ const { SlashCommandBuilder } = require("discord.js");
 const client = require("../index.js");
 const fetch = require("node-fetch");
 const fs = require("fs");
-const { exec } = require("child_process");
+const util = require("util");
+const execAsync = util.promisify(require("child_process").exec);
 
-function execute() {
-    exec("python ./chessbot/main.py", (error, stdout, stderr) => {
-        if (error) {
-            console.error(`Error executing main.py: ${error.message}`);
-            return;
-        }
-        if (stderr) {
-            console.error(`Error executing main.py: ${stderr}`);
-            return;
-        }
-    });
+async function execute() {
+    const stdout = await execAsync("python ./chessbot/main.py");
+
+    const moves = stdout
+        .trim()
+        .split("\n")
+        .map((move) => move.replace("\r", ""));
+    return moves;
 }
 
 module.exports = {
@@ -33,21 +31,13 @@ module.exports = {
 
         fs.writeFileSync(imagePath, buffer);
 
-        fs.writeFileSync("./chessbot/result.txt", "");
-        execute();
+        const result = await execute();
 
-        const input = fs.readFileSync("./chessbot/result.txt", "utf-8");
-        fs.unlinkSync("./chessbot/result.txt");
-
-        const arr = input.split("\n");
+        if (result.length == 0) return interaction.reply("No valid chessboard detected");
 
         let reply = "";
-        if (!input.trim()) {
-            reply = "No valid chessboard detected";
-        } else {
-            reply += "Best move for white - " + arr[0] + "\n";
-            reply += "Best move for black - " + arr[1];
-        }
+        reply += "Best move for white - " + result[0] + "\n";
+        reply += "Best move for black - " + result[1];
 
         await interaction.reply(reply);
     },
@@ -65,19 +55,13 @@ client.on("messageCreate", async (message) => {
 
     fs.writeFileSync(imagePath, buffer);
 
-    fs.writeFileSync("./chessbot/result.txt", "");
-    execute();
+    const result = await execute();
 
-    const input = fs.readFileSync("./chessbot/result.txt", "utf-8");
-    const arr = input.split("\n");
-
-    if (!input.trim()) return;
+    if (result.length == 0) return;
 
     let reply = "";
-    reply += "Best move for white - " + arr[0] + "\n";
-    reply += "Best move for black - " + arr[1];
+    reply += "Best move for white - " + result[0] + "\n";
+    reply += "Best move for black - " + result[1];
 
     await message.reply(reply);
-
-    fs.unlinkSync("./chessbot/result.txt");
 });
