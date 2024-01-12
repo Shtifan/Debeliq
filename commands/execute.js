@@ -7,107 +7,150 @@ const { exec } = require("child_process");
 function isDockerRunning() {
     return new Promise((resolve) => {
         exec("docker info", (error, stdout, stderr) => {
+            resolve(!error);
+        });
+    });
+}
+
+function executeJs(filePath) {
+    return new Promise((resolve) => {
+        exec(`node ${filePath}`, (error, stdout, stderr) => {
             if (error) {
-                resolve(false);
+                resolve(`Error: ${stderr}`);
             } else {
-                resolve(true);
+                resolve(`${stdout}`);
+            }
+            fs.unlinkSync(filePath);
+        });
+    });
+}
+
+function executePy(filePath) {
+    return new Promise((resolve) => {
+        exec(`python ${filePath}`, (error, stdout, stderr) => {
+            if (error) {
+                resolve(`Error: ${stderr}`);
+            } else {
+                resolve(`${stdout}`);
+            }
+            fs.unlinkSync(filePath);
+        });
+    });
+}
+
+function executeCpp(filePath) {
+    const executablePath = path.resolve("temp.exe");
+    return new Promise((resolve) => {
+        exec(`g++ ${filePath} -o ${executablePath} && ${executablePath}`, (error, stdout, stderr) => {
+            if (error) {
+                resolve(`Error: ${stderr}`);
+            } else {
+                if (fs.existsSync(executablePath)) {
+                    resolve(`${stdout}`);
+                } else {
+                    resolve("Error: Unable to create executable file");
+                }
+            }
+            fs.unlinkSync(filePath);
+            if (fs.existsSync(executablePath)) {
+                fs.unlinkSync(executablePath);
             }
         });
     });
 }
 
-async function execute(code, language) {
-    const dockerRunning = await isDockerRunning();
+function executeRs(filePath) {
+    const executablePathRs = path.resolve("temp.exe");
+    const pdbPath = path.resolve("temp.pdb");
+    return new Promise((resolve) => {
+        exec(`rustc ${filePath} -o ${executablePathRs} && ${executablePathRs}`, (error, stdout, stderr) => {
+            if (error) {
+                resolve(`Error: ${stderr}`);
+            } else {
+                if (fs.existsSync(executablePathRs)) {
+                    resolve(`${stdout}`);
+                } else {
+                    resolve("Error: Unable to create executable file");
+                }
+            }
+            fs.unlinkSync(filePath);
+            if (fs.existsSync(executablePathRs)) {
+                fs.unlinkSync(executablePathRs);
+            }
+            if (fs.existsSync(pdbPath)) {
+                fs.unlinkSync(pdbPath);
+            }
+        });
+    });
+}
 
-    if (!dockerRunning) {
-        return "Docker is not running";
-    }
+function executeSh(filePath) {
+    return new Promise((resolve) => {
+        exec(`sh ${filePath}`, (error, stdout, stderr) => {
+            if (error) {
+                resolve(`Error: ${stderr}`);
+            } else {
+                resolve(`${stdout}`);
+            }
+            fs.unlinkSync(filePath);
+        });
+    });
+}
 
+function executeC(filePath) {
+    const executablePathC = path.resolve("temp.exe");
+    return new Promise((resolve) => {
+        exec(`gcc ${filePath} -o ${executablePathC} && ${executablePathC}`, (error, stdout, stderr) => {
+            if (error) {
+                resolve(`Error: ${stderr}`);
+            } else {
+                if (fs.existsSync(executablePathC)) {
+                    resolve(`${stdout}`);
+                } else {
+                    resolve("Error: Unable to create executable file");
+                }
+            }
+            fs.unlinkSync(filePath);
+            if (fs.existsSync(executablePathC)) {
+                fs.unlinkSync(executablePathC);
+            }
+        });
+    });
+}
+
+function executeCode(code, language) {
     const fileExtension = {
         js: "js",
         cpp: "cpp",
         py: "py",
         rs: "rs",
+        sh: "sh",
+        c: "c",
     }[language];
+
+    if (!fileExtension) {
+        return "Invalid language";
+    }
 
     const fileName = `temp.${fileExtension}`;
     fs.writeFileSync(fileName, code);
     const filePath = path.resolve(fileName);
 
-    if (language == "js") {
-        return new Promise((resolve) => {
-            exec(`node ${filePath}`, (error, stdout, stderr) => {
-                if (error) {
-                    resolve(`Error: ${stderr}`);
-                } else {
-                    resolve(`${stdout}`);
-                }
-
-                fs.unlinkSync(filePath);
-            });
-            
-        });
-    } else if (language == "py") {
-        return new Promise((resolve) => {
-            exec(`python ${filePath}`, (error, stdout, stderr) => {
-                if (error) {
-                    resolve(`Error: ${stderr}`);
-                } else {
-                    resolve(`${stdout}`);
-                }
-
-                fs.unlinkSync(filePath);
-            });
-        });
-    } else if (language == "cpp") {
-        const executablePath = path.resolve("temp.exe");
-
-        return new Promise((resolve) => {
-            exec(`g++ ${filePath} -o ${executablePath} && ${executablePath}`, (error, stdout, stderr) => {
-                if (error) {
-                    resolve(`Error: ${stderr}`);
-                } else {
-                    if (fs.existsSync(executablePath)) {
-                        resolve(`${stdout}`);
-                    } else {
-                        resolve("Error: Unable to create executable file");
-                    }
-                }
-
-                fs.unlinkSync(filePath);
-
-                if (fs.existsSync(executablePath)) {
-                    fs.unlinkSync(executablePath);
-                }
-            });
-        });
-    } else if (language == "rs") {
-        const executablePath = path.resolve("temp.exe");
-        const pdbPath = path.resolve("temp.pdb");
-
-        return new Promise((resolve) => {
-            exec(`rustc ${filePath} -o ${executablePath} && ${executablePath}`, (error, stdout, stderr) => {
-                if (error) {
-                    resolve(`Error: ${stderr}`);
-                } else {
-                    if (fs.existsSync(executablePath)) {
-                        resolve(`${stdout}`);
-                    } else {
-                        resolve("Error: Unable to create executable file");
-                    }
-                }
-
-                fs.unlinkSync(filePath);
-
-                if (fs.existsSync(executablePath)) {
-                    fs.unlinkSync(executablePath);
-                }
-
-                if (fs.existsSync(pdbPath)) {
-                    fs.unlinkSync(pdbPath);
-                }
-            });
-        });
+    switch (language) {
+        case "js":
+            return executeJs(filePath);
+        case "py":
+            return executePy(filePath);
+        case "cpp":
+            return executeCpp(filePath);
+        case "rs":
+            return executeRs(filePath);
+        case "sh":
+            return executeSh(filePath);
+        case "c":
+            return executeC(filePath);
+        default:
+            return "Invalid language";
     }
 }
 
@@ -122,9 +165,11 @@ module.exports = {
                 .setRequired(true)
                 .addChoices(
                     { name: "JavaScript", value: "js" },
-                    { name: "C++", value: "cpp" },
                     { name: "Python", value: "py" },
-                    { name: "Rust", value: "rs" }
+                    { name: "C++", value: "cpp" },
+                    { name: "C", value: "c" },
+                    { name: "Rust", value: "rs" },
+                    { name: "Shell", value: "sh" }
                 )
         )
         .addStringOption((option) => option.setName("code").setDescription("Paste the whole code here").setRequired(true)),
@@ -132,7 +177,7 @@ module.exports = {
         let code = interaction.options.getString("code");
         let language = interaction.options.getString("language");
 
-        execute(code, language)
+        executeCode(code, language)
             .then((result) => interaction.reply("```" + result + "```"))
             .catch((error) => interaction.reply("```" + error + "```"));
     },
@@ -147,9 +192,9 @@ client.on("messageCreate", async (message) => {
     const language = match[1].toLowerCase();
     const code = match[2];
 
-    if (!["js", "cpp", "py", "rs"].includes(language)) return;
+    if (!["js", "cpp", "py", "rs", "sh", "c"].includes(language)) return;
 
-    execute(code, language)
+    executeCode(code, language)
         .then((result) => message.reply("```" + result + "```"))
         .catch((error) => message.reply("```" + error + "```"));
 });
