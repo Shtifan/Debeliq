@@ -84,19 +84,6 @@ function executeRs(filePath) {
     });
 }
 
-function executeSh(filePath) {
-    return new Promise((resolve) => {
-        exec(`sh ${filePath}`, (error, stdout, stderr) => {
-            if (error) {
-                resolve(`Error: ${stderr}`);
-            } else {
-                resolve(`${stdout}`);
-            }
-            fs.unlinkSync(filePath);
-        });
-    });
-}
-
 function executeC(filePath) {
     const executablePathC = path.resolve("temp.exe");
     return new Promise((resolve) => {
@@ -118,13 +105,18 @@ function executeC(filePath) {
     });
 }
 
-function executeCode(code, language) {
+async function executeCode(code, language) {
+    const dockerRunning = await isDockerRunning();
+
+    if (!dockerRunning) {
+        return "Docker is not running";
+    }
+
     const fileExtension = {
         js: "js",
         cpp: "cpp",
         py: "py",
         rs: "rs",
-        sh: "sh",
         c: "c",
     }[language];
 
@@ -145,8 +137,6 @@ function executeCode(code, language) {
             return executeCpp(filePath);
         case "rs":
             return executeRs(filePath);
-        case "sh":
-            return executeSh(filePath);
         case "c":
             return executeC(filePath);
         default:
@@ -168,8 +158,7 @@ module.exports = {
                     { name: "Python", value: "py" },
                     { name: "C++", value: "cpp" },
                     { name: "C", value: "c" },
-                    { name: "Rust", value: "rs" },
-                    { name: "Shell", value: "sh" }
+                    { name: "Rust", value: "rs" }
                 )
         )
         .addStringOption((option) => option.setName("code").setDescription("Paste the whole code here").setRequired(true)),
@@ -192,7 +181,7 @@ client.on("messageCreate", async (message) => {
     const language = match[1].toLowerCase();
     const code = match[2];
 
-    if (!["js", "cpp", "py", "rs", "sh", "c"].includes(language)) return;
+    if (!["js", "cpp", "py", "rs", "c"].includes(language)) return;
 
     executeCode(code, language)
         .then((result) => message.reply("```" + result + "```"))
