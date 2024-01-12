@@ -23,10 +23,6 @@ module.exports = {
         ),
 
     async execute(interaction) {
-        const image = interaction.options.getAttachment("image");
-        const res = await fetch(image.url);
-        const buffer = await res.buffer();
-        const imagePath = `./python/image.png`;
 
         fs.writeFileSync(imagePath, buffer);
 
