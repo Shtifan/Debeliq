@@ -23,6 +23,10 @@ module.exports = {
         ),
 
     async execute(interaction) {
+        const image = interaction.options.getAttachment("image");
+        const res = await fetch(image.url);
+        const buffer = await res.buffer();
+        const imagePath = `./python/image.png`;
 
         fs.writeFileSync(imagePath, buffer);
 
@@ -40,7 +44,7 @@ module.exports = {
         reply += "Best move for white - " + result[2] + "\n";
         reply += "Best move for black - " + result[3] + "\n";
 
-        await interaction.reply(reply);
+        return interaction.reply(reply);
     },
 };
 
@@ -70,5 +74,5 @@ client.on("messageCreate", async (message) => {
     reply += "Best move for white - " + result[2] + "\n";
     reply += "Best move for black - " + result[3] + "\n";
 
-    await message.reply(reply);
+    return message.reply(reply);
 });
