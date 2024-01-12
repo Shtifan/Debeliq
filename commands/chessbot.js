@@ -30,11 +30,13 @@ module.exports = {
 
         fs.writeFileSync(imagePath, buffer);
 
+        await interaction.deferReply();
+
         const result = await execute();
 
         fs.unlinkSync(imagePath);
 
-        if (result.length == 0) return interaction.reply("No valid chessboard detected");
+        if (result.length == 0) return interaction.followUp("No valid chessboard detected");
 
         let reply = "";
         reply += "If white is on bottom:\n";
@@ -44,7 +46,7 @@ module.exports = {
         reply += "Best move for white - " + result[2] + "\n";
         reply += "Best move for black - " + result[3] + "\n";
 
-        return interaction.reply(reply);
+        return interaction.followUp(reply);
     },
 };
 
