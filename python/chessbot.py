@@ -10,7 +10,7 @@ def rotate_fen(fen):
     fen_parts = fen.split('/')
     reversed_fen_parts = [part[::-1] for part in fen_parts[::-1]]
     rotated_fen = '/'.join(reversed_fen_parts)
-    fen = rotated_fen
+    return rotated_fen
 
 image_path = "./python/image.png"
 stockfish = Stockfish("C:/Stockfish/stockfish.exe")
@@ -23,7 +23,7 @@ try:
     print(best_move_white)
     print(best_move_black)
 
-    rotate_fen(fen)
+    fen = rotate_fen(fen)
     
     best_move_white = get_best_move(stockfish, fen + " w - - 0 1")
     best_move_black = get_best_move(stockfish, fen + " b - - 0 1")
