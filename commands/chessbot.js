@@ -34,8 +34,6 @@ module.exports = {
 
         const result = await execute();
 
-        fs.unlinkSync(imagePath);
-
         if (result.length == 0) return interaction.followUp("No valid chessboard detected");
 
         let reply = "";
@@ -63,8 +61,6 @@ client.on("messageCreate", async (message) => {
     fs.writeFileSync(imagePath, buffer);
 
     const result = await execute();
-
-    fs.unlinkSync(imagePath);
 
     if (result.length == 0) return;
 
