@@ -152,7 +152,6 @@ module.exports = {
             option
                 .setName("language")
                 .setDescription("Select the language")
-                .setRequired(true)
                 .addChoices(
                     { name: "JavaScript", value: "js" },
                     { name: "Python", value: "py" },
@@ -160,6 +159,7 @@ module.exports = {
                     { name: "C", value: "c" },
                     { name: "Rust", value: "rs" }
                 )
+                .setRequired(true)
         )
         .addStringOption((option) => option.setName("code").setDescription("Paste the whole code here").setRequired(true)),
     async execute(interaction) {
