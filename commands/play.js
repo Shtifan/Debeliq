@@ -8,6 +8,8 @@ module.exports = {
         .addStringOption((option) => option.setName("query").setDescription("Name or URL of the song").setRequired(true)),
 
     async execute(interaction) {
+        await interaction.deferReply();
+
         const player = useMainPlayer();
 
         const channel = interaction.member.voice.channel;
@@ -18,8 +20,6 @@ module.exports = {
             });
 
         const query = interaction.options.getString("query", true);
-
-        await interaction.deferReply();
 
         await player.play(channel, query, {
             nodeOptions: {
