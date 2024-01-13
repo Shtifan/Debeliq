@@ -163,12 +163,14 @@ module.exports = {
         )
         .addStringOption((option) => option.setName("code").setDescription("Paste the whole code here").setRequired(true)),
     async execute(interaction) {
+        await interaction.deferReply();
+
         let code = interaction.options.getString("code");
         let language = interaction.options.getString("language");
 
         executeCode(code, language)
-            .then((result) => interaction.reply("```" + result + "```"))
-            .catch((error) => interaction.reply("```" + error + "```"));
+            .then((result) => interaction.followUp("```" + result + "```"))
+            .catch((error) => interaction.followUp("```" + error + "```"));
     },
 };
 
