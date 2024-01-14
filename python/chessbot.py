@@ -19,15 +19,11 @@ fen = get_fen_from_image_path(image_path)
 
 try:
     best_move_white = get_best_move(stockfish, fen + " w - - 0 1")
-    best_move_black = get_best_move(stockfish, fen + " b - - 0 1")
     print(best_move_white)
-    print(best_move_black)
 
     fen = rotate_fen(fen)
     
-    best_move_white = get_best_move(stockfish, fen + " w - - 0 1")
     best_move_black = get_best_move(stockfish, fen + " b - - 0 1")
-    print(best_move_white)
     print(best_move_black)
 except Exception as e:
     pass
