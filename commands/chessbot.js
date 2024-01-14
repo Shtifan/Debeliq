@@ -20,13 +20,6 @@ module.exports = {
         .setDescription("Gives the best chess move based on an image")
         .addAttachmentOption((option) =>
             option.setName("image").setDescription("Attach a chess board image").setRequired(true)
-        )
-        .addStringOption((option) =>
-            option
-                .setName("turn")
-                .setDescription("Who's turn is it?")
-                .addChoices({ name: "White", value: "w" }, { name: "Black", value: "b" })
-                .setRequired(true)
         ),
     async execute(interaction) {
         await interaction.deferReply();
@@ -42,13 +35,10 @@ module.exports = {
 
         if (result.length == 0) return interaction.followUp("No valid chessboard detected");
 
-        let turn = interaction.options.getString("turn");
-
-        let move = "";
-        if (turn == "w") move = result[0];
-        if (turn == "b") move = result[3];
-
-        return interaction.followUp({ content: "Best move - " + move, files: [{ attachment: imagePath }] });
+        let reply = "";
+        reply += "Best move for white - " + result[0] + "\n";
+        reply += "Best move for black - " + result[1];
+        return interaction.followUp({ content: reply, files: [{ attachment: imagePath }] });
     },
 };
 
@@ -69,12 +59,8 @@ client.on("messageCreate", async (message) => {
     if (result.length == 0) return;
 
     let reply = "";
-    reply += "If white is on bottom:\n";
     reply += "Best move for white - " + result[0] + "\n";
-    reply += "Best move for black - " + result[1] + "\n\n";
-    reply += "If black is on bottom:\n";
-    reply += "Best move for white - " + result[2] + "\n";
-    reply += "Best move for black - " + result[3] + "\n";
+    reply += "Best move for black - " + result[1];
 
     return message.reply(reply);
 });
