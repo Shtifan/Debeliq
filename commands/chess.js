@@ -6,7 +6,7 @@ const util = require("util");
 const exec = util.promisify(require("child_process").exec);
 
 async function execute() {
-    const { stdout, stderr } = await exec("python ./python/chessbot.py");
+    const { stdout, stderr } = await exec("python ./python/chess/main.py");
 
     if (!stdout) return [];
 
@@ -16,7 +16,7 @@ async function execute() {
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName("chessbot")
+        .setName("chess")
         .setDescription("Gives the best chess move based on an image")
         .addAttachmentOption((option) =>
             option.setName("image").setDescription("Attach a chess board image").setRequired(true)
@@ -27,7 +27,7 @@ module.exports = {
         const image = interaction.options.getAttachment("image");
         const res = await fetch(image.url);
         const buffer = await res.buffer();
-        const imagePath = `./python/image.png`;
+        const imagePath = "./python/chess/image.png";
 
         fs.writeFileSync(imagePath, buffer);
 
@@ -50,7 +50,7 @@ client.on("messageCreate", async (message) => {
 
     const res = await fetch(image.url);
     const buffer = await res.buffer();
-    const imagePath = `./python/image.png`;
+    const imagePath = "./python/chess/image.png";
 
     fs.writeFileSync(imagePath, buffer);
 
