@@ -12,7 +12,7 @@ def rotate_fen(fen):
     rotated_fen = '/'.join(reversed_fen_parts)
     return rotated_fen
 
-image_path = "./python/image.png"
+image_path = "./python/chess/image.png"
 stockfish = Stockfish("C:/Stockfish/stockfish.exe")
 
 fen = get_fen_from_image_path(image_path)
