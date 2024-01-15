@@ -20,14 +20,19 @@ module.exports = {
         const image = interaction.options.getAttachment("image");
         const res = await fetch(image.url);
         const buffer = await res.buffer();
-        const imagePath = "./python/puzzle/image.png";
+        const imagePath = "./python/puzzle/input.png";
 
         fs.writeFileSync(imagePath, buffer);
 
         await execute();
 
         const outputPath = "./python/puzzle/output.png";
-        return interaction.followUp({ files: [{ attachment: outputPath }] });
+
+        if (fs.existsSync(outputPath)) {
+            return interaction.followUp({ files: [{ attachment: outputPath }] });
+        } else {
+            return interaction.followUp("Failed to generate the puzzle solution.");
+        }
     },
 };
 
@@ -39,12 +44,15 @@ client.on("messageCreate", async (message) => {
 
     const res = await fetch(image.url);
     const buffer = await res.buffer();
-    const imagePath = "./python/puzzle/image.png";
+    const imagePath = "./python/puzzle/input.png";
 
     fs.writeFileSync(imagePath, buffer);
 
     await execute();
 
     const outputPath = "./python/puzzle/output.png";
-    return message.reply({ files: [{ attachment: outputPath }] });
+
+    if (fs.existsSync(outputPath)) {
+        return message.reply({ files: [{ attachment: outputPath }] });
+    }
 });

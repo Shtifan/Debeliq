@@ -26,4 +26,4 @@ def find_and_mark_puzzle_pieces(image_path, output_path):
 input_path = "./python/puzzle/input.png"
 output_path = "./python/puzzle/output.png"
 
-find_and_mark_puzzle_pieces(input_path, output_path)
+#find_and_mark_puzzle_pieces(input_path, output_path)
