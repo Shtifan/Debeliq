@@ -23,4 +23,7 @@ def find_and_mark_puzzle_pieces(image_path, output_path):
     # Save the marked image
     cv2.imwrite(output_path, image)
 
-find_and_mark_puzzle_pieces('./python/puzzle/image.png', './python/puzzle/output.png')
+input_path = "./python/puzzle/input.png"
+output_path = "./python/puzzle/output.png"
+
+find_and_mark_puzzle_pieces(input_path, output_path)
