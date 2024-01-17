@@ -161,7 +161,7 @@ module.exports = {
         let code = interaction.options.getString("code");
         let language = interaction.options.getString("language");
 
-        return interaction.reply(executeCode(code, language));
+        return interaction.reply(await executeCode(code, language));
     },
 };
 
@@ -176,5 +176,5 @@ client.on("messageCreate", async (message) => {
 
     if (!["js", "cpp", "py", "rs", "c"].includes(language)) return;
 
-    return message.reply(executeCode(code, language));
+    return message.reply(await executeCode(code, language));
 });
