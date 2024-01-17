@@ -103,7 +103,7 @@ async function executeC(filePath) {
 async function executeCode(code, language) {
     const dockerRunning = await isDockerRunning();
 
-    if (!dockerRunning) return "Docker is not running";
+    /*if (!dockerRunning)*/ return "Docker is not running";
 
     const fileExtension = {
         js: "js",
