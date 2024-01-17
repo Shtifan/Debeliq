@@ -101,9 +101,11 @@ async function executeC(filePath) {
 }
 
 async function executeCode(code, language) {
-    const dockerRunning = await isDockerRunning();
+    return "Docker is not running";
 
-    /*if (!dockerRunning)*/ return "Docker is not running";
+    /*const dockerRunning = await isDockerRunning();
+
+    if (!dockerRunning) return "Docker is not running";
 
     const fileExtension = {
         js: "js",
@@ -132,7 +134,7 @@ async function executeCode(code, language) {
             return executeC(filePath);
         default:
             return "Invalid language";
-    }
+    }*/
 }
 
 module.exports = {
@@ -159,9 +161,7 @@ module.exports = {
         let code = interaction.options.getString("code");
         let language = interaction.options.getString("language");
 
-        executeCode(code, language)
-            .then((result) => interaction.followUp("```" + result + "```"))
-            .catch((error) => interaction.followUp("```" + error + "```"));
+        return interaction.reply(executeCode(code, language));
     },
 };
 
@@ -176,7 +176,5 @@ client.on("messageCreate", async (message) => {
 
     if (!["js", "cpp", "py", "rs", "c"].includes(language)) return;
 
-    executeCode(code, language)
-        .then((result) => message.reply("```" + result + "```"))
-        .catch((error) => message.reply("```" + error + "```"));
+    return message.reply(executeCode(code, language));
 });
