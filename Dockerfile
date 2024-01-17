@@ -1,31 +1,20 @@
-# Use a base image that supports apt-get (e.g., debian)
-FROM debian:latest
+# Use an official Node.js runtime as a parent image
+FROM node:20
 
-# Update the package list and install essential packages
-RUN apt-get update && \
-    apt-get install -y \
-    build-essential \
-    python3 \
-    python3-pip \
-    python3-dev \
-    rustc \
-    curl
-
-# Install Node.js
-RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash -
-RUN apt-get install -y nodejs
-
-# Set working directory
+# Set the working directory to /app
 WORKDIR /app
 
-# Copy your application files to the container
-COPY . .
+# Copy package.json and package-lock.json to the working directory
+COPY package*.json ./
 
-# Install npm dependencies
+# Install any needed packages specified in package.json
 RUN npm install
 
-# Command to run your application
-CMD ["node", "index.js"]
+# Copy the rest of the application code to the working directory
+COPY . .
+
+# Specify the command to run on container start
+CMD ["node", "./index.js"]
 
 # docker build -t debeliq .
 # docker run debeliq
