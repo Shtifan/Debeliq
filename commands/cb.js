@@ -81,5 +81,5 @@ client.on("messageCreate", async (message) => {
         gamecb = false;
     }
 
-    message.channel.send(reply);
+    return message.reply(reply);
 });

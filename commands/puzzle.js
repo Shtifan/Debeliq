@@ -52,7 +52,5 @@ client.on("messageCreate", async (message) => {
 
     const outputPath = "./python/puzzle/output.png";
 
-    if (fs.existsSync(outputPath)) {
-        return message.reply({ files: [{ attachment: outputPath }] });
-    }
+    if (fs.existsSync(outputPath)) return message.reply({ files: [{ attachment: outputPath }] });
 });

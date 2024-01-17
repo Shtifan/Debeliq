@@ -164,5 +164,5 @@ client.on("messageCreate", async (message) => {
         }
     }
 
-    message.channel.send(reply);
+    return message.channel.send(reply);
 });
