@@ -2,115 +2,108 @@ const { SlashCommandBuilder } = require("discord.js");
 const client = require("../index.js");
 const fs = require("fs");
 const path = require("path");
-const { exec } = require("child_process");
+const util = require("util");
+const execAsync = util.promisify(require("child_process").exec);
+const Docker = require("dockerode");
 
-function isDockerRunning() {
-    return new Promise((resolve) => {
-        exec("docker info", (error, stdout, stderr) => {
-            resolve(!error);
-        });
-    });
+async function isDockerRunning() {
+    const docker = new Docker();
+
+    try {
+        await docker.ping();
+        return true;
+    } catch (error) {
+        return false;
+    }
 }
 
-function executeJs(filePath) {
-    return new Promise((resolve) => {
-        exec(`node ${filePath}`, (error, stdout, stderr) => {
-            if (error) {
-                resolve(`Error: ${stderr}`);
-            } else {
-                resolve(`${stdout}`);
-            }
-            fs.unlinkSync(filePath);
-        });
-    });
+async function executeJs(filePath) {
+    try {
+        const { stdout, stderr } = await execAsync(`node ${filePath}`);
+        return `${stdout}`;
+    } catch (error) {
+        return `Error: ${error.stderr}`;
+    } finally {
+        fs.unlinkSync(filePath);
+    }
 }
 
-function executePy(filePath) {
-    return new Promise((resolve) => {
-        exec(`python ${filePath}`, (error, stdout, stderr) => {
-            if (error) {
-                resolve(`Error: ${stderr}`);
-            } else {
-                resolve(`${stdout}`);
-            }
-            fs.unlinkSync(filePath);
-        });
-    });
+async function executePy(filePath) {
+    try {
+        const { stdout, stderr } = await execAsync(`python ${filePath}`);
+        return `${stdout}`;
+    } catch (error) {
+        return `Error: ${error.stderr}`;
+    } finally {
+        fs.unlinkSync(filePath);
+    }
 }
 
-function executeCpp(filePath) {
+async function executeCpp(filePath) {
     const executablePath = path.resolve("temp.exe");
-    return new Promise((resolve) => {
-        exec(`g++ ${filePath} -o ${executablePath} && ${executablePath}`, (error, stdout, stderr) => {
-            if (error) {
-                resolve(`Error: ${stderr}`);
-            } else {
-                if (fs.existsSync(executablePath)) {
-                    resolve(`${stdout}`);
-                } else {
-                    resolve("Error: Unable to create executable file");
-                }
-            }
-            fs.unlinkSync(filePath);
-            if (fs.existsSync(executablePath)) {
-                fs.unlinkSync(executablePath);
-            }
-        });
-    });
+    try {
+        const { stdout, stderr } = await execAsync(`g++ ${filePath} -o ${executablePath} && ${executablePath}`);
+        if (fs.existsSync(executablePath)) {
+            return `${stdout}`;
+        } else {
+            return "Error: Unable to create executable file";
+        }
+    } catch (error) {
+        return `Error: ${error.stderr}`;
+    } finally {
+        fs.unlinkSync(filePath);
+        if (fs.existsSync(executablePath)) {
+            fs.unlinkSync(executablePath);
+        }
+    }
 }
 
-function executeRs(filePath) {
+async function executeRs(filePath) {
     const executablePathRs = path.resolve("temp.exe");
     const pdbPath = path.resolve("temp.pdb");
-    return new Promise((resolve) => {
-        exec(`rustc ${filePath} -o ${executablePathRs} && ${executablePathRs}`, (error, stdout, stderr) => {
-            if (error) {
-                resolve(`Error: ${stderr}`);
-            } else {
-                if (fs.existsSync(executablePathRs)) {
-                    resolve(`${stdout}`);
-                } else {
-                    resolve("Error: Unable to create executable file");
-                }
-            }
-            fs.unlinkSync(filePath);
-            if (fs.existsSync(executablePathRs)) {
-                fs.unlinkSync(executablePathRs);
-            }
-            if (fs.existsSync(pdbPath)) {
-                fs.unlinkSync(pdbPath);
-            }
-        });
-    });
+    try {
+        const { stdout, stderr } = await execAsync(`rustc ${filePath} -o ${executablePathRs} && ${executablePathRs}`);
+        if (fs.existsSync(executablePathRs)) {
+            return `${stdout}`;
+        } else {
+            return "Error: Unable to create executable file";
+        }
+    } catch (error) {
+        return `Error: ${error.stderr}`;
+    } finally {
+        fs.unlinkSync(filePath);
+        if (fs.existsSync(executablePathRs)) {
+            fs.unlinkSync(executablePathRs);
+        }
+        if (fs.existsSync(pdbPath)) {
+            fs.unlinkSync(pdbPath);
+        }
+    }
 }
 
-function executeC(filePath) {
+async function executeC(filePath) {
     const executablePathC = path.resolve("temp.exe");
-    return new Promise((resolve) => {
-        exec(`gcc ${filePath} -o ${executablePathC} && ${executablePathC}`, (error, stdout, stderr) => {
-            if (error) {
-                resolve(`Error: ${stderr}`);
-            } else {
-                if (fs.existsSync(executablePathC)) {
-                    resolve(`${stdout}`);
-                } else {
-                    resolve("Error: Unable to create executable file");
-                }
-            }
-            fs.unlinkSync(filePath);
-            if (fs.existsSync(executablePathC)) {
-                fs.unlinkSync(executablePathC);
-            }
-        });
-    });
+    try {
+        const { stdout, stderr } = await execAsync(`gcc ${filePath} -o ${executablePathC} && ${executablePathC}`);
+        if (fs.existsSync(executablePathC)) {
+            return `${stdout}`;
+        } else {
+            return "Error: Unable to create executable file";
+        }
+    } catch (error) {
+        return `Error: ${error.stderr}`;
+    } finally {
+        fs.unlinkSync(filePath);
+        if (fs.existsSync(executablePathC)) {
+            fs.unlinkSync(executablePathC);
+        }
+    }
 }
 
 async function executeCode(code, language) {
     const dockerRunning = await isDockerRunning();
 
-    if (!dockerRunning) {
-        return "Docker is not running";
-    }
+    if (dockerRunning) return "Docker is not running";
 
     const fileExtension = {
         js: "js",
@@ -120,9 +113,7 @@ async function executeCode(code, language) {
         c: "c",
     }[language];
 
-    if (!fileExtension) {
-        return "Invalid language";
-    }
+    if (!fileExtension) return "Invalid language";
 
     const fileName = `temp.${fileExtension}`;
     fs.writeFileSync(fileName, code);
