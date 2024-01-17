@@ -3,10 +3,10 @@ const client = require("../index.js");
 const fetch = require("node-fetch");
 const fs = require("fs");
 const util = require("util");
-const exec = util.promisify(require("child_process").exec);
+const execAsync = util.promisify(require("child_process").exec);
 
 async function execute() {
-    const { stdout, stderr } = await exec("python ./python/chess/main.py");
+    const { stdout, stderr } = await execAsync("python ./python/chess/main.py");
 
     if (!stdout) return [];
 
