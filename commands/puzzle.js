@@ -3,10 +3,10 @@ const client = require("../index.js");
 const fetch = require("node-fetch");
 const fs = require("fs");
 const util = require("util");
-const exec = util.promisify(require("child_process").exec);
+const execAsync = util.promisify(require("child_process").exec);
 
 async function execute() {
-    await exec("python ./python/puzzle/main.py");
+    await execAsync("python ./python/puzzle/main.py");
 }
 
 module.exports = {
@@ -29,7 +29,8 @@ module.exports = {
         const outputPath = "./python/puzzle/output.png";
 
         if (fs.existsSync(outputPath)) {
-            return interaction.followUp({ files: [{ attachment: outputPath }] });
+            await interaction.followUp({ files: [{ attachment: outputPath }] });
+            fs.unlinkSync(outputPath);
         } else {
             return interaction.followUp("Failed to generate the puzzle solution.");
         }
@@ -52,5 +53,8 @@ client.on("messageCreate", async (message) => {
 
     const outputPath = "./python/puzzle/output.png";
 
-    if (fs.existsSync(outputPath)) return message.reply({ files: [{ attachment: outputPath }] });
+    if (fs.existsSync(outputPath)) {
+        await message.reply({ files: [{ attachment: outputPath }] });
+        fs.unlinkSync(outputPath);
+    }
 });
