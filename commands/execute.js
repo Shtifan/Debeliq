@@ -161,7 +161,7 @@ module.exports = {
         let code = interaction.options.getString("code");
         let language = interaction.options.getString("language");
 
-        await interaction.reply(await executeCode(code, language));
+        await interaction.followUp(await executeCode(code, language));
     },
 };
 
