@@ -32,6 +32,6 @@ module.exports = {
                         .join("\n")
             );
 
-        return interaction.reply({ embeds: [embed] });
+        await interaction.reply({ embeds: [embed] });
     },
 };

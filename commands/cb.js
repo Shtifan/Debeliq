@@ -60,7 +60,7 @@ module.exports = {
         number = generate();
         guesses = 0;
 
-        return interaction.reply(`I'm ready`);
+        await interaction.reply(`I'm ready`);
     },
 };
 
@@ -81,5 +81,5 @@ client.on("messageCreate", async (message) => {
         gamecb = false;
     }
 
-    return message.reply(reply);
+    await message.reply(reply);
 });

@@ -20,7 +20,7 @@ module.exports = {
         if (amount > 100) amount = 100;
 
         await interaction.channel.bulkDelete(amount, true).then((messages) => {
-            return interaction.reply(`I have just deleted **${messages.size}** message${messages.size != 1 ? "s" : ""}`);
+            interaction.reply(`I have just deleted **${messages.size}** message${messages.size != 1 ? "s" : ""}`);
         });
     },
 };

@@ -93,7 +93,7 @@ module.exports = {
         reply += "\nThe briefcases have been shuffled.\n";
         reply += "Choose your briefcase (1-26):";
 
-        return interaction.reply(reply);
+        await interaction.reply(reply);
     },
 };
 
@@ -164,5 +164,5 @@ client.on("messageCreate", async (message) => {
         }
     }
 
-    return message.channel.send(reply);
+    await message.channel.send(reply);
 });

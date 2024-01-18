@@ -21,6 +21,6 @@ module.exports = {
 
         queue.delete();
 
-        return interaction.reply("Music stopped in the server, see you next time");
+        await interaction.reply("Music stopped in the server, see you next time");
     },
 };

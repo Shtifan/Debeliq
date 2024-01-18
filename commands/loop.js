@@ -36,21 +36,21 @@ module.exports = {
             case "song": {
                 queue.setRepeatMode(QueueRepeatMode.TRACK);
 
-                return interaction.reply(
+                await interaction.reply(
                     `Repeat mode **enabled**. The current song will be repeated endlessly (you can end the loop with **/loop Disable**)`
                 );
             }
             case "queue": {
                 queue.setRepeatMode(QueueRepeatMode.QUEUE);
 
-                return interaction.reply(
+                await interaction.reply(
                     `Repeat mode **enabled** for the whole queue. It will be repeated endlessly (you can end the loop with **/loop Disable**)`
                 );
             }
             case "off": {
                 queue.setRepeatMode(QueueRepeatMode.OFF);
 
-                return interaction.reply(`Repeat mode **disabled**`);
+                await interaction.reply(`Repeat mode **disabled**`);
             }
         }
     },
