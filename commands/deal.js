@@ -36,11 +36,8 @@ function getOffer(cases) {
     const averageValue = cases.reduce((total, c) => total + c.value, 0) / cases.length;
 
     let offerPercentage;
-    if (cases.length > 10) {
-        offerPercentage = 0.2;
-    } else {
-        offerPercentage = 0.1;
-    }
+    if (cases.length > 10) offerPercentage = 0.2;
+    else offerPercentage = 0.1;
 
     const offer = averageValue * offerPercentage;
 
