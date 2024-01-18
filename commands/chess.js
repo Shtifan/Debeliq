@@ -27,9 +27,9 @@ module.exports = {
         const image = interaction.options.getAttachment("image");
         const res = await fetch(image.url);
         const buffer = await res.buffer();
-        const imagePath = "./python/chess/input.png";
+        const inputPath = "./python/chess/input.png";
 
-        fs.writeFileSync(imagePath, buffer);
+        fs.writeFileSync(inputPath, buffer);
 
         const result = await execute();
 
@@ -38,7 +38,7 @@ module.exports = {
             let reply = "";
             reply += "Best move for white - " + result[0] + "\n";
             reply += "Best move for black - " + result[1];
-            await interaction.followUp({ content: reply, files: [{ attachment: imagePath }] });
+            await interaction.followUp({ content: reply, files: [{ attachment: inputPath }] });
         }
     },
 };
@@ -51,9 +51,9 @@ client.on("messageCreate", async (message) => {
 
     const res = await fetch(image.url);
     const buffer = await res.buffer();
-    const imagePath = "./python/chess/input.png";
+    const inputPath = "./python/chess/input.png";
 
-    fs.writeFileSync(imagePath, buffer);
+    fs.writeFileSync(inputPath, buffer);
 
     const result = await execute();
 
