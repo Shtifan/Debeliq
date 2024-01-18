@@ -24,11 +24,11 @@ module.exports = {
         if (!isPaused) {
             queue.node.pause();
             isPaused = true;
-            return interaction.reply("Music was paused successfully");
+            await interaction.reply("Music was paused successfully");
         } else {
             queue.node.resume();
             isPaused = false;
-            return interaction.reply("Music was resumed successfully");
+            await interaction.reply("Music was resumed successfully");
         }
     },
 };

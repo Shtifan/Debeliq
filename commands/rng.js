@@ -15,6 +15,7 @@ module.exports = {
         const min = interaction.options.getInteger("min");
         const max = interaction.options.getInteger("max");
         let randomNumber = Math.floor(Math.random() * (max - min + 1) + min).toString();
-        return interaction.reply(randomNumber);
+
+        await interaction.reply(randomNumber);
     },
 };

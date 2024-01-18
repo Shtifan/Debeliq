@@ -27,6 +27,6 @@ module.exports = {
             },
         });
 
-        return interaction.followUp("Successfully completed your request");
+        await interaction.followUp("Successfully completed your request");
     },
 };

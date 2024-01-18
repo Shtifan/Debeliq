@@ -33,12 +33,13 @@ module.exports = {
 
         const result = await execute();
 
-        if (result.length == 0) return interaction.followUp("No valid chessboard detected");
-
-        let reply = "";
-        reply += "Best move for white - " + result[0] + "\n";
-        reply += "Best move for black - " + result[1];
-        return interaction.followUp({ content: reply, files: [{ attachment: imagePath }] });
+        if (result.length == 0) await interaction.followUp("No valid chessboard detected");
+        else {
+            let reply = "";
+            reply += "Best move for white - " + result[0] + "\n";
+            reply += "Best move for black - " + result[1];
+            await interaction.followUp({ content: reply, files: [{ attachment: imagePath }] });
+        }
     },
 };
 
@@ -62,5 +63,5 @@ client.on("messageCreate", async (message) => {
     reply += "Best move for white - " + result[0] + "\n";
     reply += "Best move for black - " + result[1];
 
-    return message.reply(reply);
+    await message.reply(reply);
 });

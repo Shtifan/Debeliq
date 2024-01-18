@@ -21,6 +21,6 @@ module.exports = {
 
         queue.history.back();
 
-        return interaction.reply(`Previous track queued`);
+        await interaction.reply(`Previous track queued`);
     },
 };

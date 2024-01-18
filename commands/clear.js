@@ -21,6 +21,6 @@ module.exports = {
 
         queue.clear();
 
-        return interaction.reply(`Queue cleared`);
+        await interaction.reply(`Queue cleared`);
     },
 };

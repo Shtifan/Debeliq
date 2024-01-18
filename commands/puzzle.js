@@ -32,7 +32,7 @@ module.exports = {
             await interaction.followUp({ files: [{ attachment: outputPath }] });
             fs.unlinkSync(outputPath);
         } else {
-            return interaction.followUp("Failed to generate the puzzle solution.");
+            await interaction.followUp("Failed to generate the puzzle solution.");
         }
     },
 };

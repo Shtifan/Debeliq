@@ -97,6 +97,6 @@ module.exports = {
         reply += check(correctGuesses);
         reply += `\nThe winning numbers were: ${winningNumbers.join(", ")}`;
 
-        return interaction.reply(reply);
+        await interaction.reply(reply);
     },
 };
