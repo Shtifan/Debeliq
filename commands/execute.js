@@ -4,18 +4,6 @@ const fs = require("fs");
 const path = require("path");
 const util = require("util");
 const execAsync = util.promisify(require("child_process").exec);
-const Docker = require("dockerode");
-
-async function isDockerRunning() {
-    const docker = new Docker();
-
-    try {
-        await docker.ping();
-        return true;
-    } catch (error) {
-        return false;
-    }
-}
 
 async function executeJs(filePath) {
     try {
@@ -101,11 +89,7 @@ async function executeC(filePath) {
 }
 
 async function executeCode(code, language) {
-    return "Docker is not running.";
-
-    /*const dockerRunning = await isDockerRunning();
-
-    if (!dockerRunning) return "Docker is not running";
+    if (process.platform == "win32") return "Docker is not running.";
 
     const fileExtension = {
         js: "js",
@@ -134,7 +118,7 @@ async function executeCode(code, language) {
             return executeC(filePath);
         default:
             return "Invalid language";
-    }*/
+    }
 }
 
 module.exports = {
@@ -161,7 +145,7 @@ module.exports = {
         let code = interaction.options.getString("code");
         let language = interaction.options.getString("language");
 
-        await interaction.followUp(await executeCode(code, language));
+        await interaction.followUp("```" + (await executeCode(code, language)) + "```");
     },
 };
 
@@ -176,5 +160,5 @@ client.on("messageCreate", async (message) => {
 
     if (!["js", "cpp", "py", "rs", "c"].includes(language)) return;
 
-    await message.reply(await executeCode(code, language));
+    await message.reply("```" + (await executeCode(code, language)) + "```");
 });
