@@ -10,25 +10,25 @@ module.exports = {
         const channel = interaction.member.voice.channel;
         if (!channel)
             return interaction.reply({
-                content: "You are not connected to a voice channel",
+                content: "You are not connected to a voice channel.",
                 ephemeral: true,
             });
 
         const queue = useQueue(interaction.guild.id);
         if (!queue)
             return interaction.reply({
-                content: `There is no music currently playing`,
+                content: "There is no music currently playing.",
                 ephemeral: true,
             });
 
         if (!isPaused) {
             queue.node.pause();
             isPaused = true;
-            await interaction.reply("Music was paused successfully");
+            await interaction.reply("Music was paused successfully.");
         } else {
             queue.node.resume();
             isPaused = false;
-            await interaction.reply("Music was resumed successfully");
+            await interaction.reply("Music was resumed successfully.");
         }
     },
 };

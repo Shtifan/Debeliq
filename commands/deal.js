@@ -114,7 +114,7 @@ client.on("messageCreate", async (message) => {
         }
     } else if (message.content.toLowerCase() == "no" && acceptingDeal) {
         if (special.includes(cases.length)) {
-            reply += `You declined the offer\n`;
+            reply += `You declined the offer.\n`;
 
             special.push(2);
             let index = special.indexOf(cases.length);
@@ -145,13 +145,13 @@ client.on("messageCreate", async (message) => {
             yourCase = input;
             reply += "Now choose **6** briefcases to reveal:\n";
         } else {
-            reply += `Behind case **${input}** there were **$${cases[index].value.toLocaleString()}**\n`;
+            reply += `Behind case **${input}** there were **$${cases[index].value.toLocaleString()}**.\n`;
             remove(input, cases);
             reply += `${remainingValues(cases)}\n`;
             reply += `${remainingNumbers(cases)}\n`;
 
             if (special.includes(cases.length)) {
-                reply += `The banker offer is **$${getOffer(cases).toLocaleString()}**\n`;
+                reply += `The banker offer is **$${getOffer(cases).toLocaleString()}**.\n`;
                 reply += "Do you accept the deal?\n";
                 acceptingDeal = true;
             } else if (cases.length == 2) {

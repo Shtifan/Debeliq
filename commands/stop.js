@@ -8,19 +8,19 @@ module.exports = {
         const channel = interaction.member.voice.channel;
         if (!channel)
             return interaction.reply({
-                content: "You are not connected to a voice channel",
+                content: "You are not connected to a voice channel.",
                 ephemeral: true,
             });
 
         const queue = useQueue(interaction.guild.id);
         if (!queue || !queue.node.isPlaying())
             return interaction.reply({
-                content: `There is no music currently playing`,
+                content: "There is no music currently playing.",
                 ephemeral: true,
             });
 
         queue.delete();
 
-        await interaction.reply("Music stopped in the server, see you next time");
+        await interaction.reply("Music stopped in the server, see you next time.");
     },
 };

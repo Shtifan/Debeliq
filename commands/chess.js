@@ -33,7 +33,7 @@ module.exports = {
 
         const result = await execute();
 
-        if (result.length == 0) await interaction.followUp("No valid chessboard detected");
+        if (result.length == 0) await interaction.followUp("No valid chessboard detected.");
         else {
             let reply = "";
             reply += "Best move for white - " + result[0] + "\n";

@@ -15,7 +15,7 @@ module.exports = {
         const channel = interaction.member.voice.channel;
         if (!channel)
             return interaction.reply({
-                content: "You are not connected to a voice channel",
+                content: "You are not connected to a voice channel.",
                 ephemeral: true,
             });
 
@@ -27,6 +27,6 @@ module.exports = {
             },
         });
 
-        await interaction.followUp("Successfully completed your request");
+        await interaction.followUp("Successfully completed your request.");
     },
 };

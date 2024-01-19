@@ -21,14 +21,14 @@ module.exports = {
         const channel = interaction.member.voice.channel;
         if (!channel)
             return interaction.reply({
-                content: "You are not connected to a voice channel",
+                content: "You are not connected to a voice channel.",
                 ephemeral: true,
             });
 
         const queue = useQueue(interaction.guild.id);
         if (!queue || !queue.node.isPlaying())
             return interaction.reply({
-                content: `There is no music currently playing`,
+                content: "There is no music currently playing.",
                 ephemeral: true,
             });
 
@@ -37,20 +37,20 @@ module.exports = {
                 queue.setRepeatMode(QueueRepeatMode.TRACK);
 
                 await interaction.reply(
-                    `Repeat mode **enabled**. The current song will be repeated endlessly (you can end the loop with **/loop Disable**)`
+                    "Repeat mode **enabled**. The current song will be repeated endlessly (you can end the loop with **/loop Disable**)."
                 );
             }
             case "queue": {
                 queue.setRepeatMode(QueueRepeatMode.QUEUE);
 
                 await interaction.reply(
-                    `Repeat mode **enabled** for the whole queue. It will be repeated endlessly (you can end the loop with **/loop Disable**)`
+                    "Repeat mode **enabled** for the whole queue. It will be repeated endlessly (you can end the loop with **/loop Disable**)."
                 );
             }
             case "off": {
                 queue.setRepeatMode(QueueRepeatMode.OFF);
 
-                await interaction.reply(`Repeat mode **disabled**`);
+                await interaction.reply("Repeat mode **disabled**.");
             }
         }
     },

@@ -22,7 +22,7 @@ async function executeJs(filePath) {
         const { stdout, stderr } = await execAsync(`node ${filePath}`);
         return `${stdout}`;
     } catch (error) {
-        return `Error: ${error.stderr}`;
+        return `Error: ${error.stderr}.`;
     } finally {
         fs.unlinkSync(filePath);
     }
@@ -33,7 +33,7 @@ async function executePy(filePath) {
         const { stdout, stderr } = await execAsync(`python ${filePath}`);
         return `${stdout}`;
     } catch (error) {
-        return `Error: ${error.stderr}`;
+        return `Error: ${error.stderr}.`;
     } finally {
         fs.unlinkSync(filePath);
     }
@@ -46,10 +46,10 @@ async function executeCpp(filePath) {
         if (fs.existsSync(executablePath)) {
             return `${stdout}`;
         } else {
-            return "Error: Unable to create executable file";
+            return "Error: Unable to create executable file.";
         }
     } catch (error) {
-        return `Error: ${error.stderr}`;
+        return `Error: ${error.stderr}.`;
     } finally {
         fs.unlinkSync(filePath);
         if (fs.existsSync(executablePath)) {
@@ -66,10 +66,10 @@ async function executeRs(filePath) {
         if (fs.existsSync(executablePathRs)) {
             return `${stdout}`;
         } else {
-            return "Error: Unable to create executable file";
+            return "Error: Unable to create executable file.";
         }
     } catch (error) {
-        return `Error: ${error.stderr}`;
+        return `Error: ${error.stderr}.`;
     } finally {
         fs.unlinkSync(filePath);
         if (fs.existsSync(executablePathRs)) {
@@ -88,10 +88,10 @@ async function executeC(filePath) {
         if (fs.existsSync(executablePathC)) {
             return `${stdout}`;
         } else {
-            return "Error: Unable to create executable file";
+            return "Error: Unable to create executable file.";
         }
     } catch (error) {
-        return `Error: ${error.stderr}`;
+        return `Error: ${error.stderr}.`;
     } finally {
         fs.unlinkSync(filePath);
         if (fs.existsSync(executablePathC)) {
@@ -101,7 +101,7 @@ async function executeC(filePath) {
 }
 
 async function executeCode(code, language) {
-    return "Docker is not running";
+    return "Docker is not running.";
 
     /*const dockerRunning = await isDockerRunning();
 
