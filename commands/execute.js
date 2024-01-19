@@ -22,7 +22,7 @@ async function executeJs(filePath) {
         const { stdout, stderr } = await execAsync(`node ${filePath}`);
         return `${stdout}`;
     } catch (error) {
-        return `Error: ${error.stderr}.`;
+        return `Error: ${error.stderr}`;
     } finally {
         fs.unlinkSync(filePath);
     }
@@ -33,7 +33,7 @@ async function executePy(filePath) {
         const { stdout, stderr } = await execAsync(`python ${filePath}`);
         return `${stdout}`;
     } catch (error) {
-        return `Error: ${error.stderr}.`;
+        return `Error: ${error.stderr}`;
     } finally {
         fs.unlinkSync(filePath);
     }
@@ -49,7 +49,7 @@ async function executeCpp(filePath) {
             return "Error: Unable to create executable file.";
         }
     } catch (error) {
-        return `Error: ${error.stderr}.`;
+        return `Error: ${error.stderr}`;
     } finally {
         fs.unlinkSync(filePath);
         if (fs.existsSync(executablePath)) {
@@ -69,7 +69,7 @@ async function executeRs(filePath) {
             return "Error: Unable to create executable file.";
         }
     } catch (error) {
-        return `Error: ${error.stderr}.`;
+        return `Error: ${error.stderr}`;
     } finally {
         fs.unlinkSync(filePath);
         if (fs.existsSync(executablePathRs)) {
@@ -91,7 +91,7 @@ async function executeC(filePath) {
             return "Error: Unable to create executable file.";
         }
     } catch (error) {
-        return `Error: ${error.stderr}.`;
+        return `Error: ${error.stderr}`;
     } finally {
         fs.unlinkSync(filePath);
         if (fs.existsSync(executablePathC)) {
