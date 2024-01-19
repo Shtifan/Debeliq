@@ -15,12 +15,12 @@ module.exports = {
         const queue = useQueue(interaction.guild.id);
         if (!queue || !queue.node.isPlaying())
             return interaction.reply({
-                content: `There is no music currently playing`,
+                content: "There is no music currently playing",
                 ephemeral: true,
             });
 
         queue.history.back();
 
-        await interaction.reply(`Previous track queued`);
+        await interaction.reply("Previous track queued");
     },
 };

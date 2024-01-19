@@ -75,14 +75,14 @@ module.exports = {
 
         if (notUnique(userNumbers)) {
             return interaction.reply({
-                content: "Please ensure all numbers are unique",
+                content: "Please ensure all numbers are unique.",
                 ephemeral: true,
             });
         }
 
         if (notInRange(userNumbers)) {
             return interaction.reply({
-                content: "Please ensure all numbers are between 1 and 49",
+                content: "Please ensure all numbers are between 1 and 49.",
                 ephemeral: true,
             });
         }
@@ -95,7 +95,7 @@ module.exports = {
 
         let reply = "";
         reply += check(correctGuesses);
-        reply += `\nThe winning numbers were: ${winningNumbers.join(", ")}`;
+        reply += `\nThe winning numbers were: ${winningNumbers.join(", ")}.`;
 
         await interaction.reply(reply);
     },
