@@ -89,9 +89,9 @@ async function executeC(filePath) {
 }
 
 async function executeCode(code, language) {
-    if (process.platform == "win32") return "Docker is not running.";
+    return "The command is currently under maintenance.";
 
-    const fileExtension = {
+    /*const fileExtension = {
         js: "js",
         cpp: "cpp",
         py: "py",
@@ -118,7 +118,7 @@ async function executeCode(code, language) {
             return executeC(filePath);
         default:
             return "Invalid language";
-    }
+    }*/
 }
 
 module.exports = {
