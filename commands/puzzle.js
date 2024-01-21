@@ -20,7 +20,7 @@ module.exports = {
         const image = interaction.options.getAttachment("image");
         const res = await fetch(image.url);
         const buffer = await res.buffer();
-        const inputPath = "./python/puzzle/input.png";
+        const inputPath = "./python/puzzle/image.png";
 
         fs.writeFileSync(inputPath, buffer);
 
@@ -45,7 +45,7 @@ client.on("messageCreate", async (message) => {
 
     const res = await fetch(image.url);
     const buffer = await res.buffer();
-    const inputPath = "./python/puzzle/input.png";
+    const inputPath = "./python/puzzle/image.png";
 
     fs.writeFileSync(inputPath, buffer);
 

@@ -15,7 +15,7 @@ def rotate_fen(fen):
     rotated_fen = '/'.join(reversed_fen_parts)
     return rotated_fen
 
-input_path = "./python/chess/input.png"
+input_path = "./python/chess/image.png"
 output_path = "./python/chess/output.png"
 stockfish = Stockfish("C:/Stockfish/stockfish.exe")
 
