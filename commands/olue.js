@@ -49,11 +49,9 @@ module.exports = {
             });
         }
 
-        // Generate unique numbers
         const arrayLength = getRandomNumber(2, 5);
         const uniqueNumbers = new Set();
 
-        // Ensure unique numbers in the array
         while (uniqueNumbers.size < arrayLength) {
             uniqueNumbers.add(getRandomNumber(1, 10));
         }
@@ -85,7 +83,6 @@ module.exports = {
             reply += `    ${i + 1}    `;
         }
 
-        // Adding buttons from 1 to 10
         const numberButtons = [];
         for (let i = 1; i <= 10; i++) {
             const button = new ButtonBuilder()
@@ -95,7 +92,6 @@ module.exports = {
             numberButtons.push(button);
         }
 
-        // Splitting buttons into two rows
         const firstRowButtons = numberButtons.slice(0, 5);
         const secondRowButtons = numberButtons.slice(5);
 
