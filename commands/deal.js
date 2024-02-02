@@ -14,21 +14,14 @@ function remove(number, arr) {
 }
 
 function remainingValues(cases) {
-    let remainingValues = cases.map((c) => `$${c.value.toLocaleString()}`);
-    let sortedValues = remainingValues.sort((a, b) => a.replace(/[\$,]/g, "") - b.replace(/[\$,]/g, "")).join("\n");
-
-    return `Remaining values:\n${sortedValues}`;
+    const sortedValues = cases
+        .map((c) => `$${c.value.toLocaleString()}`)
+        .sort((a, b) => a.replace(/[\$,]/g, "") - b.replace(/[\$,]/g, ""));
+    return `Remaining values:\n${sortedValues.join("\n")}`;
 }
 
 function remainingNumbers(cases) {
-    let numbers = "";
-
-    cases.forEach((c) => {
-        numbers += `${c.number}, `;
-    });
-
-    numbers = numbers.slice(0, -2);
-
+    const numbers = cases.map((c) => c.number).join(", ");
     return `Remaining cases numbers: ${numbers}`;
 }
 
@@ -41,7 +34,7 @@ function getOffer(cases) {
 
     const offer = averageValue * offerPercentage;
 
-    return offer.toFixed(2);
+    return offer.toLocaleString();
 }
 
 let gamedeal = false;
@@ -98,12 +91,12 @@ client.on("messageCreate", async (message) => {
     if (message.author.bot) return;
     if (!gamedeal) return;
 
-    let special = [20, 15, 11, 8, 5];
+    const special = [20, 15, 11, 8, 5];
     let reply = "";
 
     if (message.content.toLowerCase() == "yes" && acceptingDeal) {
         if (special.includes(cases.length)) {
-            reply += `Congratulations! You win **$${getOffer(cases).toLocaleString()}**!\n`;
+            reply += `Congratulations! You win **$${getOffer(cases)}**!\n`;
 
             gamedeal = false;
         } else if (cases.length == 2) {
@@ -132,12 +125,10 @@ client.on("messageCreate", async (message) => {
     } else {
         if (acceptingDeal) return;
 
-        let input = parseInt(message.content);
-        if (isNaN(message.content) || input < 1 || input > 26) return;
+        const input = parseInt(message.content);
+        if (isNaN(input) || input < 1 || input > 26 || cases.findIndex((c) => c.number === input) === -1) return;
 
-        let index = 0;
-        if (cases.findIndex((c) => c.number == input) == -1) return;
-        else index = cases.findIndex((c) => c.number == input);
+        const index = cases.findIndex((c) => c.number === input);
 
         if (input == yourCase) return;
 
@@ -151,7 +142,7 @@ client.on("messageCreate", async (message) => {
             reply += `${remainingNumbers(cases)}\n`;
 
             if (special.includes(cases.length)) {
-                reply += `The banker offer is **$${getOffer(cases).toLocaleString()}**.\n`;
+                reply += `The banker offer is **$${getOffer(cases)}**.\n`;
                 reply += "Do you accept the deal?\n";
                 acceptingDeal = true;
             } else if (cases.length == 2) {
