@@ -1,6 +1,6 @@
 import cv2
 
-img = cv2.imread("./python/chess/image.png", cv2.IMREAD_UNCHANGED)
+img = cv2.imread("./chess/image.png", cv2.IMREAD_UNCHANGED)
 rows, cols, _ = img.shape
 
 # Define your PIXELS array

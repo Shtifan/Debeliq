@@ -6,7 +6,7 @@ const util = require("util");
 const execAsync = util.promisify(require("child_process").exec);
 
 async function execute() {
-    const { stdout, stderr } = await execAsync("python ./python/chess/main.py");
+    const { stdout, stderr } = await execAsync("python ./chess/main.py");
 
     if (!stdout) return [];
 
@@ -27,7 +27,7 @@ module.exports = {
         const image = interaction.options.getAttachment("image");
         const res = await fetch(image.url);
         const buffer = await res.buffer();
-        const inputPath = "./python/chess/image.png";
+        const inputPath = "./chess/image.png";
 
         fs.writeFileSync(inputPath, buffer);
 
@@ -51,7 +51,7 @@ client.on("messageCreate", async (message) => {
 
     const res = await fetch(image.url);
     const buffer = await res.buffer();
-    const inputPath = "./python/chess/image.png";
+    const inputPath = "./chess/image.png";
 
     fs.writeFileSync(inputPath, buffer);
 

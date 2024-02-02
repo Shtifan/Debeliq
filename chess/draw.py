@@ -46,9 +46,9 @@ def draw_coordinates(image_path, move):
     draw.line([(end_x, end_y), (end_x - arrow_size, end_y + arrow_size)], fill=arrow_color, width=2)
 
     # Save the modified image
-    chessboard.save('./python/chess/image.png')
+    chessboard.save('./chess/image.png')
 
 # Example usage
 move = 'a1a8'
-image_path = './python/chess/image.png'
+image_path = './chess/image.png'
 draw_coordinates(image_path, move)
