@@ -50,6 +50,7 @@ module.exports = {
     data: new SlashCommandBuilder().setName("deal").setDescription("Play deal or no deal"),
 
     async execute(interaction) {
+        gamedeal = true;
         cases = [
             { number: 1, value: 0.01 },
             { number: 2, value: 1 },
@@ -80,7 +81,6 @@ module.exports = {
         ];
         shuffle(cases);
         yourCase = 0;
-        gamedeal = true;
         acceptingDeal = false;
 
         let reply = "";
