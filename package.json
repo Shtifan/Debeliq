@@ -1,22 +1,22 @@
 {
-  "name": "debeliq",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "type": "commonjs",
-  "scripts": {
-    "build": "node index.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "@discord-player/extractor": "^4.4.5",
-    "discord-gamecord": "^4.4.1",
-    "discord-player": "^6.6.6",
-    "discord.js": "^14.14.1",
-    "mediaplex": "^0.0.9",
-    "node-fetch": "^2.7.0",
-    "ytdl-core": "^4.11.5"
-  }
+    "name": "debeliq",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "type": "commonjs",
+    "scripts": {
+        "build": "node index.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "@discord-player/extractor": "^4.4.5",
+        "discord-gamecord": "^4.4.1",
+        "discord-player": "^6.6.6",
+        "discord.js": "^14.14.1",
+        "mediaplex": "^0.0.9",
+        "node-fetch": "^2.7.0",
+        "ytdl-core": "^4.11.5"
+    }
 }
