@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js");
-const client = require("../index.js");
+const client = require("../../index.js");
 const fetch = require("node-fetch");
 const fs = require("fs");
 const util = require("util");

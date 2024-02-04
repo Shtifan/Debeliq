@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js");
-const client = require("../index.js");
+const client = require("../../index.js");
 
 module.exports = {
     data: new SlashCommandBuilder().setName("koj").setDescription("Test command"),
