@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js");
-const client = require("../index.js");
+const client = require("../../index.js");
 
 function hasDuplicates(array) {
     return new Set(array).size != array.length;
