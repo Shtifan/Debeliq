@@ -6,7 +6,7 @@ const util = require("util");
 const execAsync = util.promisify(require("child_process").exec);
 
 async function execute() {
-    const { stdout, stderr } = await execAsync("python ./commands/chess.py");
+    const { stdout, stderr } = await execAsync("python ./commands/other/chess.py");
 
     if (!stdout) return [];
 
