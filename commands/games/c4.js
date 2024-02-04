@@ -23,7 +23,7 @@ module.exports = {
                 player2: "🟡",
             },
             mentionUser: true,
-            timeoutTime: 60000,
+            timeoutTime: 120000,
             buttonStyle: "PRIMARY",
             turnMessage: "{emoji} | Its turn of player **{player}**.",
             winMessage: "{emoji} | **{player}** won the Connect4 Game.",

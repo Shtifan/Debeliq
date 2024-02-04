@@ -14,7 +14,7 @@ module.exports = {
             },
             hangman: { hat: "🎩", head: "😟", shirt: "👕", pants: "🩳", boots: "👞👞" },
             customWord: null,
-            timeoutTime: 60000,
+            timeoutTime: 120000,
             theme: "nature",
             winMessage: "You won! The word was **{word}**.",
             loseMessage: "You lost! The word was **{word}**.",
