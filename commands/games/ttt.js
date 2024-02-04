@@ -24,7 +24,7 @@ module.exports = {
                 blankButton: "➖",
             },
             mentionUser: true,
-            timeoutTime: 60000,
+            timeoutTime: 120000,
             xButtonStyle: "DANGER",
             oButtonStyle: "PRIMARY",
             turnMessage: "{emoji} | Its turn of player **{player}**.",

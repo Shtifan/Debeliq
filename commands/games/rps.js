@@ -28,7 +28,7 @@ module.exports = {
                 scissors: "✂️",
             },
             mentionUser: true,
-            timeoutTime: 60000,
+            timeoutTime: 120000,
             buttonStyle: "PRIMARY",
             pickMessage: "You choose {emoji}.",
             winMessage: "**{player}** won the Game! Congratulations!",
