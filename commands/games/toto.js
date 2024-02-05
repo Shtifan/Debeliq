@@ -74,17 +74,19 @@ module.exports = {
         ];
 
         if (notUnique(userNumbers)) {
-            return interaction.reply({
+            await interaction.reply({
                 content: "Please ensure all numbers are unique.",
                 ephemeral: true,
             });
+            return;
         }
 
         if (notInRange(userNumbers)) {
-            return interaction.reply({
+            await interaction.reply({
                 content: "Please ensure all numbers are between 1 and 49.",
                 ephemeral: true,
             });
+            return;
         }
 
         const numbers = generate();
