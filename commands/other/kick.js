@@ -28,7 +28,7 @@ module.exports = {
             await targetUser.kick({ reason });
             await interaction.editReply(`User ${targetUser} was kicked\nReason: ${reason}`);
         } catch (error) {
-            await interaction.reply({
+            await interaction.editReply({
                 content: `Sorry I am unable to kick ${targetUser}`,
                 ephemeral: true,
             });

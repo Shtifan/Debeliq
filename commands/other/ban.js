@@ -28,7 +28,7 @@ module.exports = {
             await targetUser.ban({ reason });
             await interaction.editReply(`User ${targetUser} was banned\nReason: ${reason}`);
         } catch (error) {
-            await interaction.reply({
+            await interaction.editReply({
                 content: `Sorry I am unable to ban ${targetUser}`,
                 ephemeral: true,
             });
