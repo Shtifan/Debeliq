@@ -40,7 +40,7 @@ function getOffer(cases) {
 let gamedeal = false;
 
 module.exports = {
-    data: new SlashCommandBuilder().setName("deal").setDescription("Play deal or no deal"),
+    data: new SlashCommandBuilder().setName("deal").setDescription("Play deal or no deal game"),
 
     async execute(interaction) {
         gamedeal = true;
