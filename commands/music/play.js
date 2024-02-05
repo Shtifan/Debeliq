@@ -13,11 +13,13 @@ module.exports = {
         const player = useMainPlayer();
 
         const channel = interaction.member.voice.channel;
-        if (!channel)
-            return interaction.reply({
+        if (!channel) {
+            await interaction.reply({
                 content: "You are not connected to a voice channel.",
                 ephemeral: true,
             });
+            return;
+        }
 
         const query = interaction.options.getString("query", true);
 

@@ -10,10 +10,11 @@ module.exports = {
 
     async execute(interaction) {
         if (!interaction.guild.members.me.permissionsIn(interaction.channel).has(PermissionsBitField.Flags.ManageMessages)) {
-            return interaction.reply({
+            await interaction.reply({
                 content: "I do not have permission to delete messages in this channel.",
                 ephemeral: true,
             });
+            return;
         }
 
         const amount = interaction.options.getInteger("amount");
