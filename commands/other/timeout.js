@@ -35,7 +35,7 @@ module.exports = {
             await targetUser.timeout(msDuration, reason);
             await interaction.editReply(`${targetUser} was timed out for ${duration}.\nReason: ${reason}`);
         } catch (error) {
-            await interaction.reply({
+            await interaction.editReply({
                 content: `Sorry I am unable to timeout ${targetUser}`,
                 ephemeral: true,
             });
