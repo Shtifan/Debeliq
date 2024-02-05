@@ -84,7 +84,7 @@ function mainGame(userData, userId) {
 }
 
 module.exports = {
-    data: new SlashCommandBuilder().setName("olue").setDescription("Play olue the game"),
+    data: new SlashCommandBuilder().setName("olue").setDescription("Play Olue the Game"),
 
     async execute(interaction) {
         const userId = interaction.user.id;
