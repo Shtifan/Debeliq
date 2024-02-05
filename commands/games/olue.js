@@ -1,10 +1,6 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const fs = require("fs/promises");
 
-function getRandomNumber(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
 async function readUserData() {
     try {
         const data = await fs.readFile("./user_data.json", "utf8");
@@ -24,10 +20,11 @@ async function writeUserData(userData) {
     }
 }
 
-function mainGame(userData, userId) {
-    const userMoney = userData[userId].money;
-    const durability = userData[userId].durability;
+function getRandomNumber(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
+function generate(userMoney, durability) {
     const arrayLength = getRandomNumber(2, 5);
     const uniqueNumbers = new Set();
 
@@ -38,37 +35,22 @@ function mainGame(userData, userId) {
     const chosenNumbers = Array.from(uniqueNumbers);
 
     let reply = "";
-    reply += "Money: " + userMoney + "\n";
-    reply += "Drill durability: " + durability + "\n";
-    for (let i = 0; i < 10; i++) {
-        reply += "  _____  ";
-    }
-    reply += "\n";
-    for (let i = 0; i < 10; i++) {
-        reply += chosenNumbers.includes(i + 1) ? " |🛢️🛢️| " : " |     | ";
-    }
-    reply += "\n";
-    for (let i = 0; i < 10; i++) {
-        reply += chosenNumbers.includes(i + 1) ? " |🛢️🛢️| " : " |     | ";
-    }
-    reply += "\n";
-    for (let i = 0; i < 10; i++) {
-        reply += chosenNumbers.includes(i + 1) ? " |🛢️🛢️| " : " |     | ";
-    }
-    reply += "\n";
-    for (let i = 0; i < 10; i++) {
-        reply += "  ‾‾‾‾‾  ";
-    }
-    reply += "\n";
-    for (let i = 0; i < 10; i++) {
-        reply += `    ${i + 1}    `;
-    }
 
-    const numberButtons = [];
-    for (let i = 1; i <= 10; i++) {
-        const button = new ButtonBuilder().setCustomId(`number_${i}`).setLabel(i.toString()).setStyle(ButtonStyle.Primary);
-        numberButtons.push(button);
-    }
+    reply += `Money: ${userMoney}\n`;
+    reply += `Drill durability: ${durability}\n`;
+    reply += `${"  _____  ".repeat(10)}\n`;
+    reply += `${Array.from({ length: 3 }, (_, i) =>
+        Array.from({ length: 10 }, (_, j) => (chosenNumbers.includes(j + 1) ? " |🛢️🛢️| " : " |     | ")).join("")
+    ).join("\n")}\n`;
+    reply += `${"  ‾‾‾‾‾  ".repeat(10)}\n`;
+    reply += `${Array.from({ length: 10 }, (_, i) => `    ${i + 1}    `).join("")}\n`;
+
+    const numberButtons = Array.from({ length: 10 }, (_, i) =>
+        new ButtonBuilder()
+            .setCustomId(`number_${i + 1}`)
+            .setLabel((i + 1).toString())
+            .setStyle(ButtonStyle.Primary)
+    );
 
     const firstRowButtons = numberButtons.slice(0, 5);
     const secondRowButtons = numberButtons.slice(5);
@@ -83,12 +65,44 @@ function mainGame(userData, userId) {
     return { content: "```" + reply + "```", components: [firstRow, secondRow, miscRow] };
 }
 
+async function mainGame(userData, userId, interaction) {
+    const userMoney = userData[userId].money;
+    const durability = userData[userId].durability;
+
+    const message = await interaction.followUp(generate(userMoney, durability));
+
+    const filter = (buttonInteraction) =>
+        buttonInteraction.user.id === userId && buttonInteraction.customId.startsWith("number_");
+
+    const collector = interaction.channel.createMessageComponentCollector({
+        filter,
+        time: 60000,
+    });
+
+    collector.on("collect", async (buttonInteraction) => {
+        const selectedNumber = parseInt(buttonInteraction.customId.split("_")[1]);
+
+        userData[userId].money += 10;
+        userData[userId].durability -= 1;
+        await writeUserData(userData);
+
+        await message.edit(generate(userMoney, durability));
+    });
+}
+
 module.exports = {
     data: new SlashCommandBuilder().setName("olue").setDescription("Play Olue the Game"),
 
     async execute(interaction) {
+        await interaction.deferReply();
+
         const userId = interaction.user.id;
         let userData = await readUserData();
+
+        const playButton = new ButtonBuilder().setCustomId("play").setLabel("Play").setStyle(ButtonStyle.Primary);
+        const row = new ActionRowBuilder().addComponents(playButton);
+
+        const intro = `Hi, it looks like it's your first time playing Olue the Game. So, they gave you a drilling machine from Pernik, with which they let you search for olue. Of course Pernichani will steal 60% of your earnings, but your goal is to make a living with this job so you have no choice but to continue playing. To start drilling for olue, click the button on the corresponding hole. Later in the game you will be able to buy better drills and start mining more valuable olue. Just be careful not to break all drills because you'll have to start over. Have fun. Click the play button to start playing.`;
 
         if (!(userId in userData)) {
             userData[userId] = {
@@ -98,29 +112,22 @@ module.exports = {
 
             await writeUserData(userData);
 
-            const playButton = new ButtonBuilder().setCustomId("play").setLabel("Play").setStyle(ButtonStyle.Primary);
-
-            const row = new ActionRowBuilder().addComponents(playButton);
-
-            const response = await interaction.reply({
-                content:
-                    "Hi, it look that it's your first time playing Olue the Game. So, they gave you a drilling machine from Pernik, with which they let you search for olue. Of course Pernichani will steal 60% of your earnings, but your goal is to make a living with this job so you have no choice but to continue playing. To start drilling for olue, click the button on the corresponding hole. Later in the game you will be able to buy better drills and start mining more valuable olue. Just be careful not to break all drills because you'll have to start over. Have fun. Click the play button to start playing.",
+            await interaction.followUp({
+                content: intro,
                 components: [row],
             });
 
-            const collectorFilter = (i) => i.user.id === interaction.user.id;
+            const filter = (click) => click.user.id === interaction.user.id;
 
-            const res = await response.awaitMessageComponent({ filter: collectorFilter, time: 60_000 });
+            const collector = interaction.channel.createMessageComponentCollector({
+                max: 1,
+                time: 60000,
+                filter,
+            });
 
-            if (res.customId === "play") {
-                let reply = mainGame(userData, userId);
-
-                return res.update(reply);
-            }
-        }
-
-        let reply = mainGame(userData, userId);
-
-        await interaction.reply(reply);
+            collector.on("collect", async (interaction) => {
+                await mainGame(userData, userId, interaction);
+            });
+        } else await mainGame(userData, userId, interaction);
     },
 };
