@@ -62,7 +62,10 @@ function generate(userMoney, durability) {
     const reset = new ButtonBuilder().setCustomId("reset").setLabel("Reset game").setStyle(ButtonStyle.Danger);
     const miscRow = new ActionRowBuilder().addComponents(shop, reset);
 
-    return { content: "```" + reply + "```", components: [firstRow, secondRow, miscRow] };
+    return {
+        content: "```" + reply + "```",
+        components: [firstRow, secondRow, miscRow],
+    };
 }
 
 async function mainGame(userData, userId, interaction) {
