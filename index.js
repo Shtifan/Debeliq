@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
-const { Client, Collection, GatewayIntentBits } = require("discord.js");
-const { token } = require("./config.json");
+const { Client, GatewayIntentBits, Collection, REST, Routes } = require("discord.js");
+const { clientId, token } = require("./config.json");
 const { Player } = require("discord-player");
 
 const client = new Client({
@@ -37,10 +37,19 @@ for (const folder of commandFolders) {
     }
 }
 
-client.once("ready", (client) => {
-    client.application.commands.set(commands);
-    console.log(`Ready on ${client.guilds.cache.size} server${client.guilds.cache.size != 1 ? "s" : ""}!`);
-});
+const rest = new REST().setToken(token);
+
+(async () => {
+    try {
+        console.log(`Started refreshing ${commands.length} application (/) commands.`);
+
+        const data = await rest.put(Routes.applicationCommands(clientId), { body: commands });
+
+        console.log(`Successfully reloaded ${data.length} application (/) commands.`);
+    } catch (error) {
+        console.error(error);
+    }
+})();
 
 const eventsPath = path.join(__dirname, "events");
 const eventFiles = fs.readdirSync(eventsPath).filter((file) => file.endsWith(".js"));
