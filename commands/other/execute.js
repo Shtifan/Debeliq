@@ -89,7 +89,7 @@ async function executeC(filePath) {
 }
 
 async function executeCode(code, language) {
-    return "The command is currently under maintenance.";
+    return "The command is currently not working. Please try again later.";
 
     /*const fileExtension = {
         js: "js",
