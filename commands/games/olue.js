@@ -93,7 +93,6 @@ module.exports = {
         if (!(userId in userData)) {
             userData[userId] = {
                 money: 0,
-                level: 0,
                 durability: 100,
             };
 
