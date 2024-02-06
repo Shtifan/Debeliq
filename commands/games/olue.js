@@ -32,7 +32,7 @@ function generate(userMoney, durability) {
         uniqueNumbers.add(getRandomNumber(1, 10));
     }
 
-    const chosenNumbers = Array.from(uniqueNumbers);
+    const specialNumbers = Array.from(uniqueNumbers);
 
     let reply = "";
 
@@ -40,7 +40,7 @@ function generate(userMoney, durability) {
     reply += `Drill durability: ${durability}\n`;
     reply += `${"  _____  ".repeat(10)}\n`;
     reply += `${Array.from({ length: 3 }, (_, i) =>
-        Array.from({ length: 10 }, (_, j) => (chosenNumbers.includes(j + 1) ? " |🛢️🛢️| " : " |     | ")).join("")
+        Array.from({ length: 10 }, (_, j) => (specialNumbers.includes(j + 1) ? " |🛢️🛢️| " : " |     | ")).join("")
     ).join("\n")}\n`;
     reply += `${"  ‾‾‾‾‾  ".repeat(10)}\n`;
     reply += `${Array.from({ length: 10 }, (_, i) => `    ${i + 1}    `).join("")}\n`;
@@ -65,15 +65,21 @@ function generate(userMoney, durability) {
     return {
         content: "```" + reply + "```",
         components: [firstRow, secondRow, miscRow],
+        specialNumbers: specialNumbers,
     };
+}
+
+async function remove(message, selectedNumber, specialNumbers) {
+    await message.edit();
 }
 
 async function mainGame(userData, userId, interaction) {
     const userMoney = userData[userId].money;
     const durability = userData[userId].durability;
 
-    const message = await interaction.reply(generate(userMoney, durability));
-    const specialNumbers = generate(userMoney, durability);
+    const generatedData = generate(userMoney, durability);
+    const message = await interaction.reply({ content: generatedData.content, components: generatedData.components });
+    const specialNumbers = generatedData.specialNumbers;
 
     const filter = (buttonInteraction) =>
         buttonInteraction.user.id === userId && buttonInteraction.customId.startsWith("number_");
@@ -91,7 +97,7 @@ async function mainGame(userData, userId, interaction) {
 
         await writeUserData(userData);
 
-        remove(message, selectedNumber);
+        remove(message, selectedNumber, specialNumbers);
     });
 }
 
