@@ -72,7 +72,8 @@ async function mainGame(userData, userId, interaction) {
     const userMoney = userData[userId].money;
     const durability = userData[userId].durability;
 
-    const message = await interaction.followUp(generate(userMoney, durability));
+    const message = await interaction.reply(generate(userMoney, durability));
+    const specialNumbers = generate(userMoney, durability);
 
     const filter = (buttonInteraction) =>
         buttonInteraction.user.id === userId && buttonInteraction.customId.startsWith("number_");
@@ -84,12 +85,13 @@ async function mainGame(userData, userId, interaction) {
 
     collector.on("collect", async (buttonInteraction) => {
         const selectedNumber = parseInt(buttonInteraction.customId.split("_")[1]);
-
-        userData[userId].money += 10;
         userData[userId].durability -= 1;
+
+        if (specialNumbers.includes(selectedNumber)) userData[userId].money += 10;
+
         await writeUserData(userData);
 
-        await message.edit(generate(userMoney, durability));
+        remove(message, selectedNumber);
     });
 }
 
@@ -97,8 +99,6 @@ module.exports = {
     data: new SlashCommandBuilder().setName("olue").setDescription("Play Olue the Game"),
 
     async execute(interaction) {
-        await interaction.deferReply();
-
         const userId = interaction.user.id;
         let userData = await readUserData();
 
@@ -115,7 +115,7 @@ module.exports = {
 
             await writeUserData(userData);
 
-            await interaction.followUp({
+            await interaction.reply({
                 content: intro,
                 components: [row],
             });
