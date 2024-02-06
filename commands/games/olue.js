@@ -69,8 +69,8 @@ function generate(userMoney, durability) {
     };
 }
 
-async function remove(message, selectedNumber, specialNumbers) {
-    await message.edit();
+async function remove(message, selectedNumber, specialNumbers, data) {
+    await message.edit(data);
 }
 
 async function mainGame(userData, userId, interaction) {
@@ -97,7 +97,7 @@ async function mainGame(userData, userId, interaction) {
 
         await writeUserData(userData);
 
-        remove(message, selectedNumber, specialNumbers);
+        await remove(message, selectedNumber, specialNumbers, generatedData.content);
     });
 }
 
