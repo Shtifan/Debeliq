@@ -23,9 +23,6 @@ module.exports = {
             return;
         }
 
-        const tracks = queue.tracks.toArray();
-        const currentTrack = queue.currentTrack;
-
         const embed = new EmbedBuilder()
             .setColor(0x000000)
             .setTitle("**Queue**")
