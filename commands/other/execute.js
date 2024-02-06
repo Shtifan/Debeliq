@@ -46,6 +46,25 @@ async function executeCpp(filePath) {
     }
 }
 
+async function executeC(filePath) {
+    const executablePathC = path.resolve("temp.exe");
+    try {
+        const { stdout, stderr } = await execAsync(`gcc ${filePath} -o ${executablePathC} && ${executablePathC}`);
+        if (fs.existsSync(executablePathC)) {
+            return `${stdout}`;
+        } else {
+            return "Error: Unable to create executable file.";
+        }
+    } catch (error) {
+        return `Error: ${error.stderr}`;
+    } finally {
+        fs.unlinkSync(filePath);
+        if (fs.existsSync(executablePathC)) {
+            fs.unlinkSync(executablePathC);
+        }
+    }
+}
+
 async function executeRs(filePath) {
     const executablePathRs = path.resolve("temp.exe");
     const pdbPath = path.resolve("temp.pdb");
@@ -69,25 +88,6 @@ async function executeRs(filePath) {
     }
 }
 
-async function executeC(filePath) {
-    const executablePathC = path.resolve("temp.exe");
-    try {
-        const { stdout, stderr } = await execAsync(`gcc ${filePath} -o ${executablePathC} && ${executablePathC}`);
-        if (fs.existsSync(executablePathC)) {
-            return `${stdout}`;
-        } else {
-            return "Error: Unable to create executable file.";
-        }
-    } catch (error) {
-        return `Error: ${error.stderr}`;
-    } finally {
-        fs.unlinkSync(filePath);
-        if (fs.existsSync(executablePathC)) {
-            fs.unlinkSync(executablePathC);
-        }
-    }
-}
-
 async function executeCode(code, language) {
     return "The command is currently not working. Please try again later.";
 
@@ -107,15 +107,21 @@ async function executeCode(code, language) {
 
     switch (language) {
         case "js":
-            return executeJs(filePath);
+            await executeJs(filePath);
+            break;
         case "py":
-            return executePy(filePath);
+            await executePy(filePath);
+            break;
         case "cpp":
-            return executeCpp(filePath);
-        case "rs":
-            return executeRs(filePath);
+            await executeCpp(filePath);
+            break;
         case "c":
-            return executeC(filePath);
+            await executeC(filePath);
+            break;
+        case "rs":
+            await executeRs(filePath);
+            break;
+
         default:
             return "Invalid language";
     }*/
