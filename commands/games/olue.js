@@ -69,7 +69,7 @@ function generate(userMoney, durability) {
     };
 }
 
-async function remove(message, selectedNumber, specialNumbers, data) {
+async function edit(message, selectedNumber, specialNumbers, data) {
     await message.edit(data);
 }
 
@@ -84,7 +84,7 @@ async function mainGame(userData, userId, interaction) {
     const filter = (buttonInteraction) =>
         buttonInteraction.user.id === userId && buttonInteraction.customId.startsWith("number_");
 
-    const collector = interaction.channel.createMessageComponentCollector({
+    const collector = await message.createMessageComponentCollector({
         filter,
         time: 60000,
     });
@@ -97,7 +97,7 @@ async function mainGame(userData, userId, interaction) {
 
         await writeUserData(userData);
 
-        await remove(message, selectedNumber, specialNumbers, generatedData.content);
+        await edit(message, selectedNumber, specialNumbers, generatedData.content);
     });
 }
 
@@ -121,14 +121,14 @@ module.exports = {
 
             await writeUserData(userData);
 
-            await interaction.reply({
+            const message = await interaction.reply({
                 content: intro,
                 components: [row],
             });
 
             const filter = (click) => click.user.id === interaction.user.id;
 
-            const collector = interaction.channel.createMessageComponentCollector({
+            const collector = message.createMessageComponentCollector({
                 max: 1,
                 time: 60000,
                 filter,
