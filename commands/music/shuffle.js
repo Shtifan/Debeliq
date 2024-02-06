@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require("discord.js");
 const { useQueue } = require("discord-player");
 
 module.exports = {
-    data: new SlashCommandBuilder().setName("pause").setDescription("Pause or resume the queue"),
+    data: new SlashCommandBuilder().setName("shuffle").setDescription("Shuffles the queue"),
 
     async execute(interaction) {
         const channel = interaction.member.voice.channel;
@@ -23,9 +23,8 @@ module.exports = {
             return;
         }
 
-        queue.node.setPaused(!queue.node.isPaused());
+        queue.tracks.shuffle();
 
-        if (!queue.node.isPaused()) await interaction.reply("Music was paused successfully.");
-        else await interaction.reply("Music was resumed successfully.");
+        await interaction.reply("Queue shuffled.");
     },
 };

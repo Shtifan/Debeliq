@@ -1,8 +1,13 @@
 const { SlashCommandBuilder } = require("discord.js");
-const { useQueue, useHistory } = require("discord-player");
+const { useQueue } = require("discord-player");
 
 module.exports = {
-    data: new SlashCommandBuilder().setName("back").setDescription("Plays the previous track"),
+    data: new SlashCommandBuilder()
+        .setName("remove")
+        .setDescription("Remove a specific track from the queue")
+        .addIntegerOption((option) =>
+            option.setName("number").setDescription("The track number you want to remove").setRequired(true)
+        ),
 
     async execute(interaction) {
         const channel = interaction.member.voice.channel;
@@ -23,17 +28,19 @@ module.exports = {
             return;
         }
 
-        const history = useHistory(interaction.guild.id);
-        if (!history) {
+        const trackNumber = interaction.options.getInteger("number");
+        const tracks = queue.tracks.toArray();
+
+        if (tracks.length < trackNumber) {
             await interaction.reply({
-                content: "There is no track before this one.",
+                content: "There is no track with that number",
                 ephemeral: true,
             });
             return;
         }
 
-        await history.previous();
+        queue.removeTrack(trackNumber - 1);
 
-        await interaction.reply("Previous track queued.");
+        await interaction.reply(`Track number ${trackNumber} was removed;`);
     },
 };
