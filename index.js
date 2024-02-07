@@ -34,7 +34,7 @@ for (const folder of commandFolders) {
     }
 }
 
-require("./deploy.js");
+require("./register.js");
 
 client.buttons = new Collection();
 const buttonsPath = path.join(__dirname, "buttons");
