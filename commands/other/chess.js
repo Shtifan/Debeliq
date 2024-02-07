@@ -5,7 +5,6 @@ const execAsync = util.promisify(require("child_process").exec);
 const axios = require("axios");
 const fs = require("fs");
 
-// A function that takes an image attachment and returns the image data
 async function fetchImage(imageAttachment) {
     const imageUrl = imageAttachment.url;
 
