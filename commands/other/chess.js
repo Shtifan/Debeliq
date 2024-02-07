@@ -1,6 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js");
 const client = require("../../index.js");
-const fetch = require("node-fetch");
 const fs = require("fs");
 const util = require("util");
 const execAsync = util.promisify(require("child_process").exec);
@@ -24,12 +23,10 @@ module.exports = {
     async execute(interaction) {
         await interaction.deferReply();
 
-        const image = interaction.options.getAttachment("image");
-        const res = await fetch(image.url);
-        const buffer = await res.buffer();
-        const inputPath = "./image.png";
+        const imageAttachment = interaction.options.getAttachment("image");
 
-        fs.writeFileSync(inputPath, buffer);
+        const inputPath = "./image.png";
+        fs.writeFileSync(inputPath, await imageAttachment.fetch());
 
         const result = await execute();
 
@@ -46,14 +43,11 @@ module.exports = {
 client.on("messageCreate", async (message) => {
     if (message.author.bot) return;
 
-    const image = message.attachments.first();
-    if (!image) return;
+    const imageAttachment = message.attachments.first();
+    if (!imageAttachment) return;
 
-    const res = await fetch(image.url);
-    const buffer = await res.buffer();
     const inputPath = "./image.png";
-
-    fs.writeFileSync(inputPath, buffer);
+    fs.writeFileSync(inputPath, await imageAttachment.fetch());
 
     const result = await execute();
 
