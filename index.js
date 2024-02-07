@@ -47,7 +47,9 @@ for (const folder of buttonFolders) {
         const filePath = path.join(buttonsPath, folder, file);
         const button = require(filePath);
 
-        client.buttons.set(button.data.name, button);
+        if ("data" in button && "execute" in button) {
+            client.buttons.set(button.data.name, button);
+        }
     }
 }
 
