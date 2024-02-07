@@ -1,7 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const { Client, GatewayIntentBits, Collection, REST, Routes } = require("discord.js");
-const { clientId, token } = require("./config.json");
+const { token } = require("./config.json");
 const { Player } = require("discord-player");
 
 const client = new Client({
@@ -17,8 +17,6 @@ const client = new Client({
 module.exports = client;
 
 client.commands = new Collection();
-const commands = [];
-
 const foldersPath = path.join(__dirname, "commands");
 const commandFolders = fs.readdirSync(foldersPath);
 
@@ -30,15 +28,24 @@ for (const folder of commandFolders) {
         const command = require(filePath);
         if ("data" in command && "execute" in command) {
             client.commands.set(command.data.name, command);
-            commands.push(command.data.toJSON());
-        } else {
-            console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
         }
     }
 }
 
-const rest = new REST().setToken(token);
-rest.put(Routes.applicationCommands(clientId), { body: commands });
+require("./deploy.js");
+
+client.buttons = new Collection();
+const buttonsPath = path.join(__dirname, "buttons");
+const buttonFolders = fs.readdirSync(buttonsPath);
+
+for (const folder of buttonFolders) {
+    const buttonFiles = fs.readdirSync(path.join(buttonsPath, folder)).filter((file) => file.endsWith(".js"));
+    for (const file of buttonFiles) {
+        const filePath = path.join(buttonsPath, folder, file);
+        const button = require(filePath);
+        client.buttons.set(button.data.name, button);
+    }
+}
 
 const eventsPath = path.join(__dirname, "events");
 const eventFiles = fs.readdirSync(eventsPath).filter((file) => file.endsWith(".js"));
