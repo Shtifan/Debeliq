@@ -12,7 +12,7 @@ module.exports = {
             } catch (error) {
                 console.error(error);
                 await interaction.reply({
-                    content: "There was an error while executing the command!",
+                    content: "There was an error while executing this command!",
                     ephemeral: true,
                 });
             }
@@ -25,7 +25,7 @@ module.exports = {
             } catch (error) {
                 console.error(error);
                 await interaction.reply({
-                    content: "There was an error while executing the button command!",
+                    content: "There was an error while executing this button command!",
                     ephemeral: true,
                 });
             }
