@@ -35,23 +35,6 @@ for (const folder of commandFolders) {
 
 require("./register.js");
 
-client.buttons = new Collection();
-const buttonsPath = path.join(__dirname, "buttons");
-const buttonFolders = fs.readdirSync(buttonsPath);
-
-for (const folder of buttonFolders) {
-    const buttonFiles = fs.readdirSync(path.join(buttonsPath, folder)).filter((file) => file.endsWith(".js"));
-
-    for (const file of buttonFiles) {
-        const filePath = path.join(buttonsPath, folder, file);
-        const button = require(filePath);
-
-        if ("data" in button && "execute" in button) {
-            client.buttons.set(button.data.name, button);
-        }
-    }
-}
-
 const eventsPath = path.join(__dirname, "events");
 const eventFiles = fs.readdirSync(eventsPath).filter((file) => file.endsWith(".js"));
 
