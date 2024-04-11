@@ -1,11 +1,9 @@
 node_modules
 
-package-lock.json
+bun.lockb
 
 config.json
 
 image.png
-
-output.png
 
 user_data.json

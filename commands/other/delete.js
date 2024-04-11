@@ -17,7 +17,7 @@ module.exports = {
             return;
         }
 
-        const amount = interaction.options.getInteger("amount");
+        let amount = interaction.options.getInteger("amount");
         if (amount > 100) amount = 100;
 
         await interaction.channel.bulkDelete(amount, true).then((messages) => {
