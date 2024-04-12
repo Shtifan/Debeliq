@@ -8,8 +8,6 @@ module.exports = {
         .addStringOption((option) => option.setName("reason").setDescription("The reason for the kick")),
 
     async execute(interaction) {
-        await interaction.deferReply();
-
         const targetUserId = interaction.options.getUser("user");
         const targetUser = await interaction.guild.members.fetch(targetUserId);
 
@@ -26,9 +24,9 @@ module.exports = {
 
         try {
             await targetUser.kick({ reason });
-            await interaction.editReply(`User ${targetUser} was kicked\nReason: ${reason}`);
+            await interaction.reply(`User ${targetUser} was kicked\nReason: ${reason}`);
         } catch (error) {
-            await interaction.editReply({
+            await interaction.reply({
                 content: `Sorry I am unable to kick ${targetUser}`,
                 ephemeral: true,
             });
