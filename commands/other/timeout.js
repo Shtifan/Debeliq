@@ -12,8 +12,6 @@ module.exports = {
         .addStringOption((option) => option.setName("reason").setDescription("The reason for the timeout")),
 
     async execute(interaction) {
-        await interaction.deferReply();
-
         const targetUserId = interaction.options.getUser("user");
         const targetUser = await interaction.guild.members.fetch(targetUserId);
 
@@ -33,9 +31,9 @@ module.exports = {
 
         try {
             await targetUser.timeout(msDuration, reason);
-            await interaction.editReply(`${targetUser} was timed out for ${duration}.\nReason: ${reason}`);
+            await interaction.reply(`${targetUser} was timed out for ${duration}.\nReason: ${reason}`);
         } catch (error) {
-            await interaction.editReply({
+            await interaction.reply({
                 content: `Sorry I am unable to timeout ${targetUser}`,
                 ephemeral: true,
             });
