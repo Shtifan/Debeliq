@@ -1,13 +1,14 @@
 {
   "name": "debeliq",
-  "module": "index.js",
-  "type": "module",
-  "devDependencies": {
-    "@types/bun": "latest"
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "node index.js"
   },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
-  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "dependencies": {
     "@discord-player/extractor": "^4.4.7",
     "axios": "^1.6.8",
