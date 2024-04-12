@@ -82,7 +82,7 @@ async function mainGame(userData, userId, interaction) {
     const specialNumbers = generatedData.specialNumbers;
 
     const filter = (buttonInteraction) =>
-        buttonInteraction.user.id === userId && buttonInteraction.customId.startsWith("number_");
+        buttonInteraction.user.id == userId && buttonInteraction.customId.startsWith("number_");
 
     const collector = await message.createMessageComponentCollector({
         filter,
@@ -126,7 +126,7 @@ module.exports = {
                 components: [row],
             });
 
-            const filter = (click) => click.user.id === interaction.user.id;
+            const filter = (click) => click.user.id == interaction.user.id;
 
             const collector = message.createMessageComponentCollector({
                 max: 1,
