@@ -126,9 +126,9 @@ client.on("messageCreate", async (message) => {
         if (acceptingDeal) return;
 
         const input = parseInt(message.content);
-        if (isNaN(input) || input < 1 || input > 26 || cases.findIndex((c) => c.number === input) === -1) return;
+        if (isNaN(input) || input < 1 || input > 26 || cases.findIndex((c) => c.number == input) == -1) return;
 
-        const index = cases.findIndex((c) => c.number === input);
+        const index = cases.findIndex((c) => c.number == input);
 
         if (input == yourCase) return;
 
