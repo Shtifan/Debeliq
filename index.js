@@ -1,8 +1,8 @@
-const fs = require("fs");
-const path = require("path");
 const { Client, GatewayIntentBits, Collection } = require("discord.js");
-const { token } = require("./config.json");
 const { Player } = require("discord-player");
+const path = require("path");
+const fs = require("fs");
+const { token } = require("./config.json");
 
 const client = new Client({
     intents: [
