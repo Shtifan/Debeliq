@@ -50,7 +50,7 @@ for (const file of eventFiles) {
 }
 
 const player = new Player(client);
-player.extractors.loadDefault();
+player.extractors.loadDefault((ext) => ext !== "YouTubeExtractor");
 
 require("./player.js");
 
