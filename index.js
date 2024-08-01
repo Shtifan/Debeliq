@@ -1,5 +1,4 @@
 const { Client, GatewayIntentBits, Collection } = require("discord.js");
-const { Player } = require("discord-player");
 const path = require("path");
 const fs = require("fs");
 const { token } = require("./config.json");
@@ -48,10 +47,5 @@ for (const file of eventFiles) {
         client.on(event.name, (...args) => event.execute(...args));
     }
 }
-
-const player = new Player(client);
-player.extractors.loadDefault((ext) => ext !== "YouTubeExtractor");
-
-require("./player.js");
 
 client.login(token);
