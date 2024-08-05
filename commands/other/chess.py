@@ -13,8 +13,8 @@ def rotate_fen(fen):
     rotated_fen = '/'.join(reversed_fen_parts)
     return rotated_fen
 
-input_path = "./image.png"
-output_path = "./output.png"
+input_path = "./data/image.png"
+output_path = "./data/output.png"
 stockfish = Stockfish("C:/Stockfish/stockfish.exe")
 
 #crop_chessboard(input_path)

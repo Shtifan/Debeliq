@@ -3,7 +3,7 @@ const fs = require("fs/promises");
 
 async function readUserData() {
     try {
-        const data = await fs.readFile("./user_data.json", "utf8");
+        const data = await fs.readFile("./data/olue_data.json", "utf8");
         return JSON.parse(data);
     } catch (err) {
         console.error("Error reading user data:", err);
@@ -13,7 +13,7 @@ async function readUserData() {
 
 async function writeUserData(userData) {
     try {
-        await fs.writeFile("./user_data.json", JSON.stringify(userData, null, 2), "utf8");
+        await fs.writeFile("./data/olue_data.json", JSON.stringify(userData, null, 2), "utf8");
         console.log("User data written successfully.");
     } catch (err) {
         console.error("Error writing user data:", err);
