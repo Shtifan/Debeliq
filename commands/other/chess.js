@@ -37,7 +37,7 @@ module.exports = {
         const imageAttachment = interaction.options.getAttachment("image");
 
         const image = await fetchImage(imageAttachment);
-        const inputPath = "./image.png";
+        const inputPath = "./data/image.png";
 
         fs.writeFileSync(inputPath, image);
 
@@ -60,7 +60,7 @@ client.on("messageCreate", async (message) => {
     if (!imageAttachment) return;
 
     const image = await fetchImage(imageAttachment);
-    const inputPath = "./image.png";
+    const inputPath = "./data/image.png";
 
     fs.writeFileSync(inputPath, image);
 
