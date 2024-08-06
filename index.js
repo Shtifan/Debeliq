@@ -1,8 +1,9 @@
 const { Client, GatewayIntentBits, Collection, REST, Routes } = require("discord.js");
 const { Player } = require("discord-player");
+const { YoutubeiExtractor } = require("discord-player-youtubei");
 const fs = require("fs");
 const path = require("path");
-const { clientId, token } = require("./config.json");
+const { token, clientId, YT_CREDENTIAL } = require("./config.json");
 
 const client = new Client({
     intents: [
@@ -17,10 +18,10 @@ const client = new Client({
 module.exports = client;
 
 client.commands = new Collection();
+const commands = [];
+
 const commandsPath = path.join(__dirname, "commands");
 const commandFolders = fs.readdirSync(commandsPath);
-
-const commands = [];
 
 for (const folder of commandFolders) {
     const commandFiles = fs.readdirSync(path.join(commandsPath, folder)).filter((file) => file.endsWith(".js"));
@@ -29,50 +30,40 @@ for (const folder of commandFolders) {
         const filePath = path.join(commandsPath, folder, file);
         const command = require(filePath);
 
-        if ("data" in command && "execute" in command) {
-            client.commands.set(command.data.name, command);
-            commands.push(command.data.toJSON());
-        } else {
-            console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
-        }
+        client.commands.set(command.data.name, command);
+        commands.push(command.data.toJSON());
     }
 }
 
 const rest = new REST().setToken(token);
-
-(async () => {
-    try {
-        const data = await rest.put(Routes.applicationCommands(clientId), { body: commands });
-        console.log(`Successfully registered ${data.length} slash commands.`);
-    } catch (error) {
-        console.error(error);
-    }
-})();
+rest.put(Routes.applicationCommands(clientId), { body: commands });
 
 const player = new Player(client);
+
+player.extractors.register(YoutubeiExtractor, {
+    authentication: YT_CREDENTIAL,
+});
+
 player.extractors.loadDefault();
 
 const eventsPath = path.join(__dirname, "events");
-const eventFiles = fs.readdirSync(eventsPath).filter((file) => file.endsWith(".js"));
+const eventFolders = fs.readdirSync(eventsPath);
 
-let eventCount = 0;
+for (const folder of eventFolders) {
+    const eventFiles = fs.readdirSync(path.join(eventsPath, folder)).filter((file) => file.endsWith(".js"));
 
-for (const file of eventFiles) {
-    const filePath = path.join(eventsPath, file);
-    const event = require(filePath);
+    for (const file of eventFiles) {
+        const filePath = path.join(eventsPath, folder, file);
+        const event = require(filePath);
 
-    if (event.type == "player") {
-        player.events.on(event.name, (...args) => event.execute(...args));
-        eventCount++;
-    } else if (event.once) {
-        client.once(event.name, (...args) => event.execute(...args));
-        eventCount++;
-    } else {
-        client.on(event.name, (...args) => event.execute(...args));
-        eventCount++;
+        if (event.type == "player") {
+            player.events.on(event.name, (...args) => event.execute(...args));
+        } else if (event.once) {
+            client.once(event.name, (...args) => event.execute(...args));
+        } else {
+            client.on(event.name, (...args) => event.execute(...args));
+        }
     }
 }
-
-console.log(`Successfully loaded ${eventCount} events.`);
 
 client.login(token);
