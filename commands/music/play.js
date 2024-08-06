@@ -28,7 +28,5 @@ module.exports = {
                 metadata: interaction,
             },
         });
-
-        await interaction.followUp("Successfully completed your request.");
     },
 };

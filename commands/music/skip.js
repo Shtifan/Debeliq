@@ -24,7 +24,5 @@ module.exports = {
         }
 
         queue.node.skip();
-
-        await interaction.reply(`Skipping **${queue.currentTrack.title}**.`);
     },
 };
