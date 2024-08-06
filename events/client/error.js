@@ -4,7 +4,7 @@ module.exports = {
     name: Events.Error,
     type: "error",
     once: false,
-    execute(err) {
-        console.error(err);
+    execute(error) {
+        console.error(error);
     },
 };
