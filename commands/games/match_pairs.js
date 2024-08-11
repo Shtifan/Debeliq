@@ -6,8 +6,8 @@ module.exports = {
 
     async execute(interaction) {
         const Game = new MatchPairs({
-            message: message,
-            isSlashGame: false,
+            message: interaction,
+            isSlashGame: true,
             embed: {
                 title: "Match Pairs",
                 color: "#5865F2",
