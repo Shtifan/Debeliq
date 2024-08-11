@@ -1,6 +1,8 @@
 const { SlashCommandBuilder } = require("discord.js");
 const { Fishy } = require("discord-gamecord");
 
+let player = {};
+
 module.exports = {
     data: new SlashCommandBuilder().setName("fishy").setDescription("Play Fishy"),
 
