@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require("discord.js");
 const { GuessThePokemon } = require("discord-gamecord");
 
 module.exports = {
-    data: new SlashCommandBuilder().setName("guessThePokemon").setDescription("Play Guess The Pokemon"),
+    data: new SlashCommandBuilder().setName("guess_the_pokemon").setDescription("Play Guess The Pokemon"),
 
     async execute(interaction) {
         const Game = new GuessThePokemon({
