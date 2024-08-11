@@ -10,8 +10,6 @@ module.exports = {
     async execute(interaction) {
         const player = useMainPlayer();
 
-        await interaction.deferReply();
-
         const channel = interaction.member.voice.channel;
         if (!channel) {
             await interaction.reply({
@@ -20,6 +18,8 @@ module.exports = {
             });
             return;
         }
+
+        await interaction.deferReply();
 
         const query = interaction.options.getString("query", true);
 
