@@ -1,30 +1,25 @@
 const { SlashCommandBuilder } = require("discord.js");
-const { Snake } = require("discord-gamecord");
+const { TwoZeroFourEight } = require("discord-gamecord");
 
 module.exports = {
-    data: new SlashCommandBuilder().setName("snake").setDescription("Play Snake"),
+    data: new SlashCommandBuilder().setName("2048").setDescription("Play 2048"),
 
     async execute(interaction) {
-        const Game = new Snake({
+        const Game = new TwoZeroFourEight({
             message: interaction,
             isSlashGame: true,
             embed: {
-                title: "Snake Game",
-                overTitle: "Game Over",
+                title: "2048",
                 color: "#5865F2",
             },
             emojis: {
-                board: "⬛",
-                food: "🍎",
                 up: "⬆️",
                 down: "⬇️",
                 left: "⬅️",
                 right: "➡️",
             },
-            snake: { head: "🟢", body: "🟩", tail: "🟢", over: "💀" },
-            foods: ["🍎", "🍇", "🍊", "🫐", "🥕", "🥝", "🌽"],
-            stopButton: "Stop",
-            timeoutTime: 120000,
+            timeoutTime: 60000,
+            buttonStyle: "PRIMARY",
             playerOnlyMessage: "Only {player} can use these buttons.",
         });
 

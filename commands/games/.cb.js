@@ -53,7 +53,7 @@ function cb(number, input) {
 let gamecb = false;
 
 module.exports = {
-    data: new SlashCommandBuilder().setName("cb").setDescription("Play cows and bulls game"),
+    data: new SlashCommandBuilder().setName("cb").setDescription("Play Cows and Bulls"),
 
     async execute(interaction) {
         gamecb = true;
