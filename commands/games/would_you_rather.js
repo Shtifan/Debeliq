@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require("discord.js");
 const { WouldYouRather } = require("discord-gamecord");
 
 module.exports = {
-    data: new SlashCommandBuilder().setName("wouldYouRather").setDescription("Play Would you Rather"),
+    data: new SlashCommandBuilder().setName("would_you_rather").setDescription("Play Would you Rather"),
 
     async execute(interaction) {
         const Game = new WouldYouRather({
