@@ -4,7 +4,7 @@ const { TicTacToe } = require("discord-gamecord");
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("ttt")
-        .setDescription("Play tic tac toe game")
+        .setDescription("Play Tic Tac Toe")
         .addUserOption((option) => option.setName("user").setDescription("Name of the opponent").setRequired(true)),
 
     async execute(interaction) {
