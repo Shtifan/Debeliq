@@ -4,6 +4,4 @@ package-lock.json
 
 config.json
 
-image.png
-
-user_data.json
+data/

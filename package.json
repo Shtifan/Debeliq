@@ -1,0 +1,22 @@
+{
+  "name": "debeliq",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@discord-player/extractor": "^4.5.0",
+    "axios": "^1.7.3",
+    "discord-gamecord": "^4.4.2",
+    "discord-player": "^6.7.1",
+    "discord-player-youtubei": "^1.2.4",
+    "discord.js": "^14.15.3",
+    "mediaplex": "^0.0.9",
+    "ms": "^2.1.3"
+  }
+}
