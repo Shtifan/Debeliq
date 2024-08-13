@@ -1,9 +1,9 @@
 const { SlashCommandBuilder } = require("discord.js");
-const client = require("../../index.js");
 const fs = require("fs");
 const path = require("path");
 const util = require("util");
 const execAsync = util.promisify(require("child_process").exec);
+const client = require("../../index.js");
 
 async function executeJs(filePath) {
     try {
