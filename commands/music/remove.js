@@ -33,7 +33,7 @@ module.exports = {
 
         if (tracks.length < trackNumber) {
             await interaction.reply({
-                content: "There is no track with that number",
+                content: "There is no track with that number.",
                 ephemeral: true,
             });
             return;
@@ -41,6 +41,6 @@ module.exports = {
 
         queue.removeTrack(trackNumber - 1);
 
-        await interaction.reply(`Track number ${trackNumber} was removed;`);
+        await interaction.reply(`Track number ${trackNumber} was removed.`);
     },
 };
