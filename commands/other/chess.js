@@ -1,16 +1,13 @@
 const { SlashCommandBuilder } = require("discord.js");
 const fs = require("fs");
-const fetch = require("node-fetch");
+const axios = require("axios");
 const util = require("util");
 const execAsync = util.promisify(require("child_process").exec);
 const client = require("../../index.js");
 
 async function fetchImage(imageAttachment) {
-    const response = await fetch(imageAttachment.url);
-    if (!response.ok) throw new Error(`Failed to fetch image: ${response.statusText}`);
-
-    const buffer = await response.buffer();
-    return buffer;
+    const response = await axios.get(imageAttachment.url, { responseType: "arraybuffer" });
+    return Buffer.from(response.data, "binary");
 }
 
 async function execute() {
