@@ -24,7 +24,7 @@ function getRandomNumber(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function generate(userMoney, durability) {
+function generate(userMoney, durability, specialNumbers = null) {
     const arrayLength = getRandomNumber(2, 5);
     const uniqueNumbers = new Set();
 
@@ -32,7 +32,7 @@ function generate(userMoney, durability) {
         uniqueNumbers.add(getRandomNumber(1, 10));
     }
 
-    const specialNumbers = Array.from(uniqueNumbers);
+    specialNumbers = specialNumbers || Array.from(uniqueNumbers);
 
     let reply = "";
 
@@ -40,7 +40,7 @@ function generate(userMoney, durability) {
     reply += `Drill durability: ${durability}\n`;
     reply += `${"  _____  ".repeat(10)}\n`;
     reply += `${Array.from({ length: 3 }, (_, i) =>
-        Array.from({ length: 10 }, (_, j) => (specialNumbers.includes(j + 1) ? " |🛢️🛢️| " : " |     | ")).join("")
+        Array.from({ length: 10 }, (_, j) => (specialNumbers.includes(j + 1) ? " |OOOOO| " : " |     | ")).join("")
     ).join("\n")}\n`;
     reply += `${"  ‾‾‾‾‾  ".repeat(10)}\n`;
     reply += `${Array.from({ length: 10 }, (_, i) => `    ${i + 1}    `).join("")}\n`;
@@ -69,8 +69,20 @@ function generate(userMoney, durability) {
     };
 }
 
-async function edit(message, selectedNumber, specialNumbers, data) {
-    await message.edit(data);
+async function edit(message, selectedNumber, specialNumbers, userMoney, durability) {
+    let newContent = `Money: ${userMoney}\n`;
+    newContent += `Drill durability: ${durability}\n`;
+    newContent += `${"  _____  ".repeat(10)}\n`;
+    newContent += `${Array.from({ length: 3 }, (_, i) =>
+        Array.from({ length: 10 }, (_, j) => {
+            if (j + 1 === selectedNumber) return " |XXXXX| ";
+            return specialNumbers.includes(j + 1) ? " |OOOOO| " : " |     | ";
+        }).join("")
+    ).join("\n")}\n`;
+    newContent += `${"  ‾‾‾‾‾  ".repeat(10)}\n`;
+    newContent += `${Array.from({ length: 10 }, (_, i) => `    ${i + 1}    `).join("")}\n`;
+
+    await message.edit({ content: "```" + newContent + "```" });
 }
 
 async function mainGame(userData, userId, interaction) {
@@ -84,20 +96,37 @@ async function mainGame(userData, userId, interaction) {
     const filter = (buttonInteraction) =>
         buttonInteraction.user.id == userId && buttonInteraction.customId.startsWith("number_");
 
-    const collector = await message.createMessageComponentCollector({
-        filter,
-        time: 60000,
-    });
+    const collector = message.createMessageComponentCollector({ filter, time: 60000 });
 
     collector.on("collect", async (buttonInteraction) => {
         const selectedNumber = parseInt(buttonInteraction.customId.split("_")[1]);
         userData[userId].durability -= 1;
 
-        if (specialNumbers.includes(selectedNumber)) userData[userId].money += 10;
+        if (specialNumbers.includes(selectedNumber)) {
+            userData[userId].money += 10;
+        }
 
         await writeUserData(userData);
 
-        await edit(message, selectedNumber, specialNumbers, generatedData.content);
+        // Update the game state visually
+        await edit(message, selectedNumber, specialNumbers, userData[userId].money, userData[userId].durability);
+
+        // Check if the game is over
+        if (userData[userId].durability <= 0) {
+            await message.edit({
+                content: "Game over! You've run out of durability. Please reset the game.",
+                components: [],
+            });
+            collector.stop();
+        }
+
+        buttonInteraction.deferUpdate();
+    });
+
+    collector.on("end", async (collected) => {
+        if (collected.size === 0) {
+            await message.edit({ content: "Time's up! No selection was made.", components: [] });
+        }
     });
 }
 
@@ -137,6 +166,8 @@ module.exports = {
             collector.on("collect", async (interaction) => {
                 await mainGame(userData, userId, interaction);
             });
-        } else await mainGame(userData, userId, interaction);
+        } else {
+            await mainGame(userData, userId, interaction);
+        }
     },
 };
