@@ -15,7 +15,7 @@ module.exports = {
         }
 
         const queue = useQueue(interaction.guild.id);
-        if (!queue || !queue.node.isPlaying()) {
+        if (!queue) {
             await interaction.reply({
                 content: "There is no music currently playing.",
                 ephemeral: true,
@@ -25,7 +25,7 @@ module.exports = {
 
         queue.node.setPaused(!queue.node.isPaused());
 
-        if (!queue.node.isPaused()) await interaction.reply("Music was paused successfully.");
+        if (queue.node.isPaused()) await interaction.reply("Music was paused successfully.");
         else await interaction.reply("Music was resumed successfully.");
     },
 };
