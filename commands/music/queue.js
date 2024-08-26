@@ -23,11 +23,17 @@ module.exports = {
             return;
         }
 
+        const track = queue.currentTrack;
+
         const embed = new EmbedBuilder()
             .setColor(0x000000)
-            .setTitle("**Queue**")
+            .setAuthor({ name: "Now Playing:" })
+            .setTitle(track.title)
+            .setURL(track.url)
+            .setThumbnail(track.thumbnail)
             .setDescription(
-                `**Current**: ${queue.currentTrack.title} | ${queue.currentTrack.author}\n\n` +
+                queue.node.createProgressBar() +
+                    "\n\n" +
                     queue.tracks
                         .map((track, i) => {
                             return `**#${i + 1}** - Title: **${track.title}** | Uploaded by: **${track.author}**`;
