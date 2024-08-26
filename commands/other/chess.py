@@ -1,6 +1,8 @@
 from stockfish import Stockfish
 from board_to_fen.predict import get_fen_from_image_path
 import sys
+import cv2
+import numpy as np
 
 def get_best_move(stockfish, fen):
     stockfish.set_fen_position(fen)
@@ -15,7 +17,7 @@ def rotate_fen(fen):
 
 input_path = "./data/image.png"
 output_path = "./data/output.png"
-stockfish = Stockfish("C:/Stockfish/stockfish.exe")
+stockfish = Stockfish("./commands/other/stockfish.exe")
 
 #crop_chessboard(input_path)
 
