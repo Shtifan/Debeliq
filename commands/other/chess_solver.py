@@ -40,22 +40,22 @@ def rotate_fen(fen):
     return rotated_fen
 
 
+def get_best_move(stockfish, fen):
+    stockfish.set_fen_position(fen)
+    best_move = stockfish.get_best_move()
+    return best_move
+
+
 crop_chessboard(image_path)
 
 fen = get_fen_from_image_path(image_path)
 if not stockfish.is_fen_valid(fen + " w - - 0 1"):
     sys.exit()
 
-with open("./data/move.txt", "r") as file:
-    move_color = file.read().strip()
+best_move_white = get_best_move(stockfish, fen + " w - - 0 1")
+print(best_move_white)
 
+fen = rotate_fen(fen)
 
-if move_color == "b":
-    fen = rotate_fen(fen)
-
-fen_with_color = fen + f" {move_color} - - 0 1"
-
-stockfish.set_fen_position(fen_with_color)
-
-best_move = stockfish.get_best_move()
-print(best_move)
+best_move_black = get_best_move(stockfish, fen + " b - - 0 1")
+print(best_move_black)
