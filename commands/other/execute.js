@@ -5,6 +5,15 @@ const util = require("util");
 const execAsync = util.promisify(require("child_process").exec);
 const client = require("../../index.js");
 
+function isDocker() {
+    if (fs.existsSync("/.dockerenv")) return true;
+    if (fs.existsSync("/proc/1/cgroup")) {
+        const cgroup = fs.readFileSync("/proc/1/cgroup", "utf8");
+        return cgroup.includes("docker");
+    }
+    return false;
+}
+
 async function executeJs(filePath) {
     try {
         const { stdout, stderr } = await execAsync(`node ${filePath}`);
@@ -89,9 +98,11 @@ async function executeRs(filePath) {
 }
 
 async function executeCode(code, language) {
-    return "The command is currently not working. Please try again later.";
+    /*if (!isDocker()) {
+        return "Error: The code can only be executed inside a Docker container.";
+    }*/
 
-    /*const fileExtension = {
+    const fileExtension = {
         js: "js",
         cpp: "cpp",
         py: "py",
@@ -107,24 +118,18 @@ async function executeCode(code, language) {
 
     switch (language) {
         case "js":
-            await executeJs(filePath);
-            break;
+            return await executeJs(filePath);
         case "py":
-            await executePy(filePath);
-            break;
+            return await executePy(filePath);
         case "cpp":
-            await executeCpp(filePath);
-            break;
+            return await executeCpp(filePath);
         case "c":
-            await executeC(filePath);
-            break;
+            return await executeC(filePath);
         case "rs":
-            await executeRs(filePath);
-            break;
-
+            return await executeRs(filePath);
         default:
             return "Invalid language";
-    }*/
+    }
 }
 
 module.exports = {
