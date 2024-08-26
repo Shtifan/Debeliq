@@ -150,6 +150,7 @@ module.exports = {
                 .setRequired(true)
         )
         .addStringOption((option) => option.setName("code").setDescription("Paste the whole code here").setRequired(true)),
+        
     async execute(interaction) {
         await interaction.deferReply();
 
