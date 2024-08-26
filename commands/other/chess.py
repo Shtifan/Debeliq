@@ -7,6 +7,7 @@ import numpy as np
 image_path = "./data/image.png"
 stockfish = Stockfish("./commands/other/stockfish.exe")
 
+
 def crop_chessboard(image_path):
     img = cv2.imread(image_path)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
@@ -26,10 +27,18 @@ def crop_chessboard(image_path):
         if len(approx) == 4:
             x, y, w, h = cv2.boundingRect(approx)
 
-            cropped_img = img[y:y + h, x:x + w]
+            cropped_img = img[y : y + h, x : x + w]
 
             cv2.imwrite(image_path, cropped_img)
             return
+
+
+def rotate_fen(fen):
+    fen_parts = fen.split("/")
+    reversed_fen_parts = [part[::-1] for part in fen_parts[::-1]]
+    rotated_fen = "/".join(reversed_fen_parts)
+    return rotated_fen
+
 
 crop_chessboard(image_path)
 
@@ -40,13 +49,8 @@ if not stockfish.is_fen_valid(fen + " w - - 0 1"):
 with open("./data/move.txt", "r") as file:
     move_color = file.read().strip()
 
-def rotate_fen(fen):
-    fen_parts = fen.split('/')
-    reversed_fen_parts = [part[::-1] for part in fen_parts[::-1]]
-    rotated_fen = '/'.join(reversed_fen_parts)
-    return rotated_fen
 
-if move_color == 'b':
+if move_color == "b":
     fen = rotate_fen(fen)
 
 fen_with_color = fen + f" {move_color} - - 0 1"
@@ -54,5 +58,4 @@ fen_with_color = fen + f" {move_color} - - 0 1"
 stockfish.set_fen_position(fen_with_color)
 
 best_move = stockfish.get_best_move()
-
 print(best_move)
