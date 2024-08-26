@@ -24,7 +24,7 @@ module.exports = {
         }
 
         const history = useHistory(interaction.guild.id);
-        if (!history) {
+        if (history.isEmpty()) {
             await interaction.reply({
                 content: "There is no track before this one.",
                 ephemeral: true,
@@ -32,8 +32,10 @@ module.exports = {
             return;
         }
 
+        await interaction.deferReply();
+
         await history.previous();
 
-        await interaction.reply("Previous track queued.");
+        await interaction.reply("Playing previous song.");
     },
 };
