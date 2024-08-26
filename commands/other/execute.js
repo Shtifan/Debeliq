@@ -98,9 +98,9 @@ async function executeRs(filePath) {
 }
 
 async function executeCode(code, language) {
-    /*if (!isDocker()) {
+    if (!isDocker()) {
         return "Error: The code can only be executed inside a Docker container.";
-    }*/
+    }
 
     const fileExtension = {
         js: "js",
