@@ -20,8 +20,8 @@ async function execute() {
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName("chess")
-        .setDescription("Gives the best chess move based on an image")
+        .setName("chess_solver")
+        .setDescription("Gives the best chess move based on an image using stockfish")
         .addAttachmentOption((option) =>
             option.setName("image").setDescription("Attach a chess board image").setRequired(true)
         )
