@@ -4,15 +4,12 @@ import sys
 import cv2
 import numpy as np
 
-# Define paths
 IMAGE_PATH = "./data/image.png"
 STOCKFISH_PATH = "./commands/other/stockfish.exe"
 
-# Initialize Stockfish
 stockfish = Stockfish(STOCKFISH_PATH)
 
 def crop_chessboard(image_path):
-    """Crops the chessboard from the image and saves it."""
     img = cv2.imread(image_path)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray, (5, 5), 0)
@@ -31,12 +28,10 @@ def crop_chessboard(image_path):
             return
 
 def get_best_move(stockfish, fen):
-    """Gets the best move from Stockfish for the given FEN position."""
     stockfish.set_fen_position(fen)
     return stockfish.get_best_move()
 
 def draw_best_move(image, move):
-    """Draws the best move on the chessboard image."""
     COL_MAPPING = {"a": 0, "b": 1, "c": 2, "d": 3, "e": 4, "f": 5, "g": 6, "h": 7}
     height, width, _ = image.shape
     square_size = width // 8
@@ -63,14 +58,14 @@ def main():
     fen = get_fen_from_image_path(IMAGE_PATH)
 
     if not stockfish.is_fen_valid(fen + " w - - 0 1"):
-        sys.exit("Invalid FEN for white's turn")
+        sys.exit()
 
     best_move_white = get_best_move(stockfish, fen + " w - - 0 1")
-    print(f"Best move for white: {best_move_white}")
+    print(best_move_white)
     draw_best_move(original_image, best_move_white)
 
     best_move_black = get_best_move(stockfish, fen + " b - - 0 1")
-    print(f"Best move for black: {best_move_black}")
+    print(best_move_black)
     draw_best_move(original_image, best_move_black)
 
     cv2.imwrite(IMAGE_PATH, original_image)
