@@ -41,17 +41,24 @@ module.exports = {
         const move = interaction.options.getString("move");
 
         const image = await fetchImage(imageAttachment);
-        const inputPath = "./data/image.png";
-        fs.writeFileSync(inputPath, image);
+        const imagePath = "./data/image.png";
+        fs.writeFileSync(imagePath, image);
 
         const result = await execute();
         if (result.length == 0) return interaction.followUp("No valid chessboard detected.");
 
         let best_move = "";
-        if (move == "w") best_move = result[0];
-        else best_move = result[1];
+        let move_path = "";
 
-        await interaction.followUp({ content: `Best move: ${best_move}`, files: [{ attachment: inputPath }] });
+        if (move == "w") {
+            best_move = result[0];
+            move_path = "./data/white_best_move.png";
+        } else {
+            best_move = result[1];
+            move_path = "./data/black_best_move.png";
+        }
+
+        await interaction.followUp({ content: `Best move: ${best_move}`, files: [{ attachment: move_path }] });
     },
 };
 
@@ -62,8 +69,8 @@ client.on("messageCreate", async (message) => {
     if (!imageAttachment) return;
 
     const image = await fetchImage(imageAttachment);
-    const inputPath = "./data/image.png";
-    fs.writeFileSync(inputPath, image);
+    const imagePath = "./data/image.png";
+    fs.writeFileSync(imagePath, image);
 
     const result = await execute();
     if (result.length == 0) return;

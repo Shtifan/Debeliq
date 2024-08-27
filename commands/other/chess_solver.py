@@ -49,7 +49,7 @@ def get_best_move(stockfish, fen):
     return best_move
 
 
-def draw_best_move(image_path, move):
+def draw_best_move(image_path, move, save_path):
     # Load the image
     img = cv2.imread(image_path)
     height, width, _ = img.shape
@@ -80,8 +80,8 @@ def draw_best_move(image_path, move):
     # Draw a line between the two centers
     cv2.line(img, start_center, end_center, (0, 0, 255), 5)
 
-    # Overwrite the original image with the line drawn on it
-    cv2.imwrite(image_path, img)
+    # Save the image with the line drawn on it
+    cv2.imwrite(save_path, img)
 
 
 # Crop the chessboard from the image
@@ -96,15 +96,15 @@ if not stockfish.is_fen_valid(fen + " w - - 0 1"):
 best_move_white = get_best_move(stockfish, fen + " w - - 0 1")
 print(f"Best move for white: {best_move_white}")
 
-# Draw the best move for white on the image
-draw_best_move(image_path, best_move_white)
+# Draw the best move for white on the image and save it
+draw_best_move(image_path, best_move_white, "./data/white_best_move.png")
 
 # Rotate the FEN for black's perspective
-#fen = rotate_fen(fen)
+fen = rotate_fen(fen)
 
 # Get the best move for black
-#best_move_black = get_best_move(stockfish, fen + " b - - 0 1")
-#print(f"Best move for black: {best_move_black}")
+best_move_black = get_best_move(stockfish, fen + " b - - 0 1")
+print(f"Best move for black: {best_move_black}")
 
-# Draw the best move for black on the image (use a different image path to avoid overwriting)
-#draw_best_move(image_path.replace(".png", "_rotated.png"), best_move_black)
+# Draw the best move for black on the image and save it
+draw_best_move(image_path, best_move_black, "./data/black_best_move.png")
