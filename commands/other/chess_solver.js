@@ -1,13 +1,14 @@
 const { SlashCommandBuilder } = require("discord.js");
 const fs = require("fs");
-const axios = require("axios");
 const util = require("util");
 const execAsync = util.promisify(require("child_process").exec);
+const fetch = require("node-fetch");
 const client = require("../../index.js");
 
 async function fetchImage(imageAttachment) {
-    const response = await axios.get(imageAttachment.url, { responseType: "arraybuffer" });
-    return Buffer.from(response.data, "binary");
+    const response = await fetch(imageAttachment.url);
+    if (!response.ok) throw new Error(`Failed to fetch image: ${response.statusText}`);
+    return response.buffer();
 }
 
 async function execute() {
@@ -31,14 +32,13 @@ module.exports = {
         await interaction.deferReply();
 
         const imageAttachment = interaction.options.getAttachment("image");
-        const move = interaction.options.getString("move");
 
         const image = await fetchImage(imageAttachment);
         const imagePath = "./data/image.png";
         fs.writeFileSync(imagePath, image);
 
         const result = await execute();
-        if (result.length == 0) return interaction.followUp("No valid chessboard detected.");
+        if (result.length === 0) return interaction.followUp("No valid chessboard detected.");
 
         let reply = "";
         reply += `Best move for white: **${result[0]}**\n`;
@@ -46,7 +46,7 @@ module.exports = {
 
         await interaction.followUp({
             content: reply,
-            files: [{ attachment: imagePath }],
+            files: [imagePath],
         });
     },
 };
@@ -62,7 +62,7 @@ client.on("messageCreate", async (message) => {
     fs.writeFileSync(imagePath, image);
 
     const result = await execute();
-    if (result.length == 0) return;
+    if (result.length === 0) return;
 
     let reply = "";
     reply += `Best move for white: **${result[0]}**\n`;
@@ -70,6 +70,6 @@ client.on("messageCreate", async (message) => {
 
     await message.reply({
         content: reply,
-        files: [{ attachment: imagePath }],
+        files: [imagePath],
     });
 });
