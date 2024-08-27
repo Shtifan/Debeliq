@@ -10,11 +10,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@discord-player/extractor": "^4.5.0",
-    "axios": "^1.7.4",
+    "@discord-player/extractor": "^4.5.1",
+    "axios": "^1.7.5",
     "discord-gamecord": "^4.4.2",
     "discord-player": "^6.7.1",
-    "discord-player-youtubei": "^1.2.4",
+    "discord-player-youtubei": "^1.2.6",
     "discord.js": "^14.15.3",
     "mediaplex": "^0.0.9",
     "ms": "^2.1.3"
