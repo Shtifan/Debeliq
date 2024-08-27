@@ -33,13 +33,6 @@ def crop_chessboard(image_path):
             return
 
 
-def rotate_fen(fen):
-    fen_parts = fen.split("/")
-    reversed_fen_parts = [part[::-1] for part in fen_parts[::-1]]
-    rotated_fen = "/".join(reversed_fen_parts)
-    return rotated_fen
-
-
 def get_best_move(stockfish, fen):
     stockfish.set_fen_position(fen)
     best_move = stockfish.get_best_move()
