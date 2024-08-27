@@ -25,13 +25,6 @@ module.exports = {
         .setDescription("Gives the best chess move based on an image using stockfish")
         .addAttachmentOption((option) =>
             option.setName("image").setDescription("Attach a chess board image").setRequired(true)
-        )
-        .addStringOption((option) =>
-            option
-                .setName("move")
-                .setDescription("Who is about to move?")
-                .setRequired(true)
-                .addChoices({ name: "White to play", value: "w" }, { name: "Black to play", value: "b" })
         ),
 
     async execute(interaction) {
@@ -47,18 +40,14 @@ module.exports = {
         const result = await execute();
         if (result.length == 0) return interaction.followUp("No valid chessboard detected.");
 
-        let best_move = "";
-        let move_path = "";
+        let reply = "";
+        reply += `Best move for white: **${result[0]}**\n`;
+        reply += `Best move for black: **${result[1]}**`;
 
-        if (move == "w") {
-            best_move = result[0];
-            move_path = "./data/white_best_move.png";
-        } else {
-            best_move = result[1];
-            move_path = "./data/black_best_move.png";
-        }
-
-        await interaction.followUp({ content: `Best move: ${best_move}`, files: [{ attachment: move_path }] });
+        await interaction.followUp({
+            content: reply,
+            files: [{ attachment: imagePath }],
+        });
     },
 };
 
@@ -76,8 +65,11 @@ client.on("messageCreate", async (message) => {
     if (result.length == 0) return;
 
     let reply = "";
-    reply += "Best move if it is white to play: " + result[0] + "\n";
-    reply += "Best move if it is black to play: " + result[1];
+    reply += `Best move for white: **${result[0]}**\n`;
+    reply += `Best move for black: **${result[1]}**`;
 
-    await message.reply(reply);
+    await message.reply({
+        content: reply,
+        files: [{ attachment: imagePath }],
+    });
 });
