@@ -16,6 +16,12 @@ npm i
 
 ```
 
+YT Token
+
+```bash
+npx --no discord-player-youtubei
+```
+
 # Music
 
 Install ffmpeg
