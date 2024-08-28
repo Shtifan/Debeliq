@@ -1,13 +1,29 @@
 # Instalation
 
-```git clone https://github.com/Shtifan/Debeliq.git```
-```npm i```
+```bash
+git clone https://github.com/Shtifan/Debeliq.git
+npm i
+```
+
+# Config
+
+```bash
+{
+    "clientId": "",
+    "token": "",
+    "YT_CREDENTIAL": ""
+}
+
+```
 
 # Music
 
-```Install ffmpeg```
+Install ffmpeg
 
 # Chess Solver
 
-```Install Python 3.11```
-```pip install stockfish opencv-python board_to_fen tensorflow```
+Install Python 3.11
+
+```bash
+pip install stockfish opencv-python board_to_fen tensorflow
+```
