@@ -11,7 +11,7 @@ npm i
 {
     "clientId": "",
     "token": "",
-    "YT_CREDENTIAL": ""
+    "YT_tokens": ""
 }
 
 ```
