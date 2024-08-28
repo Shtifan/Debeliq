@@ -3,7 +3,7 @@ const { Player } = require("discord-player");
 const { YoutubeiExtractor } = require("discord-player-youtubei");
 const fs = require("fs");
 const path = require("path");
-const { token, clientId, YT_CREDENTIAL } = require("./config.json");
+const { token, clientId, YT_tokens } = require("./config.json");
 
 const client = new Client({
     intents: [
@@ -41,7 +41,7 @@ rest.put(Routes.applicationCommands(clientId), { body: commands });
 const player = new Player(client);
 
 player.extractors.register(YoutubeiExtractor, {
-    authentication: YT_CREDENTIAL,
+    authentication: YT_tokens,
     streamOptions: {
         useClient: "ANDROID",
     },

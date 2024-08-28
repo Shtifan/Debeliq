@@ -16,7 +16,7 @@ npm i
 
 ```
 
-YT Token
+YouTube Token
 
 ```bash
 npx --no discord-player-youtubei
