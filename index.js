@@ -41,13 +41,8 @@ rest.put(Routes.applicationCommands(clientId), { body: commands });
 const player = new Player(client);
 
 player.extractors.register(YoutubeiExtractor, {
-    authentication: YT_credentials,
-    streamOptions: {
-        useClient: "ANDROID",
-    },
+    authentication: YT_credentials
 });
-
-player.extractors.loadDefault((ext) => !["YouTubeExtractor"].includes(ext));
 
 const eventsPath = path.join(__dirname, "events");
 const eventFolders = fs.readdirSync(eventsPath);
