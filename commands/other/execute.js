@@ -14,87 +14,41 @@ function isDocker() {
     return false;
 }
 
-async function executeJs(filePath) {
+async function executeCommand(command, cleanupFiles = []) {
     try {
-        const { stdout, stderr } = await execAsync(`node ${filePath}`);
-        return `${stdout}`;
+        const { stdout } = await execAsync(command);
+        return stdout;
     } catch (error) {
-        return `Error: ${error.stderr}`;
+        return `Error: ${error.stderr || error.message}`;
     } finally {
-        fs.unlinkSync(filePath);
+        cleanupFiles.forEach((file) => {
+            if (fs.existsSync(file)) fs.unlinkSync(file);
+        });
     }
+}
+
+async function executeJs(filePath) {
+    return await executeCommand(`node ${filePath}`, [filePath]);
 }
 
 async function executePy(filePath) {
-    try {
-        const { stdout, stderr } = await execAsync(`python ${filePath}`);
-        return `${stdout}`;
-    } catch (error) {
-        return `Error: ${error.stderr}`;
-    } finally {
-        fs.unlinkSync(filePath);
-    }
+    return await executeCommand(`python ${filePath}`, [filePath]);
 }
 
-async function executeCpp(filePath) {
-    const executablePath = path.resolve("temp.exe");
-    try {
-        const { stdout, stderr } = await execAsync(`g++ ${filePath} -o ${executablePath} && ${executablePath}`);
-        if (fs.existsSync(executablePath)) {
-            return `${stdout}`;
-        } else {
-            return "Error: Unable to create executable file.";
-        }
-    } catch (error) {
-        return `Error: ${error.stderr}`;
-    } finally {
-        fs.unlinkSync(filePath);
-        if (fs.existsSync(executablePath)) {
-            fs.unlinkSync(executablePath);
-        }
-    }
+async function executeCpp(filePath, executablePath) {
+    return await executeCommand(`g++ ${filePath} -o ${executablePath} && ${executablePath}`, [filePath, executablePath]);
 }
 
-async function executeC(filePath) {
-    const executablePathC = path.resolve("temp.exe");
-    try {
-        const { stdout, stderr } = await execAsync(`gcc ${filePath} -o ${executablePathC} && ${executablePathC}`);
-        if (fs.existsSync(executablePathC)) {
-            return `${stdout}`;
-        } else {
-            return "Error: Unable to create executable file.";
-        }
-    } catch (error) {
-        return `Error: ${error.stderr}`;
-    } finally {
-        fs.unlinkSync(filePath);
-        if (fs.existsSync(executablePathC)) {
-            fs.unlinkSync(executablePathC);
-        }
-    }
+async function executeC(filePath, executablePath) {
+    return await executeCommand(`gcc ${filePath} -o ${executablePath} && ${executablePath}`, [filePath, executablePath]);
 }
 
-async function executeRs(filePath) {
-    const executablePathRs = path.resolve("temp.exe");
-    const pdbPath = path.resolve("temp.pdb");
-    try {
-        const { stdout, stderr } = await execAsync(`rustc ${filePath} -o ${executablePathRs} && ${executablePathRs}`);
-        if (fs.existsSync(executablePathRs)) {
-            return `${stdout}`;
-        } else {
-            return "Error: Unable to create executable file.";
-        }
-    } catch (error) {
-        return `Error: ${error.stderr}`;
-    } finally {
-        fs.unlinkSync(filePath);
-        if (fs.existsSync(executablePathRs)) {
-            fs.unlinkSync(executablePathRs);
-        }
-        if (fs.existsSync(pdbPath)) {
-            fs.unlinkSync(pdbPath);
-        }
-    }
+async function executeRs(filePath, executablePath) {
+    return await executeCommand(`rustc ${filePath} -o ${executablePath} && ${executablePath}`, [filePath, executablePath]);
+}
+
+async function executeJava(filePath, classFile) {
+    return await executeCommand(`javac ${filePath} && java TempClass`, [filePath, classFile]);
 }
 
 async function executeCode(code, language) {
@@ -102,19 +56,24 @@ async function executeCode(code, language) {
         return "Error: The code can only be executed inside a Docker container.";
     }
 
-    const fileExtension = {
+    const fileExtensionMap = {
         js: "js",
-        cpp: "cpp",
         py: "py",
-        rs: "rs",
+        cpp: "cpp",
         c: "c",
-    }[language];
+        rs: "rs",
+        java: "java",
+    };
 
+    const fileExtension = fileExtensionMap[language];
     if (!fileExtension) return "Invalid language";
 
-    const fileName = `temp.${fileExtension}`;
-    fs.writeFileSync(fileName, code);
+    const fileName = `TempClass.${fileExtension}`;
     const filePath = path.resolve(fileName);
+    const executablePath = path.resolve("temp.exe");
+    const classFile = path.resolve("TempClass.class");
+
+    fs.writeFileSync(filePath, code);
 
     switch (language) {
         case "js":
@@ -122,11 +81,13 @@ async function executeCode(code, language) {
         case "py":
             return await executePy(filePath);
         case "cpp":
-            return await executeCpp(filePath);
+            return await executeCpp(filePath, executablePath);
         case "c":
-            return await executeC(filePath);
+            return await executeC(filePath, executablePath);
         case "rs":
-            return await executeRs(filePath);
+            return await executeRs(filePath, executablePath);
+        case "java":
+            return await executeJava(filePath, classFile);
         default:
             return "Invalid language";
     }
@@ -145,19 +106,21 @@ module.exports = {
                     { name: "Python", value: "py" },
                     { name: "C++", value: "cpp" },
                     { name: "C", value: "c" },
-                    { name: "Rust", value: "rs" }
+                    { name: "Rust", value: "rs" },
+                    { name: "Java", value: "java" }
                 )
                 .setRequired(true)
         )
         .addStringOption((option) => option.setName("code").setDescription("Paste the whole code here").setRequired(true)),
-        
+
     async execute(interaction) {
         await interaction.deferReply();
 
-        let code = interaction.options.getString("code");
-        let language = interaction.options.getString("language");
+        const code = interaction.options.getString("code");
+        const language = interaction.options.getString("language");
 
-        await interaction.followUp("```" + (await executeCode(code, language)) + "```");
+        const result = await executeCode(code, language);
+        await interaction.followUp("```" + result + "```");
     },
 };
 
@@ -170,7 +133,8 @@ client.on("messageCreate", async (message) => {
     const language = match[1].toLowerCase();
     const code = match[2];
 
-    if (!["js", "cpp", "py", "rs", "c"].includes(language)) return;
+    if (!["js", "py", "cpp", "c", "rs", "java"].includes(language)) return;
 
-    await message.reply("```" + (await executeCode(code, language)) + "```");
+    const result = await executeCode(code, language);
+    await message.reply("```" + result + "```");
 });
