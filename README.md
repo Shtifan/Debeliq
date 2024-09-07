@@ -11,12 +11,12 @@ npm i
 {
     "clientId": "",
     "token": "",
-    "YT_tokens": ""
+    "YT_credentials": ""
 }
 
 ```
 
-YouTube Tokens
+YouTube Credentials
 
 ```bash
 npx --no discord-player-youtubei
