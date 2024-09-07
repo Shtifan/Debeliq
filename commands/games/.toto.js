@@ -2,34 +2,23 @@ const { SlashCommandBuilder } = require("discord.js");
 
 function generate() {
     const uniqueNumbers = [];
-
     while (uniqueNumbers.length < 6) {
         const randomNumber = Math.floor(Math.random() * 49) + 1;
-
         if (!uniqueNumbers.includes(randomNumber)) {
             uniqueNumbers.push(randomNumber);
         }
     }
-
     return uniqueNumbers;
 }
 
 function check(correctGuesses) {
-    if (correctGuesses == 6) {
-        return "Congratulations! You win **$7,000,000**!";
-    } else if (correctGuesses == 5) {
-        return "Congratulations! You win **$10,000**!";
-    } else if (correctGuesses == 4) {
-        return "Congratulations! You win **$100**!";
-    } else if (correctGuesses == 3) {
-        return "Congratulations! You win **$10**!";
-    } else if (correctGuesses == 2) {
-        return "Congratulations! You win **$1**!";
-    } else if (correctGuesses == 1) {
-        return "Congratulations! You win **$0.01**!";
-    } else {
-        return `Sorry, you didn't win anything.`;
-    }
+    if (correctGuesses === 6) return "Congratulations! You win **$7,000,000**!";
+    if (correctGuesses === 5) return "Congratulations! You win **$10,000**!";
+    if (correctGuesses === 4) return "Congratulations! You win **$100**!";
+    if (correctGuesses === 3) return "Congratulations! You win **$10**!";
+    if (correctGuesses === 2) return "Congratulations! You win **$1**!";
+    if (correctGuesses === 1) return "Congratulations! You win **$0.01**!";
+    return `Sorry, you didn't win anything.`;
 }
 
 function notUnique(array) {
@@ -74,30 +63,26 @@ module.exports = {
         ];
 
         if (notUnique(userNumbers)) {
-            await interaction.reply({
-                content: "Please ensure all numbers are unique.",
-                ephemeral: true,
-            });
+            await interaction.reply({ content: "Please ensure all numbers are unique.", ephemeral: true });
             return;
         }
 
         if (notInRange(userNumbers)) {
-            await interaction.reply({
-                content: "Please ensure all numbers are between 1 and 49.",
-                ephemeral: true,
-            });
+            await interaction.reply({ content: "Please ensure all numbers are between 1 and 49.", ephemeral: true });
             return;
         }
 
-        const numbers = generate();
-        const correctGuesses = numbers.filter((number) => userNumbers.includes(number)).length;
+        const winningNumbers = generate();
+        const correctGuesses = winningNumbers.filter((number) => userNumbers.includes(number)).length;
 
-        const sortedNumbers = numbers.sort((a, b) => a - b);
-        const winningNumbers = sortedNumbers.map((number) => (userNumbers.includes(number) ? `**${number}**` : number));
+        const sortedWinningNumbers = winningNumbers.sort((a, b) => a - b);
+        const formattedWinningNumbers = sortedWinningNumbers.map((number) =>
+            userNumbers.includes(number) ? `**${number}**` : number
+        );
 
         let reply = "";
         reply += check(correctGuesses);
-        reply += `\nThe winning numbers were: ${winningNumbers.join(", ")}.`;
+        reply += `\nThe winning numbers were: ${formattedWinningNumbers.join(", ")}.`;
 
         await interaction.reply(reply);
     },
