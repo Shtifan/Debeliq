@@ -41,7 +41,7 @@ rest.put(Routes.applicationCommands(clientId), { body: commands });
 const player = new Player(client);
 
 player.extractors.register(YoutubeiExtractor, {
-    authentication: YT_credentials
+    authentication: YT_credentials,
 });
 
 const eventsPath = path.join(__dirname, "events");
