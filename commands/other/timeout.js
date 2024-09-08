@@ -1,5 +1,23 @@
 const { SlashCommandBuilder } = require("discord.js");
-const ms = require("ms");
+
+function convertToMs(duration) {
+    const timeUnits = {
+        s: 1000,
+        m: 1000 * 60,
+        h: 1000 * 60 * 60,
+        d: 1000 * 60 * 60 * 24,
+    };
+
+    const regex = /^(\d+)([smhd])$/;
+    const match = duration.match(regex);
+
+    if (!match) return null;
+
+    const value = parseInt(match[1]);
+    const unit = match[2];
+
+    return value * timeUnits[unit];
+}
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -7,7 +25,7 @@ module.exports = {
         .setDescription("Timeouts a member from this server")
         .addUserOption((option) => option.setName("user").setDescription("The user you want to timeout").setRequired(true))
         .addStringOption((option) =>
-            option.setName("duration").setDescription("Timeout duration (10s, 30m, 1h, 5 day...)").setRequired(true)
+            option.setName("duration").setDescription("Timeout duration (10s, 30m, 1h, 5d...)").setRequired(true)
         )
         .addStringOption((option) => option.setName("reason").setDescription("The reason for the timeout")),
 
@@ -24,17 +42,25 @@ module.exports = {
         }
 
         const duration = interaction.options.getString("duration");
-        const msDuration = ms(duration);
+        const msDuration = convertToMs(duration);
+
+        if (!msDuration) {
+            await interaction.reply({
+                content: "Invalid duration format. Please use (e.g., 10s, 30m, 1h, 5d).",
+                ephemeral: true,
+            });
+            return;
+        }
 
         let reason = interaction.options.getString("reason");
-        if (!reason) reason = "nigger";
+        if (!reason) reason = "No reason provided";
 
         try {
             await targetUser.timeout(msDuration, reason);
             await interaction.reply(`${targetUser} was timed out for ${duration}.\nReason: ${reason}`);
         } catch (error) {
             await interaction.reply({
-                content: `Sorry I am unable to timeout ${targetUser}`,
+                content: `Sorry, I am unable to timeout ${targetUser}`,
                 ephemeral: true,
             });
         }
