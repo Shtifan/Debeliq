@@ -1,8 +1,8 @@
 const { SlashCommandBuilder } = require("discord.js");
 const https = require("https");
 const fs = require("fs");
-const util = require("util");
 const path = require("path");
+const util = require("util");
 const execAsync = util.promisify(require("child_process").exec);
 const client = require("../../index.js");
 
@@ -49,22 +49,22 @@ async function processImage(imageAttachment) {
     }
 }
 
-async function replyWithBestMoves(interaction, imageAttachment) {
+async function message_reply(imageAttachment) {
     try {
         const { result, imagePath } = await processImage(imageAttachment);
 
         if (result.length === 0) {
-            return interaction.followUp("No valid chessboard detected.");
+            return 0;
         }
 
         const reply = `Best move for white: **${result[0]}**\nBest move for black: **${result[1]}**`;
 
-        await interaction.followUp({
+        return {
             content: reply,
             files: [imagePath],
-        });
+        };
     } catch (error) {
-        await interaction.followUp("An error occurred while processing the image.");
+        return 0;
     }
 }
 
@@ -80,7 +80,11 @@ module.exports = {
         await interaction.deferReply();
 
         const imageAttachment = interaction.options.getAttachment("image");
-        await replyWithBestMoves(interaction, imageAttachment);
+
+        let reply = await message_reply(imageAttachment);
+        if (reply == 0) reply = "No valid chessboard detected.";
+
+        await interaction.followUp(reply);
     },
 };
 
@@ -90,18 +94,8 @@ client.on("messageCreate", async (message) => {
     const imageAttachment = message.attachments.first();
     if (!imageAttachment) return;
 
-    try {
-        const { result, imagePath } = await processImage(imageAttachment);
+    let reply = await message_reply(imageAttachment);
+    if (reply == 0) return;
 
-        if (result.length === 0) return;
-
-        const reply = `Best move for white: **${result[0]}**\nBest move for black: **${result[1]}**`;
-
-        await message.reply({
-            content: reply,
-            files: [imagePath],
-        });
-    } catch (error) {
-        await message.reply("An error occurred while processing the image.");
-    }
+    await message.reply(reply);
 });
