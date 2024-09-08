@@ -7,6 +7,8 @@ npm i
 
 # Config
 
+Make config.json file
+
 ```bash
 {
     "clientId": "",
