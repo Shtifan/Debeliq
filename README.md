@@ -7,7 +7,7 @@ npm i
 
 # Config
 
-Make config.json file
+config.json
 
 ```bash
 {
