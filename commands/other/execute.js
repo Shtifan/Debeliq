@@ -16,14 +16,21 @@ function isDocker() {
 
 async function executeCommand(command, cleanupFiles = []) {
     try {
-        const { stdout } = await execAsync(command);
+        const { stdout, stderr } = await execAsync(command);
+        if (stderr) {
+            return `Error: ${stderr}`;
+        }
         return stdout;
     } catch (error) {
-        return `Error: ${error.stderr || error.message}`;
+        return `Error: ${error.message}`;
     } finally {
-        cleanupFiles.forEach((file) => {
-            if (fs.existsSync(file)) fs.unlinkSync(file);
-        });
+        await Promise.all(
+            cleanupFiles.map(async (file) => {
+                if (fs.existsSync(file)) {
+                    await fs.promises.unlink(file);
+                }
+            })
+        );
     }
 }
 
