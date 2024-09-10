@@ -1,124 +1,135 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const fs = require("fs/promises");
+const { existsSync, mkdirSync } = require("fs");
 
-async function readUserData() {
+async function saveUserData(userData) {
     try {
+        if (!existsSync("./data")) {
+            mkdirSync("./data", { recursive: true });
+        }
+        await fs.writeFile("./data/olue_data.json", JSON.stringify(userData, null, 2), "utf8");
+    } catch (error) {
+        console.error("Error saving user data:", error);
+    }
+}
+
+async function loadUserData() {
+    try {
+        if (!existsSync("./data/olue_data.json")) {
+            await saveUserData({});
+            return {};
+        }
+
         const data = await fs.readFile("./data/olue_data.json", "utf8");
         return JSON.parse(data);
-    } catch (err) {
-        console.error("Error reading user data:", err);
+    } catch (error) {
+        console.error("Error loading user data:", error);
         return {};
     }
 }
 
-async function writeUserData(userData) {
-    try {
-        await fs.writeFile("./data/olue_data.json", JSON.stringify(userData, null, 2), "utf8");
-        console.log("User data written successfully.");
-    } catch (err) {
-        console.error("Error writing user data:", err);
-    }
-}
-
-function getRandomNumber(min, max) {
+function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
-function generateGrid(userMoney, durability, specialNumbers = null) {
-    const gridSize = getRandomNumber(2, 5);
+function createGameGrid(score, specialNumbers) {
+    const gridSize = getRandomInt(2, 5);
     const uniqueNumbers = new Set();
 
     while (uniqueNumbers.size < gridSize) {
-        uniqueNumbers.add(getRandomNumber(1, 10));
+        uniqueNumbers.add(getRandomInt(1, 10));
     }
 
     specialNumbers = specialNumbers || Array.from(uniqueNumbers);
 
-    let reply = "";
-    reply += `Money: ${userMoney}\n`;
-    reply += `Drill durability: ${durability}\n`;
-    reply += `${"  _____  ".repeat(10)}\n`;
-    reply += `${Array.from({ length: 3 }, (_, i) =>
-        Array.from({ length: 10 }, (_, j) => (specialNumbers.includes(j + 1) ? " |OOOOO| " : " |     | ")).join("")
+    let gridOutput = "";
+    gridOutput += `Score: ${score}\n`;
+    gridOutput += `${"  _____  ".repeat(10)}\n`;
+    gridOutput += `${Array.from({ length: 3 }, (_, rowIndex) =>
+        Array.from({ length: 10 }, (_, colIndex) =>
+            specialNumbers.includes(colIndex + 1) ? " |OOOOO| " : " |     | "
+        ).join("")
     ).join("\n")}\n`;
-    reply += `${"  ‾‾‾‾‾  ".repeat(10)}\n`;
-    reply += `${Array.from({ length: 10 }, (_, i) => `    ${i + 1}    `).join("")}\n`;
+    gridOutput += `${"  ‾‾‾‾‾  ".repeat(10)}\n`;
+    gridOutput += `${Array.from({ length: 10 }, (_, i) => `    ${i + 1}    `).join("")}\n`;
 
-    const buttons = Array.from({ length: 10 }, (_, i) =>
+    const numberButtons = Array.from({ length: 10 }, (_, index) =>
         new ButtonBuilder()
-            .setCustomId(`number_${i + 1}`)
-            .setLabel(`${i + 1}`)
+            .setCustomId(`number_${index + 1}`)
+            .setLabel(`${index + 1}`)
             .setStyle(ButtonStyle.Primary)
     );
 
-    const rows = [
-        new ActionRowBuilder().addComponents(...buttons.slice(0, 5)),
-        new ActionRowBuilder().addComponents(...buttons.slice(5)),
+    const buttonRows = [
+        new ActionRowBuilder().addComponents(...numberButtons.slice(0, 5)),
+        new ActionRowBuilder().addComponents(...numberButtons.slice(5)),
     ];
 
-    const miscButtons = new ActionRowBuilder().addComponents(
-        new ButtonBuilder().setCustomId("shop").setLabel("Shop").setStyle(ButtonStyle.Primary),
-        new ButtonBuilder().setCustomId("reset").setLabel("Reset Game").setStyle(ButtonStyle.Danger)
-    );
-
     return {
-        content: "```" + reply + "```",
-        components: [...rows, miscButtons],
+        content: "```" + gridOutput + "```",
+        components: buttonRows,
         specialNumbers,
     };
 }
 
-async function updateGrid(message, selectedNumber, specialNumbers, userMoney, durability) {
-    let content = `Money: ${userMoney}\nDrill durability: ${durability}\n`;
+async function updateMessage(message, score, specialNumbers, isGameOver = false) {
+    const { content, components } = createGameGrid(score, specialNumbers);
 
-    content += `${"  _____  ".repeat(10)}\n`;
-    content += `${Array.from({ length: 3 }, () =>
-        Array.from({ length: 10 }, (_, j) => {
-            if (j + 1 === selectedNumber) return " |XXXXX| ";
-            return specialNumbers.includes(j + 1) ? " |OOOOO| " : " |     | ";
-        })
-    ).join("\n")}\n`;
-    content += `${"  ‾‾‾‾‾  ".repeat(10)}\n`;
-    content += `${Array.from({ length: 10 }, (_, i) => `    ${i + 1}    `).join("")}\n`;
+    if (isGameOver) {
+        const retryButton = new ButtonBuilder().setCustomId("retry").setLabel("Retry").setStyle(ButtonStyle.Primary);
+        const retryRow = new ActionRowBuilder().addComponents(retryButton);
 
-    await message.edit({ content: "```" + content + "```" });
+        await message.edit({ content: `Game Over! Your final score is ${score}`, components: [retryRow] });
+    } else {
+        await message.edit({ content, components });
+    }
 }
 
-async function mainGame(userData, userId, interaction) {
-    const { money: userMoney, durability } = userData[userId];
-    const { content, components, specialNumbers } = generateGrid(userMoney, durability);
+async function startGame(userData, userId, interaction) {
+    let currentScore = userData[userId]?.score || 0;
 
-    const message = await interaction.reply({ content, components });
+    let { content, components, specialNumbers } = createGameGrid(currentScore);
 
-    const filter = (btnInteraction) => btnInteraction.user.id === userId && btnInteraction.customId.startsWith("number_");
-    const collector = message.createMessageComponentCollector({ filter, time: 60000 });
+    let correctSelections = new Set();
 
-    collector.on("collect", async (btnInteraction) => {
-        const selectedNumber = parseInt(btnInteraction.customId.split("_")[1]);
-        userData[userId].durability -= 1;
+    let gameMessage;
+    if (!interaction.deferred && !interaction.replied) {
+        await interaction.deferReply();
+        gameMessage = await interaction.editReply({ content, components });
+    } else {
+        gameMessage = await interaction.editReply({ content, components });
+    }
 
-        if (specialNumbers.includes(selectedNumber)) {
-            userData[userId].money += 10;
-        }
+    const filter = (buttonInteraction) =>
+        buttonInteraction.user.id === userId && buttonInteraction.customId.startsWith("number_");
+    const collector = gameMessage.createMessageComponentCollector({ filter, time: 60000 });
 
-        await writeUserData(userData);
+    collector.on("collect", async (buttonInteraction) => {
+        const chosenNumber = parseInt(buttonInteraction.customId.split("_")[1]);
 
-        await updateGrid(message, selectedNumber, specialNumbers, userData[userId].money, userData[userId].durability);
+        if (specialNumbers.includes(chosenNumber)) {
+            userData[userId].score += 1;
+            correctSelections.add(chosenNumber);
 
-        if (userData[userId].durability <= 0) {
-            await message.edit({
-                content: "Game over! You've run out of durability. Please reset the game.",
-                components: [],
-            });
+            if (correctSelections.size === specialNumbers.length) {
+                correctSelections.clear();
+                ({ content, components, specialNumbers } = createGameGrid(userData[userId].score));
+                await updateMessage(gameMessage, userData[userId].score, specialNumbers);
+            } else {
+                await saveUserData(userData);
+                await updateMessage(gameMessage, userData[userId].score, specialNumbers);
+            }
+        } else {
+            await updateMessage(gameMessage, userData[userId].score, specialNumbers, true);
             collector.stop();
         }
 
-        btnInteraction.deferUpdate();
+        await buttonInteraction.deferUpdate();
     });
 
     collector.on("end", async (collected) => {
         if (collected.size === 0) {
-            await message.edit({ content: "Time's up! No selection was made.", components: [] });
+            await gameMessage.edit({ content: "Time's up! No selection was made.", components: [] });
         }
     });
 }
@@ -128,27 +139,40 @@ module.exports = {
 
     async execute(interaction) {
         const userId = interaction.user.id;
-        let userData = await readUserData();
+        let userData = await loadUserData();
 
-        const playButton = new ButtonBuilder().setCustomId("play").setLabel("Play").setStyle(ButtonStyle.Primary);
-        const row = new ActionRowBuilder().addComponents(playButton);
+        const startButton = new ButtonBuilder().setCustomId("play").setLabel("Play").setStyle(ButtonStyle.Primary);
+        const startRow = new ActionRowBuilder().addComponents(startButton);
 
-        const introMessage = `Hi, it looks like it's your first time playing Olue the Game. So, they gave you a drilling machine from Pernik, with which they let you search for olue. Of course Pernichani will steal 60% of your earnings, but your goal is to make a living with this job so you have no choice but to continue playing. To start drilling for olue, click the button on the corresponding hole. Later in the game you will be able to buy better drills and start mining more valuable olue. Just be careful not to break all drills because you'll have to start over. Have fun. Click the play button to start playing.`;
+        const introText = `Hi, it looks like it's your first time playing Olue the Game. So, they gave you a drilling machine from Pernik, with which they let you search for olue. Of course Pernichani will steal 60% of your earnings, but your goal is to make a living with this job so you have no choice but to continue playing. To start drilling for olue, click the button on the corresponding hole. Later in the game you will be able to buy better drills and start mining more valuable olue. Just be careful not to break all drills because you'll have to start over. Have fun. Click the play button to start playing.`;
 
         if (!userData[userId]) {
-            userData[userId] = { money: 0, durability: 100 };
-            await writeUserData(userData);
+            userData[userId] = { score: 0 };
+            await saveUserData(userData);
 
-            const message = await interaction.reply({ content: introMessage, components: [row] });
-            const filter = (btn) => btn.user.id === interaction.user.id;
+            const introMessage = await interaction.reply({ content: introText, components: [startRow] });
+            const buttonFilter = (btn) => btn.user.id === interaction.user.id;
 
-            const collector = message.createMessageComponentCollector({ max: 1, time: 60000, filter });
+            const introCollector = introMessage.createMessageComponentCollector({
+                max: 1,
+                time: 60000,
+                filter: buttonFilter,
+            });
 
-            collector.on("collect", async () => {
-                await mainGame(userData, userId, interaction);
+            introCollector.on("collect", async () => {
+                await startGame(userData, userId, interaction);
             });
         } else {
-            await mainGame(userData, userId, interaction);
+            await startGame(userData, userId, interaction);
         }
+    },
+
+    async handleRetry(interaction) {
+        const userId = interaction.user.id;
+        let userData = await loadUserData();
+
+        userData[userId].score = 0;
+        await saveUserData(userData);
+        await startGame(userData, userId, interaction);
     },
 };
