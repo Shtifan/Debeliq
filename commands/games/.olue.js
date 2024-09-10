@@ -28,16 +28,16 @@ async function loadUserData() {
     }
 }
 
-function getRandomInt(min, max) {
+function rng(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 function createGameGrid(score, specialNumbers) {
-    const gridSize = getRandomInt(2, 5);
+    const gridSize = rng(2, 5);
     const uniqueNumbers = new Set();
 
     while (uniqueNumbers.size < gridSize) {
-        uniqueNumbers.add(getRandomInt(1, 10));
+        uniqueNumbers.add(rng(1, 10));
     }
 
     specialNumbers = specialNumbers || Array.from(uniqueNumbers);
@@ -45,7 +45,7 @@ function createGameGrid(score, specialNumbers) {
     let gridOutput = "";
     gridOutput += `Score: ${score}\n`;
     gridOutput += `${"  _____  ".repeat(10)}\n`;
-    gridOutput += `${Array.from({ length: 3 }, (_, rowIndex) =>
+    gridOutput += `${Array.from({ length: 3 }, (_) =>
         Array.from({ length: 10 }, (_, colIndex) =>
             specialNumbers.includes(colIndex + 1) ? " |OOOOO| " : " |     | "
         ).join("")
@@ -165,14 +165,5 @@ module.exports = {
         } else {
             await startGame(userData, userId, interaction);
         }
-    },
-
-    async handleRetry(interaction) {
-        const userId = interaction.user.id;
-        let userData = await loadUserData();
-
-        userData[userId].score = 0;
-        await saveUserData(userData);
-        await startGame(userData, userId, interaction);
     },
 };
