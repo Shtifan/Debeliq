@@ -117,8 +117,16 @@ client.on("messageCreate", async (message) => {
     } else {
         if (acceptingDeal) return;
 
-        const chosenCase = parseInt(message.content);
-        if (isNaN(chosenCase) || chosenCase < 1 || chosenCase > 26 || !cases.some((c) => c.number === chosenCase)) return;
+        const chosenCase = message.content;
+
+        if (
+            chosenCase == yourCase ||
+            isNaN(chosenCase) ||
+            chosenCase < 1 ||
+            chosenCase > 26 ||
+            !cases.some((c) => c.number === chosenCase)
+        )
+            return;
 
         if (yourCase === 0) {
             yourCase = chosenCase;
