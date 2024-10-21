@@ -101,30 +101,41 @@ async function startGame(userData, userId, interaction) {
     }
 
     const filter = (buttonInteraction) =>
-        buttonInteraction.user.id === userId && buttonInteraction.customId.startsWith("number_");
+        buttonInteraction.user.id === userId &&
+        (buttonInteraction.customId.startsWith("number_") || buttonInteraction.customId === "retry");
     const collector = gameMessage.createMessageComponentCollector({ filter, time: 60000 });
 
     collector.on("collect", async (buttonInteraction) => {
-        const chosenNumber = parseInt(buttonInteraction.customId.split("_")[1]);
+        const customId = buttonInteraction.customId;
 
-        if (specialNumbers.includes(chosenNumber)) {
-            userData[userId].score += 1;
-            correctSelections.add(chosenNumber);
+        if (customId.startsWith("number_")) {
+            const chosenNumber = parseInt(buttonInteraction.customId.split("_")[1]);
 
-            if (correctSelections.size === specialNumbers.length) {
-                correctSelections.clear();
-                ({ content, components, specialNumbers } = createGameGrid(userData[userId].score));
-                await updateMessage(gameMessage, userData[userId].score, specialNumbers);
+            if (specialNumbers.includes(chosenNumber)) {
+                userData[userId].score += 1;
+                correctSelections.add(chosenNumber);
+
+                if (correctSelections.size === specialNumbers.length) {
+                    correctSelections.clear();
+                    ({ content, components, specialNumbers } = createGameGrid(userData[userId].score));
+                    await updateMessage(gameMessage, userData[userId].score, specialNumbers);
+                } else {
+                    await saveUserData(userData);
+                    await updateMessage(gameMessage, userData[userId].score, specialNumbers);
+                }
             } else {
-                await saveUserData(userData);
-                await updateMessage(gameMessage, userData[userId].score, specialNumbers);
+                await updateMessage(gameMessage, userData[userId].score, specialNumbers, true);
+                collector.stop();
             }
-        } else {
-            await updateMessage(gameMessage, userData[userId].score, specialNumbers, true);
-            collector.stop();
+
+            await buttonInteraction.deferUpdate();
         }
 
-        await buttonInteraction.deferUpdate();
+        if (customId === "retry") {
+            userData[userId].score = 0;
+            await saveUserData(userData);
+            await startGame(userData, userId, interaction);
+        }
     });
 
     collector.on("end", async (collected) => {
