@@ -32,7 +32,7 @@ function notInRange(array) {
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("toto")
-        .setDescription("Play Toto 6/49")
+        .setDescription("Play Toto 6/49!")
         .addIntegerOption((option) =>
             option.setName("1st").setDescription("Numbers must be unique and in the range of 1 to 49").setRequired(true)
         )

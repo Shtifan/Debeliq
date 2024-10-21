@@ -103,7 +103,7 @@ async function executeCode(code, language) {
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("execute")
-        .setDescription("Executes code")
+        .setDescription("Execute code!")
         .addStringOption((option) =>
             option
                 .setName("language")

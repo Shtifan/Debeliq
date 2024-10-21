@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require("discord.js");
 const { Wordle } = require("discord-gamecord");
 
 module.exports = {
-    data: new SlashCommandBuilder().setName("wordle").setDescription("Play Wordle"),
+    data: new SlashCommandBuilder().setName("wordle").setDescription("Play Wordle!"),
 
     async execute(interaction) {
         const Game = new Wordle({

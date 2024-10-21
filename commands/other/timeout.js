@@ -22,7 +22,7 @@ function convertToMs(duration) {
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("timeout")
-        .setDescription("Timeouts a member from this server")
+        .setDescription("Timeout a member from this server!")
         .addUserOption((option) => option.setName("user").setDescription("The user you want to timeout").setRequired(true))
         .addStringOption((option) =>
             option.setName("duration").setDescription("Timeout duration (10s, 30m, 1h, 5d...)").setRequired(true)

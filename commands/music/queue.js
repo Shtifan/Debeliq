@@ -2,7 +2,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const { useQueue } = require("discord-player");
 
 module.exports = {
-    data: new SlashCommandBuilder().setName("queue").setDescription("Shows the next 10 songs in the queue"),
+    data: new SlashCommandBuilder().setName("queue").setDescription("Show the next 10 songs in the queue!"),
 
     async execute(interaction) {
         const channel = interaction.member.voice.channel;

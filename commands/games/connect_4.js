@@ -1,37 +1,32 @@
 const { SlashCommandBuilder } = require("discord.js");
-const { RockPaperScissors } = require("discord-gamecord");
+const { Connect4 } = require("discord-gamecord");
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName("rps")
-        .setDescription("Play Rock Paper Scissors")
+        .setName("connect_4")
+        .setDescription("Play Connect 4!")
         .addUserOption((option) => option.setName("user").setDescription("Name of the opponent").setRequired(true)),
 
     async execute(interaction) {
-        const Game = new RockPaperScissors({
+        const Game = new Connect4({
             message: interaction,
             isSlashGame: true,
             opponent: interaction.options.getUser("user"),
             embed: {
-                title: "Rock Paper Scissors",
-                color: "#000000",
-                description: "Press a button below to make a choice.",
-            },
-            buttons: {
-                rock: "Rock",
-                paper: "Paper",
-                scissors: "Scissors",
+                title: "Connect4 Game",
+                statusTitle: "Status",
+                color: "#5865F2",
             },
             emojis: {
-                rock: "🌑",
-                paper: "📰",
-                scissors: "✂️",
+                board: "⚪",
+                player1: "🔴",
+                player2: "🟡",
             },
             mentionUser: true,
             timeoutTime: 120000,
             buttonStyle: "PRIMARY",
-            pickMessage: "You choose {emoji}.",
-            winMessage: "**{player}** won the Game! Congratulations!",
+            turnMessage: "{emoji} | Its turn of player **{player}**.",
+            winMessage: "{emoji} | **{player}** won the Connect4 Game.",
             tieMessage: "The Game tied! No one won the Game!",
             timeoutMessage: "The Game went unfinished! No one won the Game!",
             playerOnlyMessage: "Only {player} and {opponent} can use these buttons.",

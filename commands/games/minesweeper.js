@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require("discord.js");
 const { Minesweeper } = require("discord-gamecord");
 
 module.exports = {
-    data: new SlashCommandBuilder().setName("minesweeper").setDescription("Play Minesweeper"),
+    data: new SlashCommandBuilder().setName("minesweeper").setDescription("Play Minesweeper!"),
 
     async execute(interaction) {
         const Game = new Minesweeper({
