@@ -21,8 +21,10 @@ function removeCase(number, arr) {
 
 function displayRemainingValues(cases) {
     const sortedValues = cases
-        .map((c) => `$${c.value.toLocaleString()}`)
-        .sort((a, b) => a.replace(/[\$,]/g, "") - b.replace(/[\$,]/g, ""));
+        .map((c) => c.value)
+        .sort((a, b) => a - b)
+        .map((value) => `$${value.toLocaleString(undefined, { minimumFractionDigits: value < 1 ? 2 : 0 })}`);
+
     return `Remaining values:\n${sortedValues.join("\n")}`;
 }
 
@@ -117,7 +119,7 @@ client.on("messageCreate", async (message) => {
     } else {
         if (acceptingDeal) return;
 
-        const chosenCase = message.content;
+        const chosenCase = parseInt(message.content);
 
         if (
             chosenCase == yourCase ||
