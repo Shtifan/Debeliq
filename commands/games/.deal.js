@@ -30,6 +30,7 @@ function displayRemainingValues(cases) {
 
 function displayRemainingNumbers(cases) {
     const numbers = cases.map((c) => c.number).join(", ");
+
     return `Remaining case numbers: ${numbers}`;
 }
 
@@ -75,7 +76,7 @@ function initializeGame() {
 }
 
 module.exports = {
-    data: new SlashCommandBuilder().setName("deal").setDescription("Play Deal or No Deal"),
+    data: new SlashCommandBuilder().setName("deal").setDescription("Play Deal or No Deal!"),
 
     async execute(interaction) {
         gamedeal = true;
