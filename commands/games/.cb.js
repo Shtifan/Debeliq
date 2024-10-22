@@ -59,7 +59,7 @@ module.exports = {
         secretNumber = generate();
         guesses = 0;
 
-        await interaction.reply(`I'm ready! Start guessing a 4-digit number.`);
+        await interaction.reply(`I'm ready! Start guessing a 4-digit numbers.`);
     },
 };
 

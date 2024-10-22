@@ -82,7 +82,7 @@ module.exports = {
         gamedeal = true;
         initializeGame();
 
-        let reply = "The Deal or No Deal game has started.\n";
+        let reply = "The Deal or No Deal game has started!\n";
         reply += displayRemainingValues(cases);
         reply += "\nThe briefcases have been shuffled.\n";
         reply += "Choose your briefcase (1-26):";
