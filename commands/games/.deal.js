@@ -4,8 +4,9 @@ const client = require("../../index.js");
 let gamedeal = false;
 let yourCase = 0;
 let acceptingDeal = false;
-const specialCases = [20, 15, 11, 8, 5];
 let cases = [];
+let round = 0;
+const specialCases = [6, 5, 4, 3, 3, 3];
 
 function shuffle(arr) {
     for (let i = arr.length - 1; i > 0; i--) {
@@ -15,7 +16,7 @@ function shuffle(arr) {
 }
 
 function removeCase(number, arr) {
-    const index = arr.findIndex((c) => c.number === number);
+    const index = arr.findIndex((c) => c.number == number);
     if (index !== -1) arr.splice(index, 1);
 }
 
@@ -73,6 +74,7 @@ function initializeGame() {
     shuffle(cases);
     yourCase = 0;
     acceptingDeal = false;
+    round = 0;
 }
 
 module.exports = {
@@ -97,25 +99,25 @@ client.on("messageCreate", async (message) => {
     let reply = "";
     const userInput = message.content.toLowerCase();
 
-    if (userInput === "yes" && acceptingDeal) {
-        if (specialCases.includes(cases.length)) {
+    if (userInput == "yes" && acceptingDeal) {
+        if (cases.length == 2) {
+            const finalValue = cases.find((c) => c.number == yourCase).value;
+            reply = `Congratulations! You win **$${finalValue.toLocaleString()}**!\n`;
+            gamedeal = false;
+        } else {
             reply = `Congratulations! You win **$${calculateOffer(cases)}**!\n`;
             gamedeal = false;
-        } else if (cases.length === 2) {
-            const finalValue = cases.find((c) => c.number === yourCase).value;
-            reply = `Congratulations! You win **$${finalValue.toLocaleString()}**!\n`;
-            gamedeal = false;
         }
-    } else if (userInput === "no" && acceptingDeal) {
-        if (specialCases.includes(cases.length)) {
-            reply = "You declined the offer.\n";
-            const remainingCases = specialCases.find((num) => num === cases.length) - specialCases.indexOf(cases.length);
-            reply += `Now choose **${remainingCases}** more cases:\n`;
-            acceptingDeal = false;
-        } else if (cases.length === 2) {
-            const finalValue = cases.find((c) => c.number === yourCase).value;
+    } else if (userInput == "no" && acceptingDeal) {
+        if (cases.length == 2) {
+            const finalValue = cases.find((c) => c.number == yourCase).value;
             reply = `Congratulations! You win **$${finalValue.toLocaleString()}**!\n`;
             gamedeal = false;
+        } else {
+            reply = "You declined the offer.\n";
+            const nextCaseCount = specialCases[round];
+            reply += `Now choose **${nextCaseCount}** more cases:\n`;
+            acceptingDeal = false;
         }
     } else {
         if (acceptingDeal) return;
@@ -127,25 +129,31 @@ client.on("messageCreate", async (message) => {
             isNaN(chosenCase) ||
             chosenCase < 1 ||
             chosenCase > 26 ||
-            !cases.some((c) => c.number === chosenCase)
+            !cases.some((c) => c.number == chosenCase)
         )
             return;
 
-        if (yourCase === 0) {
+        if (yourCase == 0) {
             yourCase = chosenCase;
-            reply += "Now choose **6** briefcases to reveal:\n";
+            reply += `Now choose ${specialCases[round]} briefcases to reveal:\n`;
+            round++;
         } else {
-            const caseValue = cases.find((c) => c.number === chosenCase).value;
+            const caseValue = cases.find((c) => c.number == chosenCase).value;
             reply += `Behind case **${chosenCase}** was **$${caseValue.toLocaleString()}**.\n`;
             removeCase(chosenCase, cases);
             reply += displayRemainingValues(cases) + "\n" + displayRemainingNumbers(cases) + "\n";
 
-            if (specialCases.includes(cases.length)) {
-                reply += `The banker's offer is **$${calculateOffer(cases)}**.\nDo you accept the deal?\n`;
-                acceptingDeal = true;
-            } else if (cases.length === 2) {
+            if (cases.length == 2) {
                 reply += "Do you want to switch your case with the last remaining one?\n";
                 acceptingDeal = true;
+            } else if (specialCases[round] == 0) {
+                reply += `The banker's offer is **$${calculateOffer(cases)}**.\nDo you accept the deal?\n`;
+                acceptingDeal = true;
+                round++;
+            } else {
+                const nextCaseCount = specialCases[round];
+                reply += `Now choose **${nextCaseCount}** more cases:\n`;
+                specialCases[round]--;
             }
         }
     }
