@@ -1,159 +1,168 @@
 const { SlashCommandBuilder } = require("discord.js");
 const client = require("../../index.js");
 
-let gamedeal = false;
-let yourCase = 0;
-let acceptingDeal = false;
-let cases = [];
-let round = 0;
-const specialCases = [6, 5, 4, 3, 3, 3];
-
-function shuffle(arr) {
-    for (let i = arr.length - 1; i > 0; i--) {
+// Utility function to shuffle the cases array
+function shuffleCases(cases) {
+    for (let i = cases.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [arr[i].value, arr[j].value] = [arr[j].value, arr[i].value];
+        [cases[i].value, cases[j].value] = [cases[j].value, cases[i].value];
     }
 }
 
-function removeCase(number, arr) {
-    const index = arr.findIndex((c) => c.number == number);
-    if (index !== -1) arr.splice(index, 1);
+// Removes a case by number from the cases array
+function removeCase(caseNumber, cases) {
+    const index = cases.findIndex((c) => c.number === caseNumber);
+    cases.splice(index, 1);
 }
 
+// Returns a string of remaining case values, formatted
 function displayRemainingValues(cases) {
     const sortedValues = cases
         .map((c) => c.value)
         .sort((a, b) => a - b)
-        .map((value) => `$${value.toLocaleString(undefined, { minimumFractionDigits: value < 1 ? 2 : 0 })}`);
-
+        .map((value) => `$${value.toLocaleString()}`);
     return `Remaining values:\n${sortedValues.join("\n")}`;
 }
 
-function displayRemainingNumbers(cases) {
-    const numbers = cases.map((c) => c.number).join(", ");
-
-    return `Remaining case numbers: ${numbers}`;
+// Returns a string of remaining case numbers
+function displayRemainingCaseNumbers(cases) {
+    const caseNumbers = cases.map((c) => c.number).join(", ");
+    return `Remaining case numbers: ${caseNumbers}`;
 }
 
-function calculateOffer(cases) {
-    const averageValue = cases.reduce((total, c) => total + c.value, 0) / cases.length;
+// Calculates the banker's offer based on the remaining cases
+function calculateBankerOffer(cases) {
+    const totalValue = cases.reduce((sum, c) => sum + c.value, 0);
+    const averageValue = totalValue / cases.length;
+
+    // Offer percentage decreases as fewer cases remain
     const offerPercentage = cases.length > 10 ? 0.2 : 0.1;
     const offer = averageValue * offerPercentage;
+
     return offer.toLocaleString();
 }
 
-function initializeGame() {
-    cases = [
-        { number: 1, value: 0.01 },
-        { number: 2, value: 1 },
-        { number: 3, value: 5 },
-        { number: 4, value: 10 },
-        { number: 5, value: 25 },
-        { number: 6, value: 50 },
-        { number: 7, value: 75 },
-        { number: 8, value: 100 },
-        { number: 9, value: 200 },
-        { number: 10, value: 300 },
-        { number: 11, value: 400 },
-        { number: 12, value: 500 },
-        { number: 13, value: 750 },
-        { number: 14, value: 1000 },
-        { number: 15, value: 5000 },
-        { number: 16, value: 10000 },
-        { number: 17, value: 25000 },
-        { number: 18, value: 50000 },
-        { number: 19, value: 75000 },
-        { number: 20, value: 100000 },
-        { number: 21, value: 200000 },
-        { number: 22, value: 300000 },
-        { number: 23, value: 400000 },
-        { number: 24, value: 500000 },
-        { number: 25, value: 750000 },
-        { number: 26, value: 1000000 },
-    ];
-    shuffle(cases);
-    yourCase = 0;
-    acceptingDeal = false;
-    round = 0;
-}
+// Game state variables
+let isGameActive = false;
+let cases = [];
+let yourCase = 0;
+let isAwaitingDeal = false;
 
 module.exports = {
     data: new SlashCommandBuilder().setName("deal").setDescription("Play Deal or No Deal!"),
 
     async execute(interaction) {
-        gamedeal = true;
-        initializeGame();
+        isGameActive = true;
 
-        let reply = "The Deal or No Deal game has started!\n";
-        reply += displayRemainingValues(cases);
+        // Initialize the cases
+        cases = [
+            { number: 1, value: 0.01 },
+            { number: 2, value: 1 },
+            { number: 3, value: 5 },
+            { number: 4, value: 10 },
+            { number: 5, value: 25 },
+            { number: 6, value: 50 },
+            { number: 7, value: 75 },
+            { number: 8, value: 100 },
+            { number: 9, value: 200 },
+            { number: 10, value: 300 },
+            { number: 11, value: 400 },
+            { number: 12, value: 500 },
+            { number: 13, value: 750 },
+            { number: 14, value: 1000 },
+            { number: 15, value: 5000 },
+            { number: 16, value: 10000 },
+            { number: 17, value: 25000 },
+            { number: 18, value: 50000 },
+            { number: 19, value: 75000 },
+            { number: 20, value: 100000 },
+            { number: 21, value: 200000 },
+            { number: 22, value: 300000 },
+            { number: 23, value: 400000 },
+            { number: 24, value: 500000 },
+            { number: 25, value: 750000 },
+            { number: 26, value: 1000000 },
+        ];
+
+        // Shuffle the cases
+        shuffleCases(cases);
+
+        yourCase = 0;
+        isAwaitingDeal = false;
+
+        // Send game initialization message
+        let reply = "The Deal or No Deal game has started.\n";
+        reply += `These are the values inside the briefcases:\n${displayRemainingValues(cases)
+            .split("\n")
+            .slice(1)
+            .join("\n")}`;
         reply += "\nThe briefcases have been shuffled.\n";
-        reply += "Choose your briefcase (1-26):";
+        reply += "Please choose your briefcase (1-26):";
 
         await interaction.reply(reply);
     },
 };
 
+// Message handler for gameplay interactions
 client.on("messageCreate", async (message) => {
-    if (message.author.bot || !gamedeal) return;
+    if (message.author.bot || !isGameActive) return;
 
+    const specialRounds = [20, 15, 11, 8, 5];
     let reply = "";
-    const userInput = message.content.toLowerCase();
 
-    if (userInput == "yes" && acceptingDeal) {
-        if (cases.length == 2) {
-            const finalValue = cases.find((c) => c.number == yourCase).value;
-            reply = `Congratulations! You win **$${finalValue.toLocaleString()}**!\n`;
-            gamedeal = false;
-        } else {
-            reply = `Congratulations! You win **$${calculateOffer(cases)}**!\n`;
-            gamedeal = false;
+    if (message.content.toLowerCase() === "yes" && isAwaitingDeal) {
+        if (specialRounds.includes(cases.length)) {
+            reply += `Congratulations! You win **$${calculateBankerOffer(cases)}**!\n`;
+            isGameActive = false;
+        } else if (cases.length === 2) {
+            const finalCaseIndex = cases.findIndex((c) => c.number === cases[0].number);
+            reply += `Congratulations! You win **$${cases[finalCaseIndex].value.toLocaleString()}**!\n`;
+            isGameActive = false;
         }
-    } else if (userInput == "no" && acceptingDeal) {
-        if (cases.length == 2) {
-            const finalValue = cases.find((c) => c.number == yourCase).value;
-            reply = `Congratulations! You win **$${finalValue.toLocaleString()}**!\n`;
-            gamedeal = false;
-        } else {
-            reply = "You declined the offer.\n";
-            const nextCaseCount = specialCases[round];
-            reply += `Now choose **${nextCaseCount}** more cases:\n`;
-            acceptingDeal = false;
+    } else if (message.content.toLowerCase() === "no" && isAwaitingDeal) {
+        if (specialRounds.includes(cases.length)) {
+            reply += "You declined the banker's offer.\n";
+            const remainingCasesToPick =
+                specialRounds.find((s) => s === cases.length) - specialRounds[specialRounds.indexOf(cases.length) + 1];
+            reply += `Now, choose **${remainingCasesToPick}** more cases:\n`;
+            isAwaitingDeal = false;
+        } else if (cases.length === 2) {
+            const finalCaseIndex = cases.findIndex((c) => c.number === yourCase);
+            reply += `Congratulations! You win **$${cases[finalCaseIndex].value.toLocaleString()}**!\n`;
+            isGameActive = false;
         }
     } else {
-        if (acceptingDeal) return;
+        if (isAwaitingDeal) return;
 
-        const chosenCase = parseInt(message.content);
-
+        const chosenNumber = parseInt(message.content);
         if (
-            chosenCase == yourCase ||
-            isNaN(chosenCase) ||
-            chosenCase < 1 ||
-            chosenCase > 26 ||
-            !cases.some((c) => c.number == chosenCase)
+            isNaN(chosenNumber) ||
+            chosenNumber < 1 ||
+            chosenNumber > 26 ||
+            cases.findIndex((c) => c.number === chosenNumber) === -1 ||
+            chosenNumber === yourCase
         )
             return;
 
-        if (yourCase == 0) {
-            yourCase = chosenCase;
-            reply += `Now choose ${specialCases[round]} briefcases to reveal:\n`;
-            round++;
-        } else {
-            const caseValue = cases.find((c) => c.number == chosenCase).value;
-            reply += `Behind case **${chosenCase}** was **$${caseValue.toLocaleString()}**.\n`;
-            removeCase(chosenCase, cases);
-            reply += displayRemainingValues(cases) + "\n" + displayRemainingNumbers(cases) + "\n";
+        const chosenCaseIndex = cases.findIndex((c) => c.number === chosenNumber);
 
-            if (cases.length == 2) {
-                reply += "Do you want to switch your case with the last remaining one?\n";
-                acceptingDeal = true;
-            } else if (specialCases[round] == 0) {
-                reply += `The banker's offer is **$${calculateOffer(cases)}**.\nDo you accept the deal?\n`;
-                acceptingDeal = true;
-                round++;
-            } else {
-                const nextCaseCount = specialCases[round];
-                reply += `Now choose **${nextCaseCount}** more cases:\n`;
-                specialCases[round]--;
+        if (yourCase === 0) {
+            // Set player's case
+            yourCase = chosenNumber;
+            reply += "Now choose **6** briefcases to reveal:\n";
+        } else {
+            reply += `Behind case **${chosenNumber}** there were **$${cases[chosenCaseIndex].value.toLocaleString()}**.\n`;
+            removeCase(chosenNumber, cases);
+            reply += `${displayRemainingValues(cases)}\n`;
+            reply += `${displayRemainingCaseNumbers(cases)}\n`;
+
+            if (specialRounds.includes(cases.length)) {
+                reply += `The banker offers you **$${calculateBankerOffer(cases)}**.\n`;
+                reply += "Do you accept the deal? (yes/no)\n";
+                isAwaitingDeal = true;
+            } else if (cases.length === 2) {
+                reply += "Do you want to switch your case with the last remaining one? (yes/no)\n";
+                isAwaitingDeal = true;
             }
         }
     }
