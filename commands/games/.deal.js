@@ -26,7 +26,7 @@ function displayRemainingValues(cases) {
 
 // Returns a string of remaining case numbers
 function displayRemainingCaseNumbers(cases) {
-    const caseNumbers = cases.map((c) => c.number).join(", ");
+    const caseNumbers = cases.map((c) => (c.number === yourCase ? `**${c.number}**` : c.number)).join(", ");
     return `Remaining case numbers: ${caseNumbers}`;
 }
 
