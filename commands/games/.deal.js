@@ -91,7 +91,7 @@ module.exports = {
         isAwaitingDeal = false;
 
         // Send game initialization message
-        let reply = "The Deal or No Deal game has started.\n";
+        let reply = "The Deal or No Deal game has started!\n";
         reply += `These are the values inside the briefcases:\n${displayRemainingValues(cases)
             .split("\n")
             .slice(1)
