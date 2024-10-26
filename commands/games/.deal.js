@@ -26,7 +26,7 @@ function displayRemainingValues(cases) {
 
 // Returns a string of remaining case numbers
 function displayRemainingCaseNumbers(cases) {
-    const caseNumbers = cases.map((c) => (c.number === yourCase ? `**${c.number}**` : c.number)).join(", ");
+    const caseNumbers = cases.map((c) => (c.number == yourCase ? `**${c.number}**` : c.number)).join(", ");
     return `Remaining case numbers: ${caseNumbers}`;
 }
 
@@ -128,7 +128,7 @@ client.on("messageCreate", async (message) => {
         if (specialRounds.includes(cases.length)) {
             reply += "You declined the banker's offer.\n";
             let remainingCasesToPick;
-            if (cases.length === 3) {
+            if (cases.length == 3) {
                 remainingCasesToPick = 1;
             } else {
                 remainingCasesToPick =
