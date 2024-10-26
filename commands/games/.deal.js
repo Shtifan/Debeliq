@@ -11,7 +11,7 @@ function shuffleCases(cases) {
 
 // Removes a case by number from the cases array
 function removeCase(caseNumber, cases) {
-    const index = cases.findIndex((c) => c.number === caseNumber);
+    const index = cases.findIndex((c) => c.number == caseNumber);
     cases.splice(index, 1);
 }
 
@@ -32,12 +32,15 @@ function displayRemainingCaseNumbers(cases) {
 
 // Calculates the banker's offer based on the remaining cases
 function calculateBankerOffer(cases) {
+    // Calculate the total money left and the expected value
     const totalValue = cases.reduce((sum, c) => sum + c.value, 0);
-    const averageValue = totalValue / cases.length;
+    const expectedValue = totalValue / cases.length;
 
-    // Offer percentage decreases as fewer cases remain
-    const offerPercentage = cases.length > 10 ? 0.2 : 0.1;
-    const offer = averageValue * offerPercentage;
+    // Calculate the current round based on cases left (starting with 6 cases in round 1)
+    const roundNumber = 10 - Math.floor((cases.length - 1) / 3); // Rounds decrease with cases chosen
+
+    // Calculate the offer using your formula
+    const offer = Math.floor(expectedValue * (roundNumber / 9));
 
     return offer.toLocaleString();
 }
@@ -107,27 +110,35 @@ module.exports = {
 client.on("messageCreate", async (message) => {
     if (message.author.bot || !isGameActive) return;
 
-    const specialRounds = [20, 15, 11, 8, 5];
+    const specialRounds = [20, 15, 11, 8, 6, 5, 4, 3];
     let reply = "";
 
-    if (message.content.toLowerCase() === "yes" && isAwaitingDeal) {
+    if (message.content.toLowerCase() == "yes" && isAwaitingDeal) {
         if (specialRounds.includes(cases.length)) {
             reply += `Congratulations! You win **$${calculateBankerOffer(cases)}**!\n`;
+            const finalCaseIndex = cases.findIndex((c) => c.number == yourCase);
+            reply += `Behind your case **${yourCase}** there were **$${cases[finalCaseIndex].value.toLocaleString()}**!\n`;
             isGameActive = false;
-        } else if (cases.length === 2) {
-            const finalCaseIndex = cases.findIndex((c) => c.number === cases[0].number);
+        } else if (cases.length == 2) {
+            const finalCaseIndex = cases.findIndex((c) => c.number == cases[0].number);
             reply += `Congratulations! You win **$${cases[finalCaseIndex].value.toLocaleString()}**!\n`;
             isGameActive = false;
         }
-    } else if (message.content.toLowerCase() === "no" && isAwaitingDeal) {
+    } else if (message.content.toLowerCase() == "no" && isAwaitingDeal) {
         if (specialRounds.includes(cases.length)) {
             reply += "You declined the banker's offer.\n";
-            const remainingCasesToPick =
-                specialRounds.find((s) => s === cases.length) - specialRounds[specialRounds.indexOf(cases.length) + 1];
-            reply += `Now, choose **${remainingCasesToPick}** more cases:\n`;
+            let remainingCasesToPick;
+            if (cases.length === 3) {
+                remainingCasesToPick = 1;
+            } else {
+                remainingCasesToPick =
+                    specialRounds.find((s) => s == cases.length) - specialRounds[specialRounds.indexOf(cases.length) + 1];
+            }
+
+            reply += `Open **${remainingCasesToPick}** more case(s):\n`;
             isAwaitingDeal = false;
-        } else if (cases.length === 2) {
-            const finalCaseIndex = cases.findIndex((c) => c.number === yourCase);
+        } else if (cases.length == 2) {
+            const finalCaseIndex = cases.findIndex((c) => c.number == yourCase);
             reply += `Congratulations! You win **$${cases[finalCaseIndex].value.toLocaleString()}**!\n`;
             isGameActive = false;
         }
@@ -139,17 +150,17 @@ client.on("messageCreate", async (message) => {
             isNaN(chosenNumber) ||
             chosenNumber < 1 ||
             chosenNumber > 26 ||
-            cases.findIndex((c) => c.number === chosenNumber) === -1 ||
-            chosenNumber === yourCase
+            cases.findIndex((c) => c.number == chosenNumber) == -1 ||
+            chosenNumber == yourCase
         )
             return;
 
-        const chosenCaseIndex = cases.findIndex((c) => c.number === chosenNumber);
+        const chosenCaseIndex = cases.findIndex((c) => c.number == chosenNumber);
 
-        if (yourCase === 0) {
+        if (yourCase == 0) {
             // Set player's case
             yourCase = chosenNumber;
-            reply += "Now choose **6** briefcases to reveal:\n";
+            reply += "Now open **6** briefcases to reveal:\n";
         } else {
             reply += `Behind case **${chosenNumber}** there were **$${cases[chosenCaseIndex].value.toLocaleString()}**.\n`;
             removeCase(chosenNumber, cases);
@@ -158,10 +169,10 @@ client.on("messageCreate", async (message) => {
 
             if (specialRounds.includes(cases.length)) {
                 reply += `The banker offers you **$${calculateBankerOffer(cases)}**.\n`;
-                reply += "Do you accept the deal? (yes/no)\n";
+                reply += "Do you accept the deal? (**yes**/**no**)\n";
                 isAwaitingDeal = true;
-            } else if (cases.length === 2) {
-                reply += "Do you want to switch your case with the last remaining one? (yes/no)\n";
+            } else if (cases.length == 2) {
+                reply += "Do you want to switch your case with the last remaining one? (**yes**/**no**)\n";
                 isAwaitingDeal = true;
             }
         }
