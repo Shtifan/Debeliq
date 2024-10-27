@@ -12,12 +12,12 @@ function generate() {
 }
 
 function check(correctGuesses) {
-    if (correctGuesses === 6) return "Congratulations! You win **$7,000,000**!";
-    if (correctGuesses === 5) return "Congratulations! You win **$10,000**!";
-    if (correctGuesses === 4) return "Congratulations! You win **$100**!";
-    if (correctGuesses === 3) return "Congratulations! You win **$10**!";
-    if (correctGuesses === 2) return "Congratulations! You win **$1**!";
-    if (correctGuesses === 1) return "Congratulations! You win **$0.01**!";
+    if (correctGuesses == 6) return "Congratulations! You win **$7,000,000**!";
+    if (correctGuesses == 5) return "Congratulations! You win **$10,000**!";
+    if (correctGuesses == 4) return "Congratulations! You win **$100**!";
+    if (correctGuesses == 3) return "Congratulations! You win **$10**!";
+    if (correctGuesses == 2) return "Congratulations! You win **$1**!";
+    if (correctGuesses == 1) return "Congratulations! You win **$0.01**!";
     return `Sorry, you didn't win anything.`;
 }
 
