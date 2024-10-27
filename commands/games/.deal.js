@@ -9,7 +9,7 @@ function shuffleCases(cases) {
 }
 
 function removeCase(caseNumber, cases) {
-    const index = cases.findIndex((c) => c.number === caseNumber);
+    const index = cases.findIndex((c) => c.number == caseNumber);
     if (index !== -1) cases.splice(index, 1);
 }
 
@@ -22,7 +22,7 @@ function displayRemainingValues(cases) {
 }
 
 function displayRemainingCaseNumbers(cases, yourCase) {
-    const caseNumbers = cases.map((c) => (c.number === yourCase ? `**${c.number}**` : c.number)).join(", ");
+    const caseNumbers = cases.map((c) => (c.number == yourCase ? `**${c.number}**` : c.number)).join(", ");
     return `Remaining case numbers: ${caseNumbers}`;
 }
 
@@ -111,29 +111,29 @@ client.on("messageCreate", async (message) => {
     const specialRounds = [20, 15, 11, 8, 6, 5, 4, 3];
     let reply = "";
 
-    if (message.content.toLowerCase() === "yes" && isAwaitingDeal) {
+    if (message.content.toLowerCase() == "yes" && isAwaitingDeal) {
         if (specialRounds.includes(cases.length)) {
             reply += `Congratulations! You win **$${calculateBankerOffer(cases)}**!\n`;
 
-            const finalCaseIndex = cases.findIndex((c) => c.number === yourCase);
+            const finalCaseIndex = cases.findIndex((c) => c.number == yourCase);
             reply += `Behind your case **${yourCase}** there were **$${cases[finalCaseIndex].value.toLocaleString()}**!\n`;
 
             isGameActive = false;
-        } else if (cases.length === 2) {
-            const finalCaseIndex = cases.findIndex((c) => c.number === cases[0].number);
+        } else if (cases.length == 2) {
+            const finalCaseIndex = cases.findIndex((c) => c.number == cases[0].number);
             reply += `Congratulations! You win **$${cases[finalCaseIndex].value.toLocaleString()}**!\n`;
 
             isGameActive = false;
         }
-    } else if (message.content.toLowerCase() === "no" && isAwaitingDeal) {
+    } else if (message.content.toLowerCase() == "no" && isAwaitingDeal) {
         if (specialRounds.includes(cases.length)) {
             reply += "You declined the banker's offer.\n";
             remainingCasesToPick = calculateRemainingCasesToPick(cases);
             reply += `Open **${remainingCasesToPick}** more case(s):\n`;
 
             isAwaitingDeal = false;
-        } else if (cases.length === 2) {
-            const finalCaseIndex = cases.findIndex((c) => c.number === yourCase);
+        } else if (cases.length == 2) {
+            const finalCaseIndex = cases.findIndex((c) => c.number == yourCase);
             reply += `Congratulations! You win **$${cases[finalCaseIndex].value.toLocaleString()}**!\n`;
 
             isGameActive = false;
@@ -146,14 +146,14 @@ client.on("messageCreate", async (message) => {
             isNaN(chosenNumber) ||
             chosenNumber < 1 ||
             chosenNumber > 26 ||
-            cases.findIndex((c) => c.number === chosenNumber) === -1 ||
-            chosenNumber === yourCase
+            cases.findIndex((c) => c.number == chosenNumber) == -1 ||
+            chosenNumber == yourCase
         )
             return;
 
-        const chosenCaseIndex = cases.findIndex((c) => c.number === chosenNumber);
+        const chosenCaseIndex = cases.findIndex((c) => c.number == chosenNumber);
 
-        if (yourCase === 0) {
+        if (yourCase == 0) {
             yourCase = chosenNumber;
             reply += "Now open **6** briefcases to reveal:\n";
         } else {
@@ -171,7 +171,7 @@ client.on("messageCreate", async (message) => {
                     reply += `The banker offers you **$${calculateBankerOffer(cases)}**.\n`;
                     reply += "Do you accept the deal? (**yes**/**no**)\n";
                     isAwaitingDeal = true;
-                } else if (cases.length === 2) {
+                } else if (cases.length == 2) {
                     reply += "Do you want to switch your case with the last remaining one? (**yes**/**no**)\n";
                     isAwaitingDeal = true;
                 } else {
