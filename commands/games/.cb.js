@@ -9,9 +9,9 @@ function ending(number) {
     const lastDigit = number % 10;
     const lastTwoDigits = number % 100;
 
-    if (lastDigit === 1 && lastTwoDigits !== 11) return "st";
-    if (lastDigit === 2 && lastTwoDigits !== 12) return "nd";
-    if (lastDigit === 3 && lastTwoDigits !== 13) return "rd";
+    if (lastDigit == 1 && lastTwoDigits !== 11) return "st";
+    if (lastDigit == 2 && lastTwoDigits !== 12) return "nd";
+    if (lastDigit == 3 && lastTwoDigits !== 13) return "rd";
     return "th";
 }
 
@@ -37,7 +37,7 @@ function cb(secretNumber, userInput) {
     let cows = 0;
 
     for (let i = 0; i < secretNumber.length; i++) {
-        if (secretNumber[i] === userInput[i]) {
+        if (secretNumber[i] == userInput[i]) {
             bulls++;
         } else if (secretNumber.includes(userInput[i])) {
             cows++;
@@ -76,7 +76,7 @@ client.on("messageCreate", async (message) => {
 
     let reply = `**${bulls}** bull${bulls !== 1 ? "s" : ""} and **${cows}** cow${cows !== 1 ? "s" : ""}\n`;
 
-    if (bulls === 4) {
+    if (bulls == 4) {
         reply += `Congratulations! You guessed the number in **${guesses}${ending(guesses)}** attempt!\n`;
         gamecb = false;
     }

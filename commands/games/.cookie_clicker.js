@@ -26,7 +26,7 @@ module.exports = {
     },
 
     async handleButton(interaction) {
-        if (interaction.customId === "click_cookie") {
+        if (interaction.customId == "click_cookie") {
             const userId = interaction.user.id;
             userCookies[userId] = (userCookies[userId] || 0) + 1;
 

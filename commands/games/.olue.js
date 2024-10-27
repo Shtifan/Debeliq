@@ -101,8 +101,8 @@ async function startGame(userData, userId, interaction) {
     }
 
     const filter = (buttonInteraction) =>
-        buttonInteraction.user.id === userId &&
-        (buttonInteraction.customId.startsWith("number_") || buttonInteraction.customId === "retry");
+        buttonInteraction.user.id == userId &&
+        (buttonInteraction.customId.startsWith("number_") || buttonInteraction.customId == "retry");
     const collector = gameMessage.createMessageComponentCollector({ filter, time: 60000 });
 
     collector.on("collect", async (buttonInteraction) => {
@@ -115,7 +115,7 @@ async function startGame(userData, userId, interaction) {
                 userData[userId].score += 1;
                 correctSelections.add(chosenNumber);
 
-                if (correctSelections.size === specialNumbers.length) {
+                if (correctSelections.size == specialNumbers.length) {
                     correctSelections.clear();
                     ({ content, components, specialNumbers } = createGameGrid(userData[userId].score));
                     await updateMessage(gameMessage, userData[userId].score, specialNumbers);
@@ -131,7 +131,7 @@ async function startGame(userData, userId, interaction) {
             await buttonInteraction.deferUpdate();
         }
 
-        if (customId === "retry") {
+        if (customId == "retry") {
             userData[userId].score = 0;
             await saveUserData(userData);
             await startGame(userData, userId, interaction);
@@ -139,7 +139,7 @@ async function startGame(userData, userId, interaction) {
     });
 
     collector.on("end", async (collected) => {
-        if (collected.size === 0) {
+        if (collected.size == 0) {
             await gameMessage.edit({ content: "Time's up! No selection was made.", components: [] });
         }
     });
@@ -162,7 +162,7 @@ module.exports = {
             await saveUserData(userData);
 
             const introMessage = await interaction.reply({ content: introText, components: [startRow] });
-            const buttonFilter = (btn) => btn.user.id === interaction.user.id;
+            const buttonFilter = (btn) => btn.user.id == interaction.user.id;
 
             const introCollector = introMessage.createMessageComponentCollector({
                 max: 1,
