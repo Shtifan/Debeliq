@@ -8,7 +8,6 @@ module.exports = {
         if (interaction.isChatInputCommand()) {
             const command = interaction.client.commands.get(interaction.commandName);
             if (!command) return;
-
             try {
                 await command.execute(interaction);
             } catch (error) {
@@ -19,10 +18,12 @@ module.exports = {
                 });
             }
         }
-
         if (interaction.isButton()) {
-            const command = interaction.client.commands.get("cookie_clicker");
-            if (!command) return;
+            const commandName = interaction.message.interaction?.commandName;
+            if (!commandName) return;
+
+            const command = interaction.client.commands.get(commandName);
+            if (!command || !command.handleButton) return;
 
             try {
                 await command.handleButton(interaction);
