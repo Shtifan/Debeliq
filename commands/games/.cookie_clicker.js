@@ -16,7 +16,6 @@ module.exports = {
             .setColor(0xf1c40f)
             .setTitle("🍪 Cookie Clicker 🍪")
             .setDescription(`You have ${userCookies[userId]} cookies!`)
-            .setFooter({ text: "Click the button to earn more cookies!" });
 
         const row = new ActionRowBuilder().addComponents(
             new ButtonBuilder().setCustomId("click_cookie").setLabel("🍪 Click me!").setStyle(ButtonStyle.Primary)
@@ -33,8 +32,7 @@ module.exports = {
             const embed = new EmbedBuilder()
                 .setColor(0xf1c40f)
                 .setTitle("🍪 Cookie Clicker 🍪")
-                .setDescription(`You now have ${userCookies[userId]} cookies!`)
-                .setFooter({ text: "Keep clicking to earn more cookies!" });
+                .setDescription(`You now have ${userCookies[userId]} cookies!`);
 
             await interaction.update({ embeds: [embed] });
         }
