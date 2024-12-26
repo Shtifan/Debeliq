@@ -3,7 +3,7 @@ const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Embed
 const userCookies = {};
 
 module.exports = {
-    data: new SlashCommandBuilder().setName("cookie_clicker").setDescription("Play Cookie Clicker!"),
+    data: new SlashCommandBuilder().setName("cookie_clicker").setDescription("Play Cookie Clicker"),
 
     async execute(interaction) {
         const userId = interaction.user.id;
@@ -13,9 +13,8 @@ module.exports = {
         }
 
         const embed = new EmbedBuilder()
-            .setColor(0xf1c40f)
             .setTitle("🍪 Cookie Clicker 🍪")
-            .setDescription(`You have ${userCookies[userId]} cookies!`)
+            .setDescription(`You have ${userCookies[userId]} cookies!`);
 
         const row = new ActionRowBuilder().addComponents(
             new ButtonBuilder().setCustomId("click_cookie").setLabel("🍪 Click me!").setStyle(ButtonStyle.Primary)
@@ -30,7 +29,6 @@ module.exports = {
             userCookies[userId] = (userCookies[userId] || 0) + 1;
 
             const embed = new EmbedBuilder()
-                .setColor(0xf1c40f)
                 .setTitle("🍪 Cookie Clicker 🍪")
                 .setDescription(`You now have ${userCookies[userId]} cookies!`);
 

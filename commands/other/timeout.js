@@ -22,7 +22,7 @@ function convertToMs(duration) {
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("timeout")
-        .setDescription("Timeout a member from this server!")
+        .setDescription("Timeout a member from this server")
         .addUserOption((option) => option.setName("user").setDescription("The user you want to timeout").setRequired(true))
         .addStringOption((option) =>
             option.setName("duration").setDescription("Timeout duration (10s, 30m, 1h, 5d...)").setRequired(true)
@@ -57,10 +57,10 @@ module.exports = {
 
         try {
             await targetUser.timeout(msDuration, reason);
-            await interaction.reply(`${targetUser} was timed out for ${duration}.\nReason: ${reason}`);
+            await interaction.reply(`${targetUser} was timed out for ${duration}.\nReason: ${reason}.`);
         } catch (error) {
             await interaction.reply({
-                content: `Sorry, I am unable to timeout ${targetUser}`,
+                content: `Sorry, I am unable to timeout ${targetUser}.`,
                 ephemeral: true,
             });
         }

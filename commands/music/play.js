@@ -4,8 +4,8 @@ const { useMainPlayer } = require("discord-player");
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("play")
-        .setDescription("Play a song!")
-        .addStringOption((option) => option.setName("query").setDescription("Name or URL of the song").setRequired(true)),
+        .setDescription("Play a song")
+        .addStringOption((option) => option.setName("query").setDescription("Name or URL of the song or playlist").setRequired(true)),
 
     async execute(interaction) {
         const player = useMainPlayer();

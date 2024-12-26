@@ -3,7 +3,7 @@ const { SlashCommandBuilder, PermissionsBitField } = require("discord.js");
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("delete")
-        .setDescription("Delete messages!")
+        .setDescription("Delete messages in this channel")
         .addIntegerOption((option) =>
             option.setName("amount").setDescription("Number of messages you want to delete").setRequired(true)
         ),

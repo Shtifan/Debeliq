@@ -52,7 +52,7 @@ let secretNumber;
 let guesses;
 
 module.exports = {
-    data: new SlashCommandBuilder().setName("cows_bulls").setDescription("Play Cows and Bulls!"),
+    data: new SlashCommandBuilder().setName("cows_bulls").setDescription("Play Cows and Bulls"),
 
     async execute(interaction) {
         gamecb = true;
