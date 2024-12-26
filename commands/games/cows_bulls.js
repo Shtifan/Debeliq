@@ -59,7 +59,7 @@ module.exports = {
         secretNumber = generate();
         guesses = 0;
 
-        await interaction.reply(`I'm ready! Start guessing a 4-digit numbers.`);
+        await interaction.reply(`I'm ready! Start guessing a 4-digit number.`);
     },
 };
 
@@ -77,7 +77,22 @@ client.on("messageCreate", async (message) => {
     let reply = `**${bulls}** bull${bulls !== 1 ? "s" : ""} and **${cows}** cow${cows !== 1 ? "s" : ""}\n`;
 
     if (bulls == 4) {
-        reply += `Congratulations! You guessed the number in **${guesses}${ending(guesses)}** attempt!\n`;
+        let prize = 0;
+
+        if (guesses <= 5) {
+            prize = 10000;
+        } else if (guesses <= 10) {
+            prize = 1000;
+        }
+
+        reply += `Congratulations! You guessed the number in **${guesses}${ending(guesses)}** attempt!`;
+
+        if (prize > 0) {
+            reply += `You won **$${prize.toLocaleString()}**!`;
+        } else {
+            reply += `Unfortunately, you don't win any money.`;
+        }
+
         gamecb = false;
     }
 
