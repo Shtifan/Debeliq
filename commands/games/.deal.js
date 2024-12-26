@@ -186,24 +186,20 @@ client.on("interactionCreate", async (interaction) => {
     let additionalInfo = "";
 
     if (interaction.customId.startsWith("page_")) {
-        // Handle page navigation
         const [_, direction, currentPage] = interaction.customId.split("_");
         const newPage = direction === "prev" ? parseInt(currentPage) - 1 : parseInt(currentPage) + 1;
 
         components = createCaseButtons(gameState, [gameState.yourCase], newPage);
         embed = createGameEmbed(gameState, "Navigating between case pages.");
     } else if (interaction.customId.startsWith("case_")) {
-        // Handle case selection
         const chosenNumber = parseInt(interaction.customId.split("_")[1]);
 
         if (gameState.yourCase === 0) {
-            // User chooses their case
             gameState.yourCase = chosenNumber;
             additionalInfo = `You chose case ${chosenNumber} as your case!`;
             embed = createGameEmbed(gameState, additionalInfo);
             components = createCaseButtons(gameState, [chosenNumber], 1);
         } else {
-            // User opens a case
             const chosenCase = gameState.cases.find((c) => c.number === chosenNumber);
             additionalInfo = `Case ${chosenNumber} contained $${chosenCase.value.toLocaleString()}!`;
             removeCase(chosenNumber, gameState.cases);
@@ -229,7 +225,6 @@ client.on("interactionCreate", async (interaction) => {
             embed = createGameEmbed(gameState, additionalInfo);
         }
     } else if (interaction.customId.startsWith("deal_")) {
-        // Handle deal or no deal decisions
         const decision = interaction.customId.split("_")[1];
 
         if (decision === "yes") {
