@@ -111,7 +111,6 @@ function createCaseButtons(gameState, disabledNumbers = [], page = 1) {
         rows.push(currentRow);
     }
 
-    // Add navigation buttons
     const navigationRow = new ActionRowBuilder().addComponents(
         new ButtonBuilder()
             .setCustomId(`page_prev_${page}`)
@@ -129,11 +128,11 @@ function createCaseButtons(gameState, disabledNumbers = [], page = 1) {
     return rows;
 }
 
-function createDealButtons() {
+function createDealButtons(yesLabel = "DEAL", noLabel = "NO DEAL") {
     return [
         new ActionRowBuilder().addComponents(
-            new ButtonBuilder().setCustomId("deal_yes").setLabel("DEAL").setStyle(ButtonStyle.Success),
-            new ButtonBuilder().setCustomId("deal_no").setLabel("NO DEAL").setStyle(ButtonStyle.Danger)
+            new ButtonBuilder().setCustomId("deal_yes").setLabel(yesLabel).setStyle(ButtonStyle.Success),
+            new ButtonBuilder().setCustomId("deal_no").setLabel(noLabel).setStyle(ButtonStyle.Danger)
         ),
     ];
 }
@@ -213,7 +212,7 @@ client.on("interactionCreate", async (interaction) => {
                     components = createDealButtons();
                 } else if (gameState.cases.length === 2) {
                     additionalInfo += "\n\nDo you want to switch your case with the last remaining one?";
-                    components = createDealButtons();
+                    components = createDealButtons("YES", "NO");
                     gameState.isAwaitingDeal = true;
                 } else {
                     gameState.remainingCasesToPick = calculateRemainingCasesToPick(gameState.cases);
