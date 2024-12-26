@@ -26,7 +26,6 @@ module.exports = {
         const track = queue.currentTrack;
 
         const embed = new EmbedBuilder()
-            .setColor(0x000000)
             .setAuthor({ name: "Now Playing:" })
             .setTitle(track.title)
             .setURL(track.url)
