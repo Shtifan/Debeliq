@@ -7,7 +7,7 @@ async function saveUserData(userData) {
         if (!existsSync("./data")) {
             mkdirSync("./data", { recursive: true });
         }
-        await fs.writeFile("./data/olue_data.json", JSON.stringify(userData, null, 2), "utf8");
+        await fs.writeFile("./data/user_data.json", JSON.stringify({ olue_game: userData }, null, 2), "utf8");
     } catch (error) {
         console.error("Error saving user data:", error);
     }
@@ -15,19 +15,20 @@ async function saveUserData(userData) {
 
 async function loadUserData() {
     try {
-        if (!existsSync("./data/olue_data.json")) {
+        if (!existsSync("./data/user_data.json")) {
             await saveUserData({});
             return {};
         }
 
-        const data = await fs.readFile("./data/olue_data.json", "utf8");
+        const data = await fs.readFile("./data/user_data.json", "utf8");
 
         if (!data.trim()) {
             await saveUserData({});
             return {};
         }
 
-        return JSON.parse(data);
+        const parsedData = JSON.parse(data);
+        return parsedData.olue_game || {};
     } catch (error) {
         console.error("Error loading user data:", error);
         await saveUserData({});
