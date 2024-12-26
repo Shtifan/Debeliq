@@ -75,7 +75,7 @@ function calculateRemainingCasesToPick(cases) {
 }
 
 function createGameState() {
-    return {
+    const gameState = {
         isActive: true,
         cases: [
             { number: 1, value: 0.01 },
@@ -109,6 +109,8 @@ function createGameState() {
         isAwaitingDeal: false,
         remainingCasesToPick: 6,
     };
+    shuffleCases(gameState.cases);
+    return gameState;
 }
 
 function createCaseButtons(gameState, disabledNumbers = [], page = 1) {
@@ -191,15 +193,18 @@ function createGameEmbed(gameState, additionalInfo = "") {
     return embed;
 }
 
-const gameStates = new Map();
-
 module.exports = {
     data: new SlashCommandBuilder().setName("deal").setDescription("Play Deal or No Deal"),
 
     async execute(interaction) {
+        const userData = await loadUserData();
         const gameState = createGameState();
-        shuffleCases(gameState.cases);
-        gameStates.set(interaction.user.id, gameState);
+
+        if (!userData[interaction.user.id]) {
+            userData[interaction.user.id] = { money: 0 };
+        }
+        userData[interaction.user.id].currentGame = gameState;
+        await saveUserData(userData);
 
         const embed = createGameEmbed(gameState);
         const buttons = createCaseButtons(gameState);
@@ -208,11 +213,11 @@ module.exports = {
     },
 
     async handleButton(interaction) {
-        const gameState = gameStates.get(interaction.user.id);
+        const userData = await loadUserData();
+        const gameState = userData[interaction.user.id]?.currentGame;
+
         if (!gameState || !gameState.isActive) return;
 
-        const userId = interaction.user.id;
-        let userData = await loadUserData();
         let embed;
         let components;
         let additionalInfo = "";
@@ -284,13 +289,12 @@ module.exports = {
             embed = createGameEmbed(gameState, additionalInfo);
 
             if (moneyEarned > 0) {
-                if (!userData[userId]) {
-                    userData[userId] = { money: 0 };
-                }
-                userData[userId].money = parseInt(userData[userId].money || 0) + moneyEarned;
-                await saveUserData(userData);
+                userData[interaction.user.id].money = parseInt(userData[interaction.user.id].money || 0) + moneyEarned;
             }
         }
+
+        userData[interaction.user.id].currentGame = gameState;
+        await saveUserData(userData);
 
         await interaction.update({ embeds: [embed], components: components || [] });
     },
