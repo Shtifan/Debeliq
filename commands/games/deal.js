@@ -138,7 +138,7 @@ function createDealButtons(yesLabel = "DEAL", noLabel = "NO DEAL") {
 }
 
 function createGameEmbed(gameState, additionalInfo = "") {
-    const embed = new EmbedBuilder().setTitle("Deal or No Deal").setColor("#0099ff");
+    const embed = new EmbedBuilder().setTitle("Deal or No Deal");
 
     if (gameState.yourCase === 0) {
         embed.setDescription("Choose your case!");
