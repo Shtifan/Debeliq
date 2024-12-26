@@ -12,5 +12,5 @@ module.exports = {
 client.on("messageCreate", async (message) => {
     if (message.author.bot) return;
 
-    if (message.content.includes("koi") || message.content.includes("koj")) await message.reply("te e pital");
+    if (message.content.includes("koj")) await message.reply("te e pital");
 });
