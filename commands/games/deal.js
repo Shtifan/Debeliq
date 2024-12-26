@@ -160,7 +160,7 @@ function createGameEmbed(gameState, additionalInfo = "") {
 }
 
 module.exports = {
-    data: new SlashCommandBuilder().setName("deal").setDescription("Play Deal or No Deal!"),
+    data: new SlashCommandBuilder().setName("deal").setDescription("Play Deal or No Deal"),
 
     async execute(interaction) {
         const gameState = createGameState();

@@ -106,7 +106,7 @@ class GameState {
 }
 
 module.exports = {
-    data: new SlashCommandBuilder().setName("olue").setDescription("Play Olue the Game!"),
+    data: new SlashCommandBuilder().setName("olue").setDescription("Play Olue the Game"),
 
     async execute(interaction) {
         const userId = interaction.user.id;

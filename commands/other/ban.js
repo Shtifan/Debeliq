@@ -3,7 +3,7 @@ const { SlashCommandBuilder } = require("discord.js");
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("ban")
-        .setDescription("Ban a member from this server!")
+        .setDescription("Ban a member from this server")
         .addUserOption((option) => option.setName("user").setDescription("The user you want to ban").setRequired(true))
         .addStringOption((option) => option.setName("reason").setDescription("The reason for the ban")),
 
