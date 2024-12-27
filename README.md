@@ -40,5 +40,5 @@ https://www.python.org/downloads/
 Run:
 
 ```bash
-pip install stockfish opencv-python board_to_fen tensorflow
+pip install tensorflow board_to_fen stockfish opencv-python
 ```
