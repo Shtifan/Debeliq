@@ -1,13 +1,24 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
-const fs = require("fs/promises");
 const { existsSync, mkdirSync } = require("fs");
+const fs = require("fs/promises");
 
 async function saveUserData(userData) {
     try {
         if (!existsSync("./data")) {
             mkdirSync("./data", { recursive: true });
         }
-        await fs.writeFile("./data/user_data.json", JSON.stringify({ olue_game: userData }, null, 2), "utf8");
+
+        let existingData = {};
+        if (existsSync("./data/user_data.json")) {
+            const fileContent = await fs.readFile("./data/user_data.json", "utf8");
+            if (fileContent.trim()) {
+                existingData = JSON.parse(fileContent);
+            }
+        }
+
+        existingData.olue_game = userData;
+
+        await fs.writeFile("./data/user_data.json", JSON.stringify(existingData, null, 2), "utf8");
     } catch (error) {
         console.error("Error saving user data:", error);
     }
