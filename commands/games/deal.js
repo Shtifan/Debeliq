@@ -1,38 +1,19 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require("discord.js");
-const { existsSync, mkdirSync } = require("fs");
-const fs = require("fs/promises");
+const fs = require("fs");
+const path = require("path");
 
-async function saveUserData(userData) {
-    try {
-        if (!existsSync("./data")) {
-            mkdirSync("./data", { recursive: true });
-        }
-        await fs.writeFile("./data/user_data.json", JSON.stringify(userData, null, 2), "utf8");
-    } catch (error) {
-        console.error("Error saving user data:", error);
+const client = require("../../index.js");
+const userDataPath = path.join(__dirname, "../../data/user_data.json");
+
+function loadUserData() {
+    if (!fs.existsSync(userDataPath)) {
+        fs.writeFileSync(userDataPath, JSON.stringify({}));
     }
+    return JSON.parse(fs.readFileSync(userDataPath, "utf8"));
 }
 
-async function loadUserData() {
-    try {
-        if (!existsSync("./data/user_data.json")) {
-            await saveUserData({});
-            return {};
-        }
-
-        const data = await fs.readFile("./data/user_data.json", "utf8");
-
-        if (!data.trim()) {
-            await saveUserData({});
-            return {};
-        }
-
-        return JSON.parse(data);
-    } catch (error) {
-        console.error("Error loading user data:", error);
-        await saveUserData({});
-        return {};
-    }
+function saveUserData(data) {
+    fs.writeFileSync(userDataPath, JSON.stringify(data, null, 4));
 }
 
 function shuffleCases(cases) {
@@ -74,8 +55,10 @@ function calculateRemainingCasesToPick(cases) {
     return 1;
 }
 
+const gameStates = new Map();
+
 function createGameState() {
-    const gameState = {
+    return {
         isActive: true,
         cases: [
             { number: 1, value: 0.01 },
@@ -109,8 +92,6 @@ function createGameState() {
         isAwaitingDeal: false,
         remainingCasesToPick: 6,
     };
-    shuffleCases(gameState.cases);
-    return gameState;
 }
 
 function createCaseButtons(gameState, disabledNumbers = [], page = 1) {
@@ -162,11 +143,11 @@ function createCaseButtons(gameState, disabledNumbers = [], page = 1) {
     return rows;
 }
 
-function createDealButtons(yesLabel = "DEAL", noLabel = "NO DEAL") {
+function createDealButtons() {
     return [
         new ActionRowBuilder().addComponents(
-            new ButtonBuilder().setCustomId("deal_yes").setLabel(yesLabel).setStyle(ButtonStyle.Success),
-            new ButtonBuilder().setCustomId("deal_no").setLabel(noLabel).setStyle(ButtonStyle.Danger)
+            new ButtonBuilder().setCustomId("deal_yes").setLabel("DEAL").setStyle(ButtonStyle.Success),
+            new ButtonBuilder().setCustomId("deal_no").setLabel("NO DEAL").setStyle(ButtonStyle.Danger)
         ),
     ];
 }
@@ -197,105 +178,104 @@ module.exports = {
     data: new SlashCommandBuilder().setName("deal").setDescription("Play Deal or No Deal"),
 
     async execute(interaction) {
-        const userData = await loadUserData();
         const gameState = createGameState();
-
-        if (!userData[interaction.user.id]) {
-            userData[interaction.user.id] = { money: 0 };
-        }
-        userData[interaction.user.id].currentGame = gameState;
-        await saveUserData(userData);
+        shuffleCases(gameState.cases);
+        gameStates.set(interaction.user.id, gameState);
 
         const embed = createGameEmbed(gameState);
         const buttons = createCaseButtons(gameState);
 
         await interaction.reply({ embeds: [embed], components: buttons });
     },
+};
 
-    async handleButton(interaction) {
-        const userData = await loadUserData();
-        const gameState = userData[interaction.user.id]?.currentGame;
+client.on("interactionCreate", async (interaction) => {
+    if (!interaction.isButton()) return;
 
-        if (!gameState || !gameState.isActive) return;
+    const gameState = gameStates.get(interaction.user.id);
+    if (!gameState || !gameState.isActive) return;
 
-        let embed;
-        let components;
-        let additionalInfo = "";
-        let moneyEarned = 0;
+    let embed;
+    let components;
+    let additionalInfo = "";
 
-        if (interaction.customId.startsWith("case_")) {
-            const chosenNumber = parseInt(interaction.customId.split("_")[1]);
+    const userData = loadUserData();
 
-            if (gameState.yourCase === 0) {
-                gameState.yourCase = chosenNumber;
-                additionalInfo = `You chose case ${chosenNumber} as your case!`;
-                embed = createGameEmbed(gameState, additionalInfo);
-                components = createCaseButtons(gameState, [chosenNumber], 1);
-            } else {
-                const chosenCase = gameState.cases.find((c) => c.number === chosenNumber);
-                additionalInfo = `Case ${chosenNumber} contained $${chosenCase.value.toLocaleString()}!`;
-                removeCase(chosenNumber, gameState.cases);
-                gameState.remainingCasesToPick--;
+    if (interaction.customId.startsWith("page_")) {
+        const [_, direction, currentPage] = interaction.customId.split("_");
+        const newPage = direction === "prev" ? parseInt(currentPage) - 1 : parseInt(currentPage) + 1;
 
-                if (gameState.remainingCasesToPick <= 0) {
-                    if ([20, 15, 11, 8, 6, 5, 4, 3].includes(gameState.cases.length)) {
-                        const offer = calculateBankerOffer(gameState.cases);
-                        additionalInfo += `\n\nThe banker offers you $${offer}. Deal or No Deal?`;
-                        gameState.isAwaitingDeal = true;
-                        components = createDealButtons();
-                    } else if (gameState.cases.length === 2) {
-                        additionalInfo += "\n\nDo you want to switch your case with the last remaining one?";
-                        components = createDealButtons("YES", "NO");
-                        gameState.isAwaitingDeal = true;
-                    } else {
-                        gameState.remainingCasesToPick = calculateRemainingCasesToPick(gameState.cases);
-                        components = createCaseButtons(gameState, [gameState.yourCase], 1);
-                    }
-                } else {
-                    components = createCaseButtons(gameState, [gameState.yourCase], 1);
-                }
-                embed = createGameEmbed(gameState, additionalInfo);
-            }
-        } else if (interaction.customId.startsWith("deal_")) {
-            const decision = interaction.customId.split("_")[1];
+        components = createCaseButtons(gameState, [gameState.yourCase], newPage);
+        embed = createGameEmbed(gameState, "Navigating between case pages.");
+    } else if (interaction.customId.startsWith("case_")) {
+        const chosenNumber = parseInt(interaction.customId.split("_")[1]);
 
-            if (decision === "yes") {
-                if (gameState.cases.length === 2) {
-                    const switchCase = gameState.cases.find((c) => c.number !== gameState.yourCase);
-                    moneyEarned = switchCase.value;
-                    additionalInfo = `You switched to case ${switchCase.number} and won $${moneyEarned.toLocaleString()}!`;
-                } else {
+        if (gameState.yourCase === 0) {
+            gameState.yourCase = chosenNumber;
+            additionalInfo = `You chose case ${chosenNumber} as your case!`;
+            embed = createGameEmbed(gameState, additionalInfo);
+            components = createCaseButtons(gameState, [chosenNumber], 1);
+        } else {
+            const chosenCase = gameState.cases.find((c) => c.number === chosenNumber);
+            additionalInfo = `Case ${chosenNumber} contained $${chosenCase.value.toLocaleString()}!`;
+            removeCase(chosenNumber, gameState.cases);
+            gameState.remainingCasesToPick--;
+
+            if (gameState.remainingCasesToPick <= 0) {
+                if ([20, 15, 11, 8, 6, 5, 4, 3].includes(gameState.cases.length)) {
                     const offer = calculateBankerOffer(gameState.cases);
-                    const yourCaseValue = gameState.cases.find((c) => c.number === gameState.yourCase).value;
-                    moneyEarned = offer;
-                    additionalInfo = `Congratulations! You accepted the deal for $${offer}!\nYour case ${
-                        gameState.yourCase
-                    } contained $${yourCaseValue.toLocaleString()}!`;
-                }
-                gameState.isActive = false;
-            } else {
-                if (gameState.cases.length === 2) {
-                    const yourCaseValue = gameState.cases.find((c) => c.number === gameState.yourCase).value;
-                    moneyEarned = yourCaseValue;
-                    additionalInfo = `You kept your case and won $${moneyEarned.toLocaleString()}!`;
-                    gameState.isActive = false;
+                    additionalInfo += `\n\nThe banker offers you $${offer.toLocaleString()}. Deal or No Deal?`;
+                    gameState.isAwaitingDeal = true;
+                    components = createDealButtons();
+                } else if (gameState.cases.length === 2) {
+                    additionalInfo += "\n\nDo you want to switch your case with the last remaining one?";
+                    components = createDealButtons();
+                    gameState.isAwaitingDeal = true;
                 } else {
                     gameState.remainingCasesToPick = calculateRemainingCasesToPick(gameState.cases);
-                    additionalInfo = "You declined the offer. Continue opening cases!";
                     components = createCaseButtons(gameState, [gameState.yourCase], 1);
                 }
+            } else {
+                components = createCaseButtons(gameState, [gameState.yourCase], 1);
             }
-            gameState.isAwaitingDeal = false;
             embed = createGameEmbed(gameState, additionalInfo);
+        }
+    } else if (interaction.customId.startsWith("deal_")) {
+        const decision = interaction.customId.split("_")[1];
 
-            if (moneyEarned > 0) {
-                userData[interaction.user.id].money = parseInt(userData[interaction.user.id].money || 0) + moneyEarned;
+        if (decision === "yes") {
+            if (gameState.cases.length === 2) {
+                const switchCase = gameState.cases.find((c) => c.number !== gameState.yourCase);
+                additionalInfo = `You switched to case ${switchCase.number} and won $${switchCase.value.toLocaleString()}!`;
+                userData[interaction.user.id] = userData[interaction.user.id] || { money: 0 };
+                userData[interaction.user.id].money += switchCase.value;
+            } else {
+                const offer = calculateBankerOffer(gameState.cases);
+                const yourCaseValue = gameState.cases.find((c) => c.number === gameState.yourCase).value;
+                additionalInfo = `Congratulations! You accepted the deal for $${offer.toLocaleString()}!\nYour case ${
+                    gameState.yourCase
+                } contained $${yourCaseValue.toLocaleString()}!`;
+                userData[interaction.user.id] = userData[interaction.user.id] || { money: 0 };
+                userData[interaction.user.id].money += offer;
+            }
+            gameState.isActive = false;
+        } else {
+            if (gameState.cases.length === 2) {
+                const yourCaseValue = gameState.cases.find((c) => c.number === gameState.yourCase).value;
+                additionalInfo = `You kept your case and won $${yourCaseValue.toLocaleString()}!`;
+                userData[interaction.user.id] = userData[interaction.user.id] || { money: 0 };
+                userData[interaction.user.id].money += yourCaseValue;
+                gameState.isActive = false;
+            } else {
+                gameState.remainingCasesToPick = calculateRemainingCasesToPick(gameState.cases);
+                additionalInfo = "You declined the offer. Continue opening cases!";
+                components = createCaseButtons(gameState, [gameState.yourCase], 1);
             }
         }
+        gameState.isAwaitingDeal = false;
+        embed = createGameEmbed(gameState, additionalInfo);
+        saveUserData(userData);
+    }
 
-        userData[interaction.user.id].currentGame = gameState;
-        await saveUserData(userData);
-
-        await interaction.update({ embeds: [embed], components: components || [] });
-    },
-};
+    await interaction.update({ embeds: [embed], components: components || [] });
+});
