@@ -7,9 +7,9 @@ npm i
 
 # Config
 
-config.json
+Make config.json:
 
-```bash
+```json
 {
     "clientId": "",
     "token": "",
