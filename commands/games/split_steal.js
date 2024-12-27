@@ -1,134 +1,120 @@
-const { SlashCommandBuilder } = require("discord.js");
+const { SlashCommandBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, EmbedBuilder } = require("discord.js");
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("split_steal")
-        .setDescription("Playe Split or Steal")
-        .addUserOption((option) => option.setName("user").setDescription("The user to play with").setRequired(true)),
+        .setDescription("Play Split or Steal")
+        .addUserOption((option) =>
+            option.setName("opponent").setDescription("The user you want to play against").setRequired(true)
+        ),
 
     async execute(interaction) {
-        const challenger = interaction.user;
-        const opponent = interaction.options.getUser("user");
+        const opponent = interaction.options.getUser("opponent");
 
+        if (opponent.id === interaction.user.id) {
+            return interaction.reply({ content: "You can't play against yourself!", ephemeral: true });
+        }
         if (opponent.bot) {
-            return interaction.reply({ content: "You cannot play with a bot!", ephemeral: true });
+            return interaction.reply({ content: "You can't play against a bot!", ephemeral: true });
         }
 
-        if (opponent.id === challenger.id) {
-            return interaction.reply({ content: "You cannot play with yourself!", ephemeral: true });
+        const prize = Math.floor(Math.random() * 91 + 10) * 1000;
+
+        const splitButton = new ButtonBuilder().setCustomId("split").setLabel("SPLIT").setStyle(ButtonStyle.Success);
+
+        const stealButton = new ButtonBuilder().setCustomId("steal").setLabel("STEAL").setStyle(ButtonStyle.Danger);
+
+        const row = new ActionRowBuilder().addComponents(splitButton, stealButton);
+
+        const gameEmbed = new EmbedBuilder()
+            .setTitle("Split or Steal Game")
+            .setDescription(
+                `${interaction.user} has challenged ${opponent} to a game of Split or Steal!\n\n` +
+                    `Prize: **${prize.toLocaleString()}** coins\n\n` +
+                    "Rules:\n" +
+                    "• Both players choose to either SPLIT or STEAL\n" +
+                    "• If both choose SPLIT, both share the prize equally\n" +
+                    "• If one chooses STEAL and one SPLIT, the stealer takes the entire prize\n" +
+                    "• If both choose STEAL, neither gets the prize\n\n" +
+                    "Make your choice using the buttons below!"
+            );
+
+        if (!interaction.client.splitStealGames) {
+            interaction.client.splitStealGames = new Map();
         }
 
-        const minPrize = 10000;
-        const maxPrize = 100000;
-        const randomNumber = Math.floor(Math.random() * ((maxPrize - minPrize) / 1000 + 1)) * 1000 + minPrize;
-
-        const row = {
-            type: 1,
-            components: [
-                {
-                    type: 2,
-                    custom_id: `split_${challenger.id}_${opponent.id}`,
-                    label: "Split",
-                    style: 1,
-                },
-                {
-                    type: 2,
-                    custom_id: `steal_${challenger.id}_${opponent.id}`,
-                    label: "Steal",
-                    style: 4,
-                },
-            ],
+        const gameState = {
+            player1: {
+                id: interaction.user.id,
+                choice: null,
+            },
+            player2: {
+                id: opponent.id,
+                choice: null,
+            },
+            prize: prize,
+            timeout: null,
         };
 
-        await interaction.reply(`Game started between ${challenger} and ${opponent}! Prize: ${randomNumber} coins 🎰`);
-
-        await challenger.send({
-            content: `You're playing Split or Steal with ${opponent}! Prize: ${randomNumber} coins\nMake your choice:`,
+        const reply = await interaction.reply({
+            embeds: [gameEmbed],
             components: [row],
+            fetchReply: true,
         });
 
-        await opponent.send({
-            content: `${challenger} has invited you to play Split or Steal! Prize: ${randomNumber} coins\nMake your choice:`,
-            components: [row],
-        });
+        gameState.timeout = setTimeout(() => {
+            if (interaction.client.splitStealGames.has(reply.id)) {
+                const embed = new EmbedBuilder()
+                    .setTitle("Game Expired")
+                    .setDescription("The game has expired due to inactivity.");
 
-        const gameData = {
-            challenger: challenger.id,
-            opponent: opponent.id,
-            prize: randomNumber,
-            challengerChoice: null,
-            opponentChoice: null,
-        };
-
-        interaction.client.splitStealGames = interaction.client.splitStealGames || new Map();
-        interaction.client.splitStealGames.set(`${challenger.id}_${opponent.id}`, gameData);
-
-        setTimeout(() => {
-            if (interaction.client.splitStealGames.has(`${challenger.id}_${opponent.id}`)) {
-                interaction.client.splitStealGames.delete(`${challenger.id}_${opponent.id}`);
-                interaction.channel.send(`The game between ${challenger} and ${opponent} has timed out!`);
+                reply.edit({ embeds: [embed], components: [] });
+                interaction.client.splitStealGames.delete(reply.id);
             }
-        }, 300000);
+        }, 60000);
+
+        interaction.client.splitStealGames.set(reply.id, gameState);
     },
 
     async handleButton(interaction) {
-        const [action, challengerId, opponentId] = interaction.customId.split("_");
-        const gameKey = `${challengerId}_${opponentId}`;
-        const game = interaction.client.splitStealGames?.get(gameKey);
+        const gameState = interaction.client.splitStealGames.get(interaction.message.id);
+        if (!gameState) return;
 
-        if (!game) {
-            return interaction.reply({ content: "This game has expired or doesn't exist!", ephemeral: true });
+        if (interaction.user.id !== gameState.player1.id && interaction.user.id !== gameState.player2.id) {
+            return interaction.reply({ content: "This isn't your game!", ephemeral: true });
         }
 
-        const isChallenger = interaction.user.id === challengerId;
-        const isOpponent = interaction.user.id === opponentId;
-
-        if (!isChallenger && !isOpponent) {
-            return interaction.reply({ content: "You are not part of this game!", ephemeral: true });
+        const player = interaction.user.id === gameState.player1.id ? "player1" : "player2";
+        if (gameState[player].choice) {
+            return interaction.reply({ content: "You've already made your choice!", ephemeral: true });
         }
 
-        if (isChallenger && !game.challengerChoice) {
-            game.challengerChoice = action;
-        } else if (isOpponent && !game.opponentChoice) {
-            game.opponentChoice = action;
-        } else {
-            return interaction.reply({ content: "You have already made your choice!", ephemeral: true });
-        }
+        gameState[player].choice = interaction.customId;
+        await interaction.reply({ content: `You chose to ${interaction.customId}!`, ephemeral: true });
 
-        await interaction.reply({ content: `You chose to ${action}!`, ephemeral: true });
+        if (gameState.player1.choice && gameState.player2.choice) {
+            clearTimeout(gameState.timeout);
 
-        if (game.challengerChoice && game.opponentChoice) {
-            const challenger = await interaction.client.users.fetch(challengerId);
-            const opponent = await interaction.client.users.fetch(opponentId);
-
-            let resultMessage = "";
-
-            if (game.challengerChoice === "split" && game.opponentChoice === "split") {
-                resultMessage = `Both players chose to split! ${challenger} and ${opponent} each get ${
-                    game.prize / 2
-                } coins! 🤝`;
-            } else if (game.challengerChoice === "steal" && game.opponentChoice === "steal") {
-                resultMessage = `Both players chose to steal! No one gets anything! 😈`;
-            } else if (game.challengerChoice === "steal") {
-                resultMessage = `${challenger} chose to steal while ${opponent} chose to split! ${challenger} gets ${game.prize} coins! 💰`;
+            let result;
+            const prize = gameState.prize;
+            if (gameState.player1.choice === "split" && gameState.player2.choice === "split") {
+                result = `Both players chose to SPLIT! Each player gets **${(prize / 2).toLocaleString()}** coins!`;
+            } else if (gameState.player1.choice === "steal" && gameState.player2.choice === "split") {
+                result = `<@${gameState.player1.id}> chose to STEAL while <@${gameState.player2.id}> chose to SPLIT!\n<@${
+                    gameState.player1.id
+                }> gets the entire prize of **${prize.toLocaleString()}** coins!`;
+            } else if (gameState.player1.choice === "split" && gameState.player2.choice === "steal") {
+                result = `<@${gameState.player2.id}> chose to STEAL while <@${gameState.player1.id}> chose to SPLIT!\n<@${
+                    gameState.player2.id
+                }> gets the entire prize of **${prize.toLocaleString()}** coins!`;
             } else {
-                resultMessage = `${opponent} chose to steal while ${challenger} chose to split! ${opponent} gets ${game.prize} coins! 💰`;
+                result = "Both players chose to STEAL! No one gets the prize!";
             }
 
-            const guild = interaction.client.guilds.cache.find(
-                (g) => g.members.cache.has(challengerId) && g.members.cache.has(opponentId)
-            );
-            const channel = guild.channels.cache.find((ch) =>
-                ch.messages.cache.find(
-                    (m) => m.content.includes(`Game started between ${challenger}`) && m.content.includes(`${opponent}`)
-                )
-            );
+            const resultEmbed = new EmbedBuilder().setTitle("Game Results").setDescription(result);
 
-            if (channel) {
-                await channel.send(resultMessage);
-            }
-
-            interaction.client.splitStealGames.delete(gameKey);
+            await interaction.message.edit({ embeds: [resultEmbed], components: [] });
+            interaction.client.splitStealGames.delete(interaction.message.id);
         }
     },
 };
