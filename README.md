@@ -9,7 +9,7 @@ npm i
 
 # Config
 
-Make config.json:
+Make config.json file:
 
 ```json
 {
