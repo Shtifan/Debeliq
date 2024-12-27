@@ -1,5 +1,20 @@
 const { SlashCommandBuilder } = require("discord.js");
+const fs = require("fs");
+const path = require("path");
+
 const client = require("../../index.js");
+const userDataPath = path.join(__dirname, "../../data/user_data.json");
+
+function loadUserData() {
+    if (!fs.existsSync(userDataPath)) {
+        fs.writeFileSync(userDataPath, JSON.stringify({}));
+    }
+    return JSON.parse(fs.readFileSync(userDataPath, "utf8"));
+}
+
+function saveUserData(data) {
+    fs.writeFileSync(userDataPath, JSON.stringify(data, null, 4));
+}
 
 function hasDuplicates(array) {
     return new Set(array).size !== array.length;
@@ -80,17 +95,28 @@ client.on("messageCreate", async (message) => {
         let prize = 0;
 
         if (guesses <= 5) {
-            prize = 10000;
+            prize = 100000;
         } else if (guesses <= 10) {
-            prize = 1000;
+            prize = 10000;
         }
 
         reply += `Congratulations! You guessed the number in **${guesses}${ending(guesses)}** attempt!`;
 
         if (prize > 0) {
-            reply += `You won **$${prize.toLocaleString()}**!`;
+            reply += `\nYou won **$${prize.toLocaleString()}**!`;
+
+            const userData = loadUserData();
+            const userId = message.author.id;
+
+            if (userData[userId]) {
+                userData[userId].money += prize;
+            } else {
+                userData[userId] = { money: prize };
+            }
+
+            saveUserData(userData);
         } else {
-            reply += `Unfortunately, you don't win any money.`;
+            reply += `\nUnfortunately, you don't win any money.`;
         }
 
         gamecb = false;
