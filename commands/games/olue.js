@@ -2,28 +2,6 @@ const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = re
 const { existsSync, mkdirSync } = require("fs");
 const fs = require("fs/promises");
 
-async function saveUserData(userData) {
-    try {
-        if (!existsSync("./data")) {
-            mkdirSync("./data", { recursive: true });
-        }
-
-        let existingData = {};
-        if (existsSync("./data/user_data.json")) {
-            const fileContent = await fs.readFile("./data/user_data.json", "utf8");
-            if (fileContent.trim()) {
-                existingData = JSON.parse(fileContent);
-            }
-        }
-
-        existingData.olue_game = userData;
-
-        await fs.writeFile("./data/user_data.json", JSON.stringify(existingData, null, 2), "utf8");
-    } catch (error) {
-        console.error("Error saving user data:", error);
-    }
-}
-
 async function loadUserData() {
     try {
         if (!existsSync("./data/user_data.json")) {
@@ -44,6 +22,28 @@ async function loadUserData() {
         console.error("Error loading user data:", error);
         await saveUserData({});
         return {};
+    }
+}
+
+async function saveUserData(userData) {
+    try {
+        if (!existsSync("./data")) {
+            mkdirSync("./data", { recursive: true });
+        }
+
+        let existingData = {};
+        if (existsSync("./data/user_data.json")) {
+            const fileContent = await fs.readFile("./data/user_data.json", "utf8");
+            if (fileContent.trim()) {
+                existingData = JSON.parse(fileContent);
+            }
+        }
+
+        existingData.olue_game = userData;
+
+        await fs.writeFile("./data/user_data.json", JSON.stringify(existingData, null, 2), "utf8");
+    } catch (error) {
+        console.error("Error saving user data:", error);
     }
 }
 

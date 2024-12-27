@@ -2,17 +2,6 @@ const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Embed
 const { existsSync, mkdirSync } = require("fs");
 const fs = require("fs/promises");
 
-async function saveUserData(userData) {
-    try {
-        if (!existsSync("./data")) {
-            mkdirSync("./data", { recursive: true });
-        }
-        await fs.writeFile("./data/user_data.json", JSON.stringify(userData, null, 2), "utf8");
-    } catch (error) {
-        console.error("Error saving user data:", error);
-    }
-}
-
 async function loadUserData() {
     try {
         if (!existsSync("./data/user_data.json")) {
@@ -32,6 +21,17 @@ async function loadUserData() {
         console.error("Error loading user data:", error);
         await saveUserData({});
         return {};
+    }
+}
+
+async function saveUserData(userData) {
+    try {
+        if (!existsSync("./data")) {
+            mkdirSync("./data", { recursive: true });
+        }
+        await fs.writeFile("./data/user_data.json", JSON.stringify(userData, null, 2), "utf8");
+    } catch (error) {
+        console.error("Error saving user data:", error);
     }
 }
 

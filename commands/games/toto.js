@@ -1,4 +1,19 @@
 const { SlashCommandBuilder } = require("discord.js");
+const fs = require("fs");
+const path = require("path");
+
+const userDataPath = path.join(__dirname, "../../data/user_data.json");
+
+function loadUserData() {
+    if (!fs.existsSync(userDataPath)) {
+        fs.writeFileSync(userDataPath, JSON.stringify({}));
+    }
+    return JSON.parse(fs.readFileSync(userDataPath, "utf8"));
+}
+
+function saveUserData(data) {
+    fs.writeFileSync(userDataPath, JSON.stringify(data, null, 4));
+}
 
 function generate() {
     const uniqueNumbers = [];
@@ -12,13 +27,22 @@ function generate() {
 }
 
 function check(correctGuesses) {
-    if (correctGuesses == 6) return "Congratulations! You win **$7,000,000**!";
-    if (correctGuesses == 5) return "Congratulations! You win **$10,000**!";
-    if (correctGuesses == 4) return "Congratulations! You win **$100**!";
-    if (correctGuesses == 3) return "Congratulations! You win **$10**!";
-    if (correctGuesses == 2) return "Congratulations! You win **$1**!";
-    if (correctGuesses == 1) return "Congratulations! You win **$0.01**!";
-    return `Sorry, you didn't win anything.`;
+    switch (correctGuesses) {
+        case 6:
+            return "Congratulations! You win **$7 000 000**!";
+        case 5:
+            return "Congratulations! You win **$10 000**!";
+        case 4:
+            return "Congratulations! You win **$100**!";
+        case 3:
+            return "Congratulations! You win **$10**!";
+        case 2:
+            return "Congratulations! You win **$1**!";
+        case 1:
+            return "Congratulations! You win **$0,01**!";
+        default:
+            return `Sorry, you didn't win anything.`;
+    }
 }
 
 function notUnique(array) {
@@ -33,26 +57,21 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("toto")
         .setDescription("Play Toto 6/49")
-        .addIntegerOption((option) =>
-            option.setName("1st").setDescription("Numbers must be unique and in the range of 1 to 49").setRequired(true)
-        )
-        .addIntegerOption((option) =>
-            option.setName("2nd").setDescription("Numbers must be unique and in the range of 1 to 49").setRequired(true)
-        )
-        .addIntegerOption((option) =>
-            option.setName("3rd").setDescription("Numbers must be unique and in the range of 1 to 49").setRequired(true)
-        )
-        .addIntegerOption((option) =>
-            option.setName("4th").setDescription("Numbers must be unique and in the range of 1 to 49").setRequired(true)
-        )
-        .addIntegerOption((option) =>
-            option.setName("5th").setDescription("Numbers must be unique and in the range of 1 to 49").setRequired(true)
-        )
-        .addIntegerOption((option) =>
-            option.setName("6th").setDescription("Numbers must be unique and in the range of 1 to 49").setRequired(true)
-        ),
+        .addIntegerOption((option) => option.setName("1st").setDescription("Number between 1 and 49").setRequired(true))
+        .addIntegerOption((option) => option.setName("2nd").setDescription("Number between 1 and 49").setRequired(true))
+        .addIntegerOption((option) => option.setName("3rd").setDescription("Number between 1 and 49").setRequired(true))
+        .addIntegerOption((option) => option.setName("4th").setDescription("Number between 1 and 49").setRequired(true))
+        .addIntegerOption((option) => option.setName("5th").setDescription("Number between 1 and 49").setRequired(true))
+        .addIntegerOption((option) => option.setName("6th").setDescription("Number between 1 and 49").setRequired(true)),
 
     async execute(interaction) {
+        const userData = loadUserData();
+        const userId = interaction.user.id;
+
+        if (!userData[userId]) {
+            userData[userId] = { money: 0 };
+        }
+
         const userNumbers = [
             interaction.options.getInteger("1st"),
             interaction.options.getInteger("2nd"),
@@ -77,13 +96,37 @@ module.exports = {
 
         const sortedWinningNumbers = winningNumbers.sort((a, b) => a - b);
         const formattedWinningNumbers = sortedWinningNumbers.map((number) =>
-            userNumbers.includes(number) ? `**${number}**` : number
+            userNumbers.includes(number) ? `**${number}**` : `${number}`
         );
 
-        let reply = "";
-        reply += check(correctGuesses);
-        reply += `\nThe winning numbers were: ${formattedWinningNumbers.join(", ")}.`;
+        let prizeMoney = 0;
+        switch (correctGuesses) {
+            case 6:
+                prizeMoney = 7000000;
+                break;
+            case 5:
+                prizeMoney = 10000;
+                break;
+            case 4:
+                prizeMoney = 100;
+                break;
+            case 3:
+                prizeMoney = 10;
+                break;
+            case 2:
+                prizeMoney = 1;
+                break;
+            case 1:
+                prizeMoney = 0.01;
+                break;
+        }
 
-        await interaction.reply(reply);
+        userData[userId].money += prizeMoney;
+
+        saveUserData(userData);
+
+        await interaction.reply(
+            `${check(correctGuesses)}\nThe winning numbers were: ${formattedWinningNumbers.join(", ")}.`
+        );
     },
 };
