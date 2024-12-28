@@ -103,20 +103,6 @@ function createGameGrid(score = 0, specialNumbers = null, selectedCells = new Se
 
 const gameStates = new Map();
 
-class GameState {
-    constructor() {
-        this.score = 0;
-        this.selectedCells = new Set();
-        this.specialNumbers = generateSpecialNumbers();
-    }
-
-    reset() {
-        this.score = 0;
-        this.selectedCells = new Set();
-        this.specialNumbers = generateSpecialNumbers();
-    }
-}
-
 module.exports = {
     data: new SlashCommandBuilder().setName("olue").setDescription("Play Olue the Game"),
 
@@ -141,10 +127,15 @@ module.exports = {
                 components: [startRow],
             });
         } else {
-            const gameState = new GameState();
-            gameStates.set(userId, gameState);
+            const userState = {
+                score: 0,
+                selectedCells: new Set(),
+                specialNumbers: generateSpecialNumbers(),
+            };
 
-            const { content, components } = createGameGrid(0, gameState.specialNumbers);
+            gameStates.set(userId, userState);
+
+            const { content, components } = createGameGrid(0, userState.specialNumbers);
             await interaction.reply({ content, components });
         }
     },
@@ -152,26 +143,25 @@ module.exports = {
     async handleButton(interaction) {
         const userId = interaction.user.id;
         let userData = await loadUserData();
-        let gameState = gameStates.get(userId);
+        let userState = gameStates.get(userId);
 
-        if (!gameState) {
-            gameState = new GameState();
-            gameStates.set(userId, gameState);
+        if (!userState) {
+            userState = {
+                score: 0,
+                selectedCells: new Set(),
+                specialNumbers: generateSpecialNumbers(),
+            };
+            gameStates.set(userId, userState);
         }
 
         const customId = interaction.customId;
 
         try {
-            if (customId === "start") {
-                gameState.reset();
-                const { content, components } = createGameGrid(0, gameState.specialNumbers);
-                await interaction.update({ content, components });
-                return;
-            }
-
-            if (customId === "retry") {
-                gameState.reset();
-                const { content, components } = createGameGrid(0, gameState.specialNumbers);
+            if (customId === "start" || customId === "retry") {
+                userState.score = 0;
+                userState.selectedCells = new Set();
+                userState.specialNumbers = generateSpecialNumbers();
+                const { content, components } = createGameGrid(0, userState.specialNumbers);
                 await interaction.update({ content, components });
                 return;
             }
@@ -179,28 +169,30 @@ module.exports = {
             if (customId.startsWith("number_")) {
                 const chosenNumber = parseInt(customId.split("_")[1]);
 
-                if (gameState.specialNumbers.includes(chosenNumber)) {
-                    gameState.selectedCells.add(chosenNumber);
+                if (userState.specialNumbers.includes(chosenNumber)) {
+                    userState.selectedCells.add(chosenNumber);
                     userData[userId].score += 1;
-                    gameState.score = userData[userId].score;
+                    userState.score = userData[userId].score;
                     await saveUserData(userData);
 
-                    if (gameState.specialNumbers.every((num) => gameState.selectedCells.has(num))) {
-                        gameState.selectedCells.clear();
-                        gameState.specialNumbers = generateSpecialNumbers();
-                        const { content, components } = createGameGrid(gameState.score, gameState.specialNumbers);
+                    if (userState.specialNumbers.every((num) => userState.selectedCells.has(num))) {
+                        userState.selectedCells.clear();
+                        userState.specialNumbers = generateSpecialNumbers();
+                        const { content, components } = createGameGrid(userState.score, userState.specialNumbers);
                         await interaction.update({ content, components });
                     } else {
                         const { content, components } = createGameGrid(
-                            gameState.score,
-                            gameState.specialNumbers,
-                            gameState.selectedCells
+                            userState.score,
+                            userState.specialNumbers,
+                            userState.selectedCells
                         );
                         await interaction.update({ content, components });
                     }
                 } else {
-                    const finalScore = gameState.score;
-                    gameState.reset();
+                    const finalScore = userState.score;
+                    userState.score = 0;
+                    userState.selectedCells = new Set();
+                    userState.specialNumbers = generateSpecialNumbers();
                     userData[userId].score = 0;
                     await saveUserData(userData);
 
