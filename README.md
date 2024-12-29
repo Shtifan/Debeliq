@@ -1,15 +1,18 @@
-# Instalation
+# Debeliq
 
-Run:
+## Installation
+
+Clone the repository and install the dependencies:
 
 ```bash
 git clone https://github.com/Shtifan/Debeliq.git
-npm i
+cd Debeliq
+npm install
 ```
 
-# Config
+## Configuration
 
-Make config.json file:
+Create a `config.json` file in the root directory with the following content:
 
 ```json
 {
@@ -19,41 +22,52 @@ Make config.json file:
 }
 ```
 
-For YouTube credentials run:
+For YouTube credentials, run:
 
 ```bash
 npx --no discord-player-youtubei
 ```
 
-# Music
+## Music
 
-Install ffmpeg:
+Install `ffmpeg`:
 
-https://www.gyan.dev/ffmpeg/builds/
+[Download ffmpeg](https://www.gyan.dev/ffmpeg/builds/)
 
-# ⚠️ Chess Solver
+## Chess Solver
 
 **Currently not working**
 
-1. **Download and Install Python 3.11**  
-   Visit the official Python website and download Python 3.11:  
-   [Download Python 3.11](https://www.python.org/downloads/)
+~~Install Python 3.11:~~
 
-2. **Install Required Python Packages**  
-   Run the following command to install the necessary packages:
+~~[Download Python 3.11](https://www.python.org/downloads/)~~
 
-    ```bash
-    pip install tensorflow board_to_fen stockfish opencv-python
-    ```
+~~Run:~~
 
-# Code Execute Command
+~~```bash~~
+~~pip install tensorflow board_to_fen stockfish opencv-python~~
+~~```~~
 
-Install docker:
+## Code Execute Command
 
-https://www.docker.com/products/docker-desktop/
+Install Docker:
 
-Look at Dockerfile
+[Download Docker](https://www.docker.com/products/docker-desktop/)
 
+Refer to the `Dockerfile` for more details.
+
+## Running the Bot
+
+Start the bot using:
+
+```bash
+npm start
 ```
 
-```
+## Contributing
+
+Feel free to open issues or submit pull requests for any improvements or bug fixes.
+
+## License
+
+This project is licensed under the MIT License.
