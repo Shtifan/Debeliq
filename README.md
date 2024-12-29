@@ -30,29 +30,20 @@ npx --no discord-player-youtubei
 
 ## Music
 
-Install `ffmpeg`:
-
-[Download ffmpeg](https://www.gyan.dev/ffmpeg/builds/)
+Install [ffmpeg](https://www.gyan.dev/ffmpeg/builds/)
 
 ## Chess Solver
 
 **Currently not working**
 
-~~Install Python 3.11:~~
-
-~~[Download Python 3.11](https://www.python.org/downloads/)~~
-
-~~Run:~~
-
-~~```bash~~
-~~pip install tensorflow board_to_fen stockfish opencv-python~~
-~~```~~
+```bash
+Python 3.11
+pip install tensorflow board_to_fen stockfish opencv-python
+```
 
 ## Code Execute Command
 
-Install Docker:
-
-[Download Docker](https://www.docker.com/products/docker-desktop/)
+Install [Docker](https://www.docker.com/products/docker-desktop/)
 
 Refer to the `Dockerfile` for more details.
 
@@ -63,11 +54,3 @@ Start the bot using:
 ```bash
 npm start
 ```
-
-## Contributing
-
-Feel free to open issues or submit pull requests for any improvements or bug fixes.
-
-## License
-
-This project is licensed under the MIT License.
