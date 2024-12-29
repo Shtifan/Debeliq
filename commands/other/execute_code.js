@@ -55,13 +55,11 @@ async function executeRs(filePath, executablePath) {
 }
 
 async function executeJava(filePath, classFile) {
-    return await executeCommand(`javac ${filePath} && java TempClass`, [filePath, classFile]);
+    return await executeCommand(`javac ${filePath} && java temp`, [filePath, classFile]);
 }
 
 async function executeCode(code, language) {
-    if (!isDocker()) {
-        return "Error: The code can only be executed inside a Docker container.";
-    }
+    if (!isDocker()) return "Error: The code can only be executed inside a Docker container.";
 
     const fileExtensionMap = {
         js: "js",
@@ -75,29 +73,44 @@ async function executeCode(code, language) {
     const fileExtension = fileExtensionMap[language];
     if (!fileExtension) return "Invalid language";
 
-    const fileName = `TempClass.${fileExtension}`;
+    const fileName = `temp.${fileExtension}`;
     const filePath = path.resolve(fileName);
     const executablePath = path.resolve("temp.exe");
-    const classFile = path.resolve("TempClass.class");
+    const classFile = path.resolve("temp.class");
 
     fs.writeFileSync(filePath, code);
 
+    let result;
     switch (language) {
         case "js":
-            return await executeJs(filePath);
+            result = await executeJs(filePath);
+            break;
         case "py":
-            return await executePy(filePath);
+            result = await executePy(filePath);
+            break;
         case "cpp":
-            return await executeCpp(filePath, executablePath);
+            result = await executeCpp(filePath, executablePath);
+            break;
         case "c":
-            return await executeC(filePath, executablePath);
+            result = await executeC(filePath, executablePath);
+            break;
         case "rs":
-            return await executeRs(filePath, executablePath);
+            result = await executeRs(filePath, executablePath);
+            break;
         case "java":
-            return await executeJava(filePath, classFile);
+            result = await executeJava(filePath, classFile);
+            break;
         default:
             return "Invalid language";
     }
+
+    if (!result.trim()) {
+        result = "``` \n```";
+    } else {
+        result = "```" + result + "```";
+    }
+
+    return result;
 }
 
 module.exports = {
@@ -127,7 +140,7 @@ module.exports = {
         const language = interaction.options.getString("language");
 
         const result = await executeCode(code, language);
-        await interaction.followUp("```" + result + "```");
+        await interaction.followUp(result);
     },
 };
 
@@ -143,5 +156,5 @@ client.on("messageCreate", async (message) => {
     if (!["js", "py", "cpp", "c", "rs", "java"].includes(language)) return;
 
     const result = await executeCode(code, language);
-    await message.reply("```" + result + "```");
+    await message.reply(result);
 });
