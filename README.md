@@ -31,17 +31,20 @@ Install ffmpeg:
 
 https://www.gyan.dev/ffmpeg/builds/
 
-# Chess Solver ⚠️ Currently not working
+# ⚠️ Chess Solver
 
-Install Python 3.11:
+**Currently not working**
 
-https://www.python.org/downloads/
+1. **Download and Install Python 3.11**  
+   Visit the official Python website and download Python 3.11:  
+   [Download Python 3.11](https://www.python.org/downloads/)
 
-Run:
+2. **Install Required Python Packages**  
+   Run the following command to install the necessary packages:
 
-```bash
-pip install tensorflow board_to_fen stockfish opencv-python
-```
+    ```bash
+    pip install tensorflow board_to_fen stockfish opencv-python
+    ```
 
 # Code Execute Command
 
@@ -50,3 +53,7 @@ Install docker:
 https://www.docker.com/products/docker-desktop/
 
 Look at Dockerfile
+
+```
+
+```
