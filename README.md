@@ -1,6 +1,6 @@
-# Debeliq 🎵
+# Debeliq
 
-## Installation 🛠️
+## Installation
 
 Clone the repository and install the dependencies:
 
@@ -10,7 +10,7 @@ cd Debeliq
 npm install
 ```
 
-## Configuration ⚙️
+## Configuration
 
 Create a `config.json` file in the root directory with the following content:
 
@@ -28,7 +28,7 @@ For YouTube credentials, run:
 npx --no discord-player-youtubei
 ```
 
-## Running the Bot 🚀
+## Running the Bot
 
 Start the bot using:
 
@@ -36,17 +36,17 @@ Start the bot using:
 npm start
 ```
 
-## Music 🎶
+## Music
 
 Install [ffmpeg](https://www.gyan.dev/ffmpeg/builds/)
 
-## Code Execute Command 🐳
+## Code Execute Command
 
 Install [Docker](https://www.docker.com/products/docker-desktop/)
 
-## Chess Solver ♟️
+## Chess Solver
 
-**Currently not working ⚠️**
+**⚠️ Currently not working**
 
 ```bash
 Python 3.11
