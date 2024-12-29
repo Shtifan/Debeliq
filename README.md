@@ -28,9 +28,21 @@ For YouTube credentials, run:
 npx --no discord-player-youtubei
 ```
 
+## Running the Bot
+
+Start the bot using:
+
+```bash
+npm start
+```
+
 ## Music
 
 Install [ffmpeg](https://www.gyan.dev/ffmpeg/builds/)
+
+## Code Execute Command
+
+Install [Docker](https://www.docker.com/products/docker-desktop/)
 
 ## Chess Solver
 
@@ -39,18 +51,4 @@ Install [ffmpeg](https://www.gyan.dev/ffmpeg/builds/)
 ```bash
 Python 3.11
 pip install tensorflow board_to_fen stockfish opencv-python
-```
-
-## Code Execute Command
-
-Install [Docker](https://www.docker.com/products/docker-desktop/)
-
-Refer to the `Dockerfile` for more details.
-
-## Running the Bot
-
-Start the bot using:
-
-```bash
-npm start
 ```
