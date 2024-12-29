@@ -46,7 +46,7 @@ Install [Docker](https://www.docker.com/products/docker-desktop/)
 
 ## Chess Solver
 
-**Currently not working**
+**Currently not working ⚠️**
 
 ```bash
 Python 3.11
