@@ -30,7 +30,10 @@ module.exports = {
         const balance = userData[userId].money;
 
         await interaction.reply({
-            content: `Your current balance is: **$${balance.toLocaleString()}**.`,
+            content: `Your current balance is: **${balance.toLocaleString("en-US", {
+                style: "currency",
+                currency: "USD",
+            })}**.`,
             ephemeral: true,
         });
     },
