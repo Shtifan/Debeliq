@@ -4,7 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const util = require("util");
 const execAsync = util.promisify(require("child_process").exec);
-const client = require("../../index.js");
+const client = require("../../../index.js");
 
 async function fetchImage(imageAttachment) {
     return new Promise((resolve, reject) => {
@@ -24,7 +24,7 @@ async function fetchImage(imageAttachment) {
 
 async function executeChessSolver() {
     try {
-        const { stdout } = await execAsync("python ./commands/other/chess_solver.py");
+        const { stdout } = await execAsync("python ./commands/other/chess_solver/chess_solver.py");
         if (!stdout) return [];
 
         return stdout.trim().split("\r\n");
@@ -77,6 +77,8 @@ module.exports = {
         ),
 
     async execute(interaction) {
+        await interaction.reply("This command is currently disabled.");
+        /*
         await interaction.deferReply();
 
         const imageAttachment = interaction.options.getAttachment("image");
@@ -85,10 +87,12 @@ module.exports = {
         if (reply == 0) reply = "No valid chessboard detected.";
 
         await interaction.followUp(reply);
+        */
     },
 };
 
 client.on("messageCreate", async (message) => {
+    /*
     if (message.author.bot) return;
 
     const imageAttachment = message.attachments.first();
@@ -98,4 +102,5 @@ client.on("messageCreate", async (message) => {
     if (reply == 0) return;
 
     await message.reply(reply);
+    */
 });

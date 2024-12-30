@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 
 image_path = "./data/image.png"
-stockfish_path = "./commands/other/stockfish.exe"
+stockfish_path = "./commands/other/chess_solver/stockfish.exe"
 
 stockfish = Stockfish(stockfish_path)
 
