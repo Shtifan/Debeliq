@@ -1,5 +1,9 @@
 const { SlashCommandBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, EmbedBuilder } = require("discord.js");
 
+function formatCurrency(amount) {
+    return amount.toLocaleString("en-US", { style: "currency", currency: "USD" });
+}
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("split_steal")
@@ -30,7 +34,7 @@ module.exports = {
             .setTitle("Split or Steal Game")
             .setDescription(
                 `${interaction.user} has challenged ${opponent} to a game of Split or Steal!\n\n` +
-                    `Prize: **${prize.toLocaleString()}** coins\n\n` +
+                    `Prize: **${formatCurrency(prize)}**\n\n` +
                     "Rules:\n" +
                     "• Both players choose to either SPLIT or STEAL\n" +
                     "• If both choose SPLIT, both share the prize equally\n" +
@@ -98,15 +102,15 @@ module.exports = {
             let result;
             const prize = gameState.prize;
             if (gameState.player1.choice === "split" && gameState.player2.choice === "split") {
-                result = `Both players chose to SPLIT! Each player gets **${(prize / 2).toLocaleString()}** coins!`;
+                result = `Both players chose to SPLIT! Each player gets **${formatCurrency(prize / 2)}**!`;
             } else if (gameState.player1.choice === "steal" && gameState.player2.choice === "split") {
                 result = `<@${gameState.player1.id}> chose to STEAL while <@${gameState.player2.id}> chose to SPLIT!\n<@${
                     gameState.player1.id
-                }> gets the entire prize of **${prize.toLocaleString()}** coins!`;
+                }> gets the entire prize of **${formatCurrency(prize)}**!`;
             } else if (gameState.player1.choice === "split" && gameState.player2.choice === "steal") {
                 result = `<@${gameState.player2.id}> chose to STEAL while <@${gameState.player1.id}> chose to SPLIT!\n<@${
                     gameState.player2.id
-                }> gets the entire prize of **${prize.toLocaleString()}** coins!`;
+                }> gets the entire prize of **${formatCurrency(prize)}**!`;
             } else {
                 result = "Both players chose to STEAL! No one gets the prize!";
             }

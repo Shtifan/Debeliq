@@ -27,11 +27,15 @@ function removeCase(caseNumber, cases) {
     if (index !== -1) cases.splice(index, 1);
 }
 
+function formatCurrency(amount) {
+    return amount.toLocaleString("en-US", { style: "currency", currency: "USD" });
+}
+
 function displayRemainingValues(cases) {
     const sortedValues = cases
         .map((c) => c.value)
         .sort((a, b) => a - b)
-        .map((value) => `$${value.toLocaleString()}`);
+        .map((value) => formatCurrency(value));
     return `Remaining values:\n${sortedValues.join("\n")}`;
 }
 
@@ -213,14 +217,14 @@ module.exports = {
                 components = createCaseButtons(gameState, [chosenNumber], 1);
             } else {
                 const chosenCase = gameState.cases.find((c) => c.number === chosenNumber);
-                additionalInfo = `Case ${chosenNumber} contained $${chosenCase.value.toLocaleString()}!`;
+                additionalInfo = `Case ${chosenNumber} contained ${formatCurrency(chosenCase.value)}!`;
                 removeCase(chosenNumber, gameState.cases);
                 gameState.remainingCasesToPick--;
 
                 if (gameState.remainingCasesToPick <= 0) {
                     if ([20, 15, 11, 8, 6, 5, 4, 3].includes(gameState.cases.length)) {
                         const offer = calculateBankerOffer(gameState.cases);
-                        additionalInfo += `\n\nThe banker offers you $${offer.toLocaleString()}. Deal or No Deal?`;
+                        additionalInfo += `\n\nThe banker offers you ${formatCurrency(offer)}. Deal or No Deal?`;
                         gameState.isAwaitingDeal = true;
                         components = createDealButtons();
                     } else if (gameState.cases.length === 2) {
@@ -242,17 +246,17 @@ module.exports = {
             if (decision === "yes") {
                 if (gameState.cases.length === 2) {
                     const switchCase = gameState.cases.find((c) => c.number !== gameState.yourCase);
-                    additionalInfo = `You switched to case ${
-                        switchCase.number
-                    } and won $${switchCase.value.toLocaleString()}!`;
+                    additionalInfo = `You switched to case ${switchCase.number} and won ${formatCurrency(
+                        switchCase.value
+                    )}!`;
                     userData[interaction.user.id] = userData[interaction.user.id] || { money: 0 };
                     userData[interaction.user.id].money += switchCase.value;
                 } else {
                     const offer = calculateBankerOffer(gameState.cases);
                     const yourCaseValue = gameState.cases.find((c) => c.number === gameState.yourCase).value;
-                    additionalInfo = `Congratulations! You accepted the deal for $${offer.toLocaleString()}!\nYour case ${
+                    additionalInfo = `Congratulations! You accepted the deal for ${formatCurrency(offer)}!\nYour case ${
                         gameState.yourCase
-                    } contained $${yourCaseValue.toLocaleString()}!`;
+                    } contained ${formatCurrency(yourCaseValue)}!`;
                     userData[interaction.user.id] = userData[interaction.user.id] || { money: 0 };
                     userData[interaction.user.id].money += offer;
                 }
@@ -260,7 +264,7 @@ module.exports = {
             } else {
                 if (gameState.cases.length === 2) {
                     const yourCaseValue = gameState.cases.find((c) => c.number === gameState.yourCase).value;
-                    additionalInfo = `You kept your case and won $${yourCaseValue.toLocaleString()}!`;
+                    additionalInfo = `You kept your case and won ${formatCurrency(yourCaseValue)}!`;
                     userData[interaction.user.id] = userData[interaction.user.id] || { money: 0 };
                     userData[interaction.user.id].money += yourCaseValue;
                     gameState.isActive = false;
