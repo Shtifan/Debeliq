@@ -20,20 +20,24 @@ module.exports = client;
 client.commands = new Collection();
 const commands = [];
 
-const commandsPath = path.join(__dirname, "commands");
-const commandFolders = fs.readdirSync(commandsPath);
+function loadCommandFiles(dir) {
+    const files = fs.readdirSync(dir);
 
-for (const folder of commandFolders) {
-    const commandFiles = fs.readdirSync(path.join(commandsPath, folder)).filter((file) => file.endsWith(".js"));
+    for (const file of files) {
+        const filePath = path.join(dir, file);
+        const stat = fs.statSync(filePath);
 
-    for (const file of commandFiles) {
-        const filePath = path.join(commandsPath, folder, file);
-        const command = require(filePath);
-
-        client.commands.set(command.data.name, command);
-        commands.push(command.data.toJSON());
+        if (stat.isDirectory()) {
+            loadCommandFiles(filePath);
+        } else if (file.endsWith(".js")) {
+            const command = require(filePath);
+            client.commands.set(command.data.name, command);
+            commands.push(command.data.toJSON());
+        }
     }
 }
+
+loadCommandFiles(path.join(__dirname, "commands"));
 
 const rest = new REST().setToken(token);
 rest.put(Routes.applicationCommands(clientId), { body: commands });
@@ -47,23 +51,30 @@ player.extractors.register(YoutubeiExtractor, {
 player.extractors.loadDefault((ext) => ext !== "YouTubeExtractor");
 
 const eventsPath = path.join(__dirname, "events");
-const eventFolders = fs.readdirSync(eventsPath);
 
-for (const folder of eventFolders) {
-    const eventFiles = fs.readdirSync(path.join(eventsPath, folder)).filter((file) => file.endsWith(".js"));
+function loadEventFiles(dir) {
+    const files = fs.readdirSync(dir);
 
-    for (const file of eventFiles) {
-        const filePath = path.join(eventsPath, folder, file);
-        const event = require(filePath);
+    for (const file of files) {
+        const filePath = path.join(dir, file);
+        const stat = fs.statSync(filePath);
 
-        if (event.type == "player") {
-            player.events.on(event.name, (...args) => event.execute(...args));
-        } else if (event.once) {
-            client.once(event.name, (...args) => event.execute(...args));
-        } else {
-            client.on(event.name, (...args) => event.execute(...args));
+        if (stat.isDirectory()) {
+            loadEventFiles(filePath);
+        } else if (file.endsWith(".js")) {
+            const event = require(filePath);
+
+            if (event.type === "player") {
+                player.events.on(event.name, (...args) => event.execute(...args));
+            } else if (event.once) {
+                client.once(event.name, (...args) => event.execute(...args));
+            } else {
+                client.on(event.name, (...args) => event.execute(...args));
+            }
         }
     }
 }
+
+loadEventFiles(eventsPath);
 
 client.login(token);
