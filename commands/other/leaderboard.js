@@ -31,7 +31,13 @@ module.exports = {
         }
 
         const leaderboardMessage = leaderboard
-            .map((entry, index) => `**${index + 1}. <@${entry.userId}>** - $${entry.money.toLocaleString()}`)
+            .map(
+                (entry, index) =>
+                    `**${index + 1}. <@${entry.userId}>** - ${entry.money.toLocaleString("en-US", {
+                        style: "currency",
+                        currency: "USD",
+                    })}`
+            )
             .join("\n");
 
         await interaction.reply({

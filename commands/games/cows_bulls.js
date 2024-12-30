@@ -62,7 +62,7 @@ function cb(secretNumber, userInput) {
     return [bulls, cows];
 }
 
-let gamecb = false;
+let gamestate = false;
 let secretNumber;
 let guesses;
 
@@ -70,7 +70,7 @@ module.exports = {
     data: new SlashCommandBuilder().setName("cows_bulls").setDescription("Play Cows and Bulls"),
 
     async execute(interaction) {
-        gamecb = true;
+        gamestate = true;
         secretNumber = generate();
         guesses = 0;
 
@@ -79,7 +79,7 @@ module.exports = {
 };
 
 client.on("messageCreate", async (message) => {
-    if (message.author.bot || !gamecb) return;
+    if (message.author.bot || !gamestate) return;
 
     const input = message.content.split("").map(Number);
 
@@ -103,7 +103,8 @@ client.on("messageCreate", async (message) => {
         reply += `Congratulations! You guessed the number in **${guesses}${ending(guesses)}** attempt!`;
 
         if (prize > 0) {
-            reply += `\nYou won **$${prize.toLocaleString()}**!`;
+            const formattedPrize = prize.toLocaleString("en-US", { style: "currency", currency: "USD" });
+            reply += `\nYou won **${formattedPrize}**!`;
 
             const userData = loadUserData();
             const userId = message.author.id;
@@ -119,7 +120,7 @@ client.on("messageCreate", async (message) => {
             reply += `\nUnfortunately, you don't win any money.`;
         }
 
-        gamecb = false;
+        gamestate = false;
     }
 
     await message.reply(reply);

@@ -26,25 +26,6 @@ function generate() {
     return uniqueNumbers;
 }
 
-function check(correctGuesses) {
-    switch (correctGuesses) {
-        case 6:
-            return "Congratulations! You win **$7 000 000**!";
-        case 5:
-            return "Congratulations! You win **$10 000**!";
-        case 4:
-            return "Congratulations! You win **$100**!";
-        case 3:
-            return "Congratulations! You win **$10**!";
-        case 2:
-            return "Congratulations! You win **$1**!";
-        case 1:
-            return "Congratulations! You win **$0,01**!";
-        default:
-            return `Sorry, you didn't win anything.`;
-    }
-}
-
 function notUnique(array) {
     return new Set(array).size !== array.length;
 }
@@ -121,12 +102,37 @@ module.exports = {
                 break;
         }
 
+        const formattedPrize = prizeMoney.toLocaleString("en-US", { style: "currency", currency: "USD" });
+
         userData[userId].money += prizeMoney;
 
         saveUserData(userData);
 
-        await interaction.reply(
-            `${check(correctGuesses)}\nThe winning numbers were: ${formattedWinningNumbers.join(", ")}.`
-        );
+        let resultMessage;
+        switch (correctGuesses) {
+            case 6:
+                resultMessage = `Congratulations! You win **${formattedPrize}**!`;
+                break;
+            case 5:
+                resultMessage = `Congratulations! You win **${formattedPrize}**!`;
+                break;
+            case 4:
+                resultMessage = `Congratulations! You win **${formattedPrize}**!`;
+                break;
+            case 3:
+                resultMessage = `Congratulations! You win **${formattedPrize}**!`;
+                break;
+            case 2:
+                resultMessage = `Congratulations! You win **${formattedPrize}**!`;
+                break;
+            case 1:
+                resultMessage = `Congratulations! You win **${formattedPrize}**!`;
+                break;
+            default:
+                resultMessage = `Sorry, you didn't win anything.`;
+                break;
+        }
+
+        await interaction.reply(`${resultMessage}\nThe winning numbers were: ${formattedWinningNumbers.join(", ")}.`);
     },
 };
