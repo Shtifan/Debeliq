@@ -25,6 +25,10 @@ async function saveUserData(userData) {
     }
 }
 
+function formatCurrency(amount) {
+    return amount.toLocaleString("en-US", { style: "currency", currency: "USD" });
+}
+
 const standardSymbols = [
     { symbol: "🍒", value: 25 },
     { symbol: "🍋", value: 35 },
@@ -42,10 +46,6 @@ const specialSymbols = {
     scatter: { symbol: "🌟", value: 120 },
     bonus: { symbol: "🎉", value: 170 },
 };
-
-function formatCurrency(amount) {
-    return amount.toLocaleString("en-US", { style: "currency", currency: "USD" });
-}
 
 function calculateWins(grid, bet) {
     let totalWin = 0;
