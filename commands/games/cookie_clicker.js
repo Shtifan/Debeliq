@@ -57,7 +57,7 @@ module.exports = {
             .setDescription(`You have ${userData.cookie_clicker[userId].cookies} cookies!`);
 
         const row = new ActionRowBuilder().addComponents(
-            new ButtonBuilder().setCustomId("click_cookie").setLabel("🍪 Click me!").setStyle(ButtonStyle.Primary)
+            new ButtonBuilder().setCustomId("click_cookie").setLabel("Click me!").setStyle(ButtonStyle.Primary)
         );
 
         await interaction.reply({ embeds: [embed], components: [row] });
