@@ -29,24 +29,6 @@ function formatCurrency(amount) {
     return amount.toLocaleString("en-US", { style: "currency", currency: "USD" });
 }
 
-const standardSymbols = [
-    { symbol: "🍒", value: 25 },
-    { symbol: "🍋", value: 35 },
-    { symbol: "🍉", value: 45 },
-    { symbol: "🍇", value: 55 },
-    { symbol: "🎰", value: 65 },
-    { symbol: "⭐", value: 85 },
-    { symbol: "💎", value: 110 },
-    { symbol: "🍀", value: 130 },
-    { symbol: "7️⃣", value: 160 },
-];
-
-const specialSymbols = {
-    wild: { symbol: "🔥", value: 220 },
-    scatter: { symbol: "🌟", value: 120 },
-    bonus: { symbol: "🎉", value: 170 },
-};
-
 function calculateWins(grid, bet) {
     let totalWin = 0;
     let winningCombos = [];
@@ -119,6 +101,24 @@ function generateGrid() {
         })
     );
 }
+
+const standardSymbols = [
+    { symbol: "🍒", value: 25 },
+    { symbol: "🍋", value: 35 },
+    { symbol: "🍉", value: 45 },
+    { symbol: "🍇", value: 55 },
+    { symbol: "🎰", value: 65 },
+    { symbol: "⭐", value: 85 },
+    { symbol: "💎", value: 110 },
+    { symbol: "🍀", value: 130 },
+    { symbol: "7️⃣", value: 160 },
+];
+
+const specialSymbols = {
+    wild: { symbol: "🔥", value: 220 },
+    scatter: { symbol: "🌟", value: 120 },
+    bonus: { symbol: "🎉", value: 170 },
+};
 
 module.exports = {
     data: new SlashCommandBuilder()
