@@ -33,8 +33,8 @@ function generateGrid() {
     return Array.from({ length: 3 }, () =>
         Array.from({ length: 5 }, () => {
             const roll = Math.random() * 100;
-            if (roll < 5) return specialSymbols.wild.symbol;
-            if (roll < 10) return specialSymbols.scatter.symbol;
+            if (roll < 3) return specialSymbols.wild.symbol;
+            if (roll < 7) return specialSymbols.scatter.symbol;
             return standardSymbols[Math.floor(Math.random() * standardSymbols.length)].symbol;
         })
     );
@@ -103,7 +103,7 @@ function calculateWins(grid, bet) {
         const symbols = payline.map(([row, col]) => grid[row][col]);
         const uniqueSymbols = new Set(symbols);
 
-        if (uniqueSymbols.size <= 2 || (symbols.includes(specialSymbols.wild.symbol) && uniqueSymbols.size <= 3)) {
+        if (uniqueSymbols.size <= 2 || (symbols.includes(specialSymbols.wild.symbol) && uniqueSymbols.size <= 2)) {
             const symbol = symbols.find((s) => s !== specialSymbols.wild.symbol) || specialSymbols.wild.symbol;
             const symbolData = [...standardSymbols, ...Object.values(specialSymbols)].find((s) => s.symbol === symbol);
 
