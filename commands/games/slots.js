@@ -4,11 +4,11 @@ const fs = require("fs/promises");
 
 async function loadBalances() {
     try {
-        if (!existsSync("./data/balances.json")) {
+        if (!existsSync("./data/user_data.json")) {
             await saveBalances({});
             return {};
         }
-        const data = await fs.readFile("./data/balances.json", "utf8");
+        const data = await fs.readFile("./data/user_data.json", "utf8");
         return JSON.parse(data || "{}");
     } catch (error) {
         console.error("Error loading balances:", error);
@@ -19,7 +19,7 @@ async function loadBalances() {
 async function saveBalances(balances) {
     try {
         if (!existsSync("./data")) mkdirSync("./data", { recursive: true });
-        await fs.writeFile("./data/balances.json", JSON.stringify(balances, null, 2));
+        await fs.writeFile("./data/user_data.json", JSON.stringify(balances, null, 2));
     } catch (error) {
         console.error("Error saving balances:", error);
     }
@@ -80,20 +80,6 @@ function calculateWins(grid, bet) {
             [1, 3],
             [2, 4],
         ],
-        [
-            [0, 0],
-            [0, 1],
-            [1, 2],
-            [2, 3],
-            [2, 4],
-        ],
-        [
-            [2, 0],
-            [2, 1],
-            [1, 2],
-            [0, 3],
-            [0, 4],
-        ],
     ];
 
     const baseMultiplier = 2.0;
@@ -131,9 +117,9 @@ async function performSpin(interaction, bet, isAutoSpin = false) {
     const userId = interaction.user.id;
     const balances = await loadBalances();
 
-    if (!balances[userId]) balances[userId] = 0;
+    if (!balances[userId]) balances[userId] = { money: 0 };
 
-    if (bet > 0 && balances[userId] < bet) {
+    if (bet > 0 && balances[userId].money < bet) {
         if (isAutoSpin) {
             autoSpinStates.delete(userId);
             await interaction.followUp({
@@ -149,12 +135,12 @@ async function performSpin(interaction, bet, isAutoSpin = false) {
         return false;
     }
 
-    if (bet > 0) balances[userId] -= bet;
+    if (bet > 0) balances[userId].money -= bet;
 
     const grid = generateGrid();
     const { totalWin, winningCombos } = calculateWins(grid, bet);
 
-    if (totalWin > 0) balances[userId] += totalWin;
+    if (totalWin > 0) balances[userId].money += totalWin;
     await saveBalances(balances);
 
     const gridDisplay = grid.map((row) => row.join(" ")).join("\n");
@@ -164,7 +150,7 @@ async function performSpin(interaction, bet, isAutoSpin = false) {
             `**Grid:**\n${gridDisplay}\n\n` +
                 `**Bet:** ${formatCurrency(bet)}\n` +
                 `**Win:** ${formatCurrency(totalWin)}\n` +
-                `**Balance:** ${formatCurrency(balances[userId])}` +
+                `**Balance:** ${formatCurrency(balances[userId].money)}` +
                 (winningCombos.length ? `\n\n**Winning Combinations:**\n${winningCombos.join("\n")}` : "")
         );
 
