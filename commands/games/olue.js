@@ -154,6 +154,11 @@ module.exports = {
             gameStates.set(userId, userState);
         }
 
+        if (!userData[userId]) {
+            userData[userId] = { score: 0 };
+            await saveUserData(userData);
+        }
+
         const customId = interaction.customId;
 
         try {
@@ -161,6 +166,7 @@ module.exports = {
                 userState.score = 0;
                 userState.selectedCells = new Set();
                 userState.specialNumbers = generateSpecialNumbers();
+
                 const { content, components } = createGameGrid(0, userState.specialNumbers);
                 await interaction.update({ content, components });
                 return;
@@ -178,6 +184,7 @@ module.exports = {
                     if (userState.specialNumbers.every((num) => userState.selectedCells.has(num))) {
                         userState.selectedCells.clear();
                         userState.specialNumbers = generateSpecialNumbers();
+
                         const { content, components } = createGameGrid(userState.score, userState.specialNumbers);
                         await interaction.update({ content, components });
                     } else {
