@@ -2,26 +2,26 @@ const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, Embed
 const { existsSync, mkdirSync } = require("fs");
 const fs = require("fs/promises");
 
-async function loadUserData() {
+async function loadBalances() {
     try {
-        if (!existsSync("./data/user_data.json")) {
-            await saveUserData({});
+        if (!existsSync("./data/balances.json")) {
+            await saveBalances({});
             return {};
         }
-        const data = await fs.readFile("./data/user_data.json", "utf8");
+        const data = await fs.readFile("./data/balances.json", "utf8");
         return JSON.parse(data || "{}");
     } catch (error) {
-        console.error("Error loading user data:", error);
+        console.error("Error loading balances:", error);
         return {};
     }
 }
 
-async function saveUserData(userData) {
+async function saveBalances(balances) {
     try {
         if (!existsSync("./data")) mkdirSync("./data", { recursive: true });
-        await fs.writeFile("./data/user_data.json", JSON.stringify(userData, null, 2));
+        await fs.writeFile("./data/balances.json", JSON.stringify(balances, null, 2));
     } catch (error) {
-        console.error("Error saving user data:", error);
+        console.error("Error saving balances:", error);
     }
 }
 
@@ -129,28 +129,33 @@ function calculateWins(grid, bet) {
 
 async function performSpin(interaction, bet, isAutoSpin = false) {
     const userId = interaction.user.id;
-    const userData = await loadUserData();
+    const balances = await loadBalances();
 
-    if (!userData[userId]) userData[userId] = { money: 0 };
+    if (!balances[userId]) balances[userId] = 0;
 
-    if (bet > 0 && userData[userId].money < bet) {
+    if (bet > 0 && balances[userId] < bet) {
         if (isAutoSpin) {
             autoSpinStates.delete(userId);
             await interaction.followUp({
                 content: "Auto spin stopped due to insufficient funds!",
                 ephemeral: true,
             });
+        } else {
+            await interaction.followUp({
+                content: "You don't have enough money to place this bet!",
+                ephemeral: true,
+            });
         }
         return false;
     }
 
-    if (bet > 0) userData[userId].money -= bet;
+    if (bet > 0) balances[userId] -= bet;
 
     const grid = generateGrid();
     const { totalWin, winningCombos } = calculateWins(grid, bet);
 
-    if (totalWin > 0) userData[userId].money += totalWin;
-    await saveUserData(userData);
+    if (totalWin > 0) balances[userId] += totalWin;
+    await saveBalances(balances);
 
     const gridDisplay = grid.map((row) => row.join(" ")).join("\n");
     const embed = new EmbedBuilder()
@@ -159,7 +164,7 @@ async function performSpin(interaction, bet, isAutoSpin = false) {
             `**Grid:**\n${gridDisplay}\n\n` +
                 `**Bet:** ${formatCurrency(bet)}\n` +
                 `**Win:** ${formatCurrency(totalWin)}\n` +
-                `**Balance:** ${formatCurrency(userData[userId].money)}` +
+                `**Balance:** ${formatCurrency(balances[userId])}` +
                 (winningCombos.length ? `\n\n**Winning Combinations:**\n${winningCombos.join("\n")}` : "")
         );
 
@@ -179,8 +184,6 @@ async function performSpin(interaction, bet, isAutoSpin = false) {
     return true;
 }
 
-const autoSpinStates = new Map();
-
 const standardSymbols = [
     { symbol: "🍒", value: 45 },
     { symbol: "🍋", value: 55 },
@@ -195,6 +198,8 @@ const specialSymbols = {
     scatter: { symbol: "🌟", value: 150 },
 };
 
+const autoSpinStates = new Map();
+
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("slots")
@@ -203,7 +208,6 @@ module.exports = {
 
     async execute(interaction) {
         const bet = interaction.options.getInteger("bet");
-
         await interaction.deferReply();
         await performSpin(interaction, bet);
     },
@@ -221,7 +225,6 @@ module.exports = {
             if (autoSpinStates.has(userId)) {
                 clearTimeout(autoSpinStates.get(userId));
                 autoSpinStates.delete(userId);
-
                 await performSpin(interaction, bet);
             } else {
                 async function autoSpin() {

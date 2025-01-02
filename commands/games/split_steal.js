@@ -1,4 +1,36 @@
 const { SlashCommandBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, EmbedBuilder } = require("discord.js");
+const { existsSync, mkdirSync } = require("fs");
+const fs = require("fs/promises");
+
+async function loadUserData() {
+    try {
+        if (!existsSync("./data/user_data.json")) {
+            await saveUserData({});
+            return {};
+        }
+        const data = await fs.readFile("./data/user_data.json", "utf8");
+        return JSON.parse(data || "{}");
+    } catch (error) {
+        console.error("Error loading user data:", error);
+        return {};
+    }
+}
+
+async function saveUserData(userData) {
+    try {
+        if (!existsSync("./data")) mkdirSync("./data", { recursive: true });
+        await fs.writeFile("./data/user_data.json", JSON.stringify(userData, null, 2));
+    } catch (error) {
+        console.error("Error saving user data:", error);
+    }
+}
+
+async function updatePlayerMoney(userId, amount) {
+    const userData = await loadUserData();
+    if (!userData[userId]) userData[userId] = { money: 0 };
+    userData[userId].money += amount;
+    await saveUserData(userData);
+}
 
 function formatCurrency(amount) {
     return amount.toLocaleString("en-US", { style: "currency", currency: "USD" });
@@ -101,13 +133,19 @@ module.exports = {
 
             let result;
             const prize = gameState.prize;
+
             if (gameState.player1.choice === "split" && gameState.player2.choice === "split") {
-                result = `Both players chose to SPLIT! Each player gets **${formatCurrency(prize / 2)}**!`;
+                const halfPrize = prize / 2;
+                await updatePlayerMoney(gameState.player1.id, halfPrize);
+                await updatePlayerMoney(gameState.player2.id, halfPrize);
+                result = `Both players chose to SPLIT! Each player gets **${formatCurrency(halfPrize)}**!`;
             } else if (gameState.player1.choice === "steal" && gameState.player2.choice === "split") {
+                await updatePlayerMoney(gameState.player1.id, prize);
                 result = `<@${gameState.player1.id}> chose to STEAL while <@${gameState.player2.id}> chose to SPLIT!\n<@${
                     gameState.player1.id
                 }> gets the entire prize of **${formatCurrency(prize)}**!`;
             } else if (gameState.player1.choice === "split" && gameState.player2.choice === "steal") {
+                await updatePlayerMoney(gameState.player2.id, prize);
                 result = `<@${gameState.player2.id}> chose to STEAL while <@${gameState.player1.id}> chose to SPLIT!\n<@${
                     gameState.player2.id
                 }> gets the entire prize of **${formatCurrency(prize)}**!`;
