@@ -40,9 +40,6 @@ module.exports = {
             )
             .join("\n");
 
-        await interaction.reply({
-            content: `**Leaderboard**\n${leaderboardMessage}`,
-            ephemeral: true,
-        });
+        await interaction.reply(`**Leaderboard**\n${leaderboardMessage}`);
     },
 };
