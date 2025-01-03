@@ -14,10 +14,10 @@ module.exports = {
         .setName("timeout")
         .setDescription("Timeout a member from this server")
         .addUserOption((option) => option.setName("user").setDescription("The user you want to timeout").setRequired(true))
-        .addIntegerOption((option) => option.setName("days").setDescription("Days for the timeout").setRequired(false))
-        .addIntegerOption((option) => option.setName("hours").setDescription("Hours for the timeout").setRequired(false))
-        .addIntegerOption((option) => option.setName("minutes").setDescription("Minutes for the timeout").setRequired(false))
-        .addIntegerOption((option) => option.setName("seconds").setDescription("Seconds for the timeout").setRequired(false))
+        .addIntegerOption((option) => option.setName("days").setDescription("Days for the timeout"))
+        .addIntegerOption((option) => option.setName("hours").setDescription("Hours for the timeout"))
+        .addIntegerOption((option) => option.setName("minutes").setDescription("Minutes for the timeout"))
+        .addIntegerOption((option) => option.setName("seconds").setDescription("Seconds for the timeout"))
         .addStringOption((option) => option.setName("reason").setDescription("The reason for the timeout")),
 
     async execute(interaction) {
