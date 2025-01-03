@@ -29,12 +29,11 @@ module.exports = {
 
         const balance = userData[userId].money;
 
-        await interaction.reply({
-            content: `Your current balance is: **${balance.toLocaleString("en-US", {
+        await interaction.reply(
+            `Your current balance is: **${balance.toLocaleString("en-US", {
                 style: "currency",
                 currency: "USD",
-            })}**.`,
-            ephemeral: true,
-        });
+            })}**.`
+        );
     },
 };
