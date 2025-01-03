@@ -5,7 +5,7 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("volume")
         .setDescription("Set or check the player's volume")
-        .addIntegerOption((option) => option.setName("value").setDescription("Volume level").setRequired(false)),
+        .addIntegerOption((option) => option.setName("value").setDescription("Volume level")),
 
     async execute(interaction) {
         const queue = useQueue(interaction.guild.id);

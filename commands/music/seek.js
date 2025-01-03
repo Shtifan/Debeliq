@@ -26,9 +26,9 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("seek")
         .setDescription("Seek the player to a specific timestamp")
-        .addIntegerOption((option) => option.setName("hours").setDescription("Hours to seek to").setRequired(false))
-        .addIntegerOption((option) => option.setName("minutes").setDescription("Minutes to seek to").setRequired(false))
-        .addIntegerOption((option) => option.setName("seconds").setDescription("Seconds to seek to").setRequired(false)),
+        .addIntegerOption((option) => option.setName("hours").setDescription("Hours to seek to"))
+        .addIntegerOption((option) => option.setName("minutes").setDescription("Minutes to seek to"))
+        .addIntegerOption((option) => option.setName("seconds").setDescription("Seconds to seek to")),
 
     async execute(interaction) {
         const queue = useQueue(interaction.guild.id);

@@ -2,7 +2,10 @@ const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const { useQueue } = require("discord-player");
 
 module.exports = {
-    data: new SlashCommandBuilder().setName("queue").setDescription("Show the next 10 songs in the queue"),
+    data: new SlashCommandBuilder()
+        .setName("queue")
+        .setDescription("Show songs in the queue")
+        .addBooleanOption((option) => option.setName("last").setDescription("Show the last 10 songs instead of first 10")),
 
     async execute(interaction) {
         const channel = interaction.member.voice.channel;
@@ -23,7 +26,10 @@ module.exports = {
             return;
         }
 
+        const showLast = interaction.options.getBoolean("last") ?? false;
         const track = queue.currentTrack;
+        const tracksArray = Array.from(queue.tracks.toArray());
+        const tracksToShow = showLast ? tracksArray.slice(Math.max(tracksArray.length - 10, 0)) : tracksArray.slice(0, 10);
 
         const embed = new EmbedBuilder()
             .setAuthor({ name: "Now Playing:" })
@@ -33,11 +39,11 @@ module.exports = {
             .setDescription(
                 queue.node.createProgressBar() +
                     "\n\n" +
-                    queue.tracks
+                    tracksToShow
                         .map((track, i) => {
-                            return `**#${i + 1}** - Title: **${track.title}** | Uploaded by: **${track.author}**`;
+                            const position = showLast ? tracksArray.length - (tracksToShow.length - i) + 1 : i + 1;
+                            return `**#${position}** - Title: **${track.title}** | Uploaded by: **${track.author}**`;
                         })
-                        .slice(0, 10)
                         .join("\n")
             );
 
