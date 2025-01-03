@@ -126,6 +126,9 @@ async function performSpin(interaction, bet, isAutoSpin = false) {
                 content: "Auto spin stopped due to insufficient funds!",
                 ephemeral: true,
             });
+            const grid = generateGrid();
+            const { totalWin, winningCombos } = calculateWins(grid, bet);
+            await updateUI(interaction, grid, bet, totalWin, balances[userId].money, winningCombos, false);
         } else {
             await interaction.followUp({
                 content: "You don't have enough money to place this bet!",
@@ -143,14 +146,20 @@ async function performSpin(interaction, bet, isAutoSpin = false) {
     if (totalWin > 0) balances[userId].money += totalWin;
     await saveBalances(balances);
 
+    await updateUI(interaction, grid, bet, totalWin, balances[userId].money, winningCombos, autoSpinStates.has(userId));
+
+    return true;
+}
+
+async function updateUI(interaction, grid, bet, totalWin, balance, winningCombos, isAutoSpinActive) {
     const gridDisplay = grid.map((row) => row.join(" ")).join("\n");
     const embed = new EmbedBuilder()
-        .setTitle(isAutoSpin ? "Slots - Auto Spin" : "Slots")
+        .setTitle(isAutoSpinActive ? "Slots - Auto Spin" : "Slots")
         .setDescription(
             `**Grid:**\n${gridDisplay}\n\n` +
                 `**Bet:** ${formatCurrency(bet)}\n` +
                 `**Win:** ${formatCurrency(totalWin)}\n` +
-                `**Balance:** ${formatCurrency(balances[userId].money)}` +
+                `**Balance:** ${formatCurrency(balance)}` +
                 (winningCombos.length ? `\n\n**Winning Combinations:**\n${winningCombos.join("\n")}` : "")
         );
 
@@ -158,16 +167,14 @@ async function performSpin(interaction, bet, isAutoSpin = false) {
         new ButtonBuilder().setCustomId(`spin_slots_${bet}`).setLabel("Spin Again").setStyle(ButtonStyle.Primary),
         new ButtonBuilder()
             .setCustomId(`auto_slots_${bet}`)
-            .setLabel(autoSpinStates.has(userId) ? "Stop Auto" : "Auto Spin")
-            .setStyle(autoSpinStates.has(userId) ? ButtonStyle.Danger : ButtonStyle.Success)
+            .setLabel(isAutoSpinActive ? "Stop Auto" : "Auto Spin")
+            .setStyle(isAutoSpinActive ? ButtonStyle.Danger : ButtonStyle.Success)
     );
 
     await interaction.editReply({
         embeds: [embed],
         components: [row],
     });
-
-    return true;
 }
 
 const standardSymbols = [
@@ -219,9 +226,6 @@ module.exports = {
                     const success = await performSpin(interaction, bet, true);
                     if (success) {
                         autoSpinStates.set(userId, setTimeout(autoSpin, 2000));
-                    } else {
-                        autoSpinStates.delete(userId);
-                        await performSpin(interaction, bet);
                     }
                 }
 
