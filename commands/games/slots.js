@@ -29,17 +29,6 @@ function formatCurrency(amount) {
     return amount.toLocaleString("en-US", { style: "currency", currency: "USD" });
 }
 
-function generateGrid() {
-    return Array.from({ length: 3 }, () =>
-        Array.from({ length: 5 }, () => {
-            const roll = Math.random() * 100;
-            if (roll < 3) return specialSymbols.wild.symbol;
-            if (roll < 7) return specialSymbols.scatter.symbol;
-            return standardSymbols[Math.floor(Math.random() * standardSymbols.length)].symbol;
-        })
-    );
-}
-
 function calculateWins(grid, bet) {
     let totalWin = 0;
     let winningCombos = [];
@@ -80,37 +69,193 @@ function calculateWins(grid, bet) {
             [1, 3],
             [2, 4],
         ],
+        [
+            [0, 0],
+            [0, 1],
+            [1, 2],
+            [2, 3],
+            [2, 4],
+        ],
+        [
+            [2, 0],
+            [2, 1],
+            [1, 2],
+            [0, 3],
+            [0, 4],
+        ],
+        [
+            [1, 0],
+            [0, 1],
+            [0, 2],
+            [0, 3],
+            [1, 4],
+        ],
+        [
+            [1, 0],
+            [2, 1],
+            [2, 2],
+            [2, 3],
+            [1, 4],
+        ],
+        [
+            [0, 0],
+            [1, 0],
+            [2, 1],
+            [1, 2],
+            [0, 3],
+        ],
+        [
+            [2, 0],
+            [1, 0],
+            [0, 1],
+            [1, 2],
+            [2, 3],
+        ],
+        [
+            [1, 0],
+            [2, 1],
+            [1, 2],
+            [0, 3],
+            [1, 4],
+        ],
+        [
+            [1, 0],
+            [0, 1],
+            [1, 2],
+            [2, 3],
+            [1, 4],
+        ],
+        [
+            [0, 0],
+            [1, 1],
+            [1, 2],
+            [1, 3],
+            [0, 4],
+        ],
+        [
+            [2, 0],
+            [1, 1],
+            [1, 2],
+            [1, 3],
+            [2, 4],
+        ],
+        [
+            [1, 0],
+            [1, 1],
+            [0, 2],
+            [1, 3],
+            [1, 4],
+        ],
+        [
+            [1, 0],
+            [1, 1],
+            [2, 2],
+            [1, 3],
+            [1, 4],
+        ],
+        [
+            [0, 0],
+            [2, 1],
+            [1, 2],
+            [2, 3],
+            [0, 4],
+        ],
+        [
+            [2, 0],
+            [0, 1],
+            [1, 2],
+            [0, 3],
+            [2, 4],
+        ],
+        [
+            [1, 0],
+            [0, 1],
+            [1, 2],
+            [2, 3],
+            [1, 4],
+        ],
     ];
 
-    const baseMultiplier = 2.0;
-    const wildMultiplier = 2.5;
-
-    for (const payline of paylines) {
+    for (let paylineIndex = 0; paylineIndex < paylines.length; paylineIndex++) {
+        const payline = paylines[paylineIndex];
         const symbols = payline.map(([row, col]) => grid[row][col]);
-        const uniqueSymbols = new Set(symbols);
 
-        if (uniqueSymbols.size <= 2 || (symbols.includes(specialSymbols.wild.symbol) && uniqueSymbols.size <= 2)) {
-            const symbol = symbols.find((s) => s !== specialSymbols.wild.symbol) || specialSymbols.wild.symbol;
-            const symbolData = [...standardSymbols, ...Object.values(specialSymbols)].find((s) => s.symbol === symbol);
+        let consecutiveCount = 1;
+        let currentSymbol = symbols[0];
+        let wildCount = currentSymbol === specialSymbols.wild.symbol ? 1 : 0;
 
-            let win = bet * (symbolData.value / 100) * baseMultiplier;
-            if (symbols.includes(specialSymbols.wild.symbol)) win *= wildMultiplier;
+        for (let i = 1; i < symbols.length; i++) {
+            if (
+                symbols[i] === currentSymbol ||
+                symbols[i] === specialSymbols.wild.symbol ||
+                (currentSymbol === specialSymbols.wild.symbol && symbols[i] !== specialSymbols.scatter.symbol)
+            ) {
+                consecutiveCount++;
+                if (symbols[i] === specialSymbols.wild.symbol) wildCount++;
+            } else break;
+        }
 
-            totalWin += win;
-            winningCombos.push(
-                `Payline (${payline.map(([r, c]) => `[${r + 1}, ${c + 1}]`).join(" -> ")}): ${symbols.join(" ")}`
+        if (consecutiveCount >= 3) {
+            const symbolData =
+                currentSymbol === specialSymbols.wild.symbol
+                    ? symbols.find((s) => s !== specialSymbols.wild.symbol) || specialSymbols.wild.symbol
+                    : currentSymbol;
+            const symbolInfo = [...standardSymbols, specialSymbols.wild, specialSymbols.scatter].find(
+                (s) => s.symbol === symbolData
             );
+
+            if (symbolInfo) {
+                let multiplier = consecutiveCount >= 5 ? 15 : consecutiveCount >= 4 ? 5 : 2;
+
+                if (wildCount > 0) {
+                    multiplier *= 1 + wildCount * 0.5;
+                }
+
+                const win = bet * (symbolInfo.value / 100) * multiplier;
+                totalWin += win;
+
+                winningCombos.push({
+                    paylineIndex: paylineIndex + 1,
+                    symbols: symbols.slice(0, consecutiveCount).join(" "),
+                    matches: consecutiveCount,
+                    win: win,
+                    multiplier,
+                });
+            }
         }
     }
 
     const scatterCount = grid.flat().filter((s) => s === specialSymbols.scatter.symbol).length;
-    if (scatterCount >= 2) {
-        const scatterWin = bet * (scatterCount * 1.5);
+    if (scatterCount >= 3) {
+        const scatterMultiplier = scatterCount >= 5 ? 50 : scatterCount >= 4 ? 20 : 10;
+        const scatterWin = bet * scatterMultiplier;
         totalWin += scatterWin;
-        winningCombos.push(`Scatter: ${scatterCount}x ${specialSymbols.scatter.symbol}`);
+        winningCombos.push({
+            type: "scatter",
+            count: scatterCount,
+            win: scatterWin,
+        });
     }
 
     return { totalWin, winningCombos };
+}
+
+function generateGrid() {
+    return Array.from({ length: 3 }, () =>
+        Array.from({ length: 5 }, () => {
+            const roll = Math.random() * 100;
+            if (roll < 1.5) return specialSymbols.wild.symbol;
+            if (roll < 2.5) return specialSymbols.scatter.symbol;
+
+            const weightedRoll = Math.random() * 100;
+            let cumulative = 0;
+            for (const symbol of standardSymbols) {
+                cumulative += 1000 / symbol.value;
+                if (weightedRoll < cumulative) return symbol.symbol;
+            }
+            return standardSymbols[standardSymbols.length - 1].symbol;
+        })
+    );
 }
 
 async function performSpin(interaction, bet, isAutoSpin = false) {
@@ -153,6 +298,20 @@ async function performSpin(interaction, bet, isAutoSpin = false) {
 
 async function updateUI(interaction, grid, bet, totalWin, balance, winningCombos, isAutoSpinActive) {
     const gridDisplay = grid.map((row) => row.join(" ")).join("\n");
+
+    const formattedCombos = winningCombos
+        .map((combo) => {
+            if (combo.type === "scatter") {
+                return `Scatter: ${combo.count} symbols, Win: ${formatCurrency(combo.win)}`;
+            } else {
+                return (
+                    `Payline ${combo.paylineIndex}: ${combo.symbols} (${combo.matches} matches), ` +
+                    `Multiplier: x${combo.multiplier.toFixed(2)}, Win: ${formatCurrency(combo.win)}`
+                );
+            }
+        })
+        .join("\n");
+
     const embed = new EmbedBuilder()
         .setTitle(isAutoSpinActive ? "Slots - Auto Spin" : "Slots")
         .setDescription(
@@ -160,7 +319,7 @@ async function updateUI(interaction, grid, bet, totalWin, balance, winningCombos
                 `**Bet:** ${formatCurrency(bet)}\n` +
                 `**Win:** ${formatCurrency(totalWin)}\n` +
                 `**Balance:** ${formatCurrency(balance)}` +
-                (winningCombos.length ? `\n\n**Winning Combinations:**\n${winningCombos.join("\n")}` : "")
+                (formattedCombos ? `\n\n**Winning Combinations:**\n${formattedCombos}` : "")
         );
 
     const row = new ActionRowBuilder().addComponents(
@@ -178,17 +337,18 @@ async function updateUI(interaction, grid, bet, totalWin, balance, winningCombos
 }
 
 const standardSymbols = [
-    { symbol: "🍒", value: 45 },
-    { symbol: "🍋", value: 55 },
-    { symbol: "🍉", value: 65 },
-    { symbol: "🍇", value: 75 },
-    { symbol: "⭐", value: 105 },
-    { symbol: "💎", value: 130 },
+    { symbol: "7️⃣", value: 200, name: "Seven" },
+    { symbol: "💎", value: 150, name: "Diamond" },
+    { symbol: "🔔", value: 100, name: "Bell" },
+    { symbol: "🍇", value: 75, name: "Grapes" },
+    { symbol: "🍊", value: 50, name: "Orange" },
+    { symbol: "🍋", value: 40, name: "Lemon" },
+    { symbol: "🍒", value: 30, name: "Cherry" },
 ];
 
 const specialSymbols = {
-    wild: { symbol: "🔥", value: 250 },
-    scatter: { symbol: "🌟", value: 150 },
+    wild: { symbol: "⭐", value: 500, name: "Wild" },
+    scatter: { symbol: "🎰", value: 200, name: "Scatter" },
 };
 
 const autoSpinStates = new Map();
