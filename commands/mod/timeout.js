@@ -1,22 +1,12 @@
 const { SlashCommandBuilder } = require("discord.js");
 
-function convertToMs(duration) {
-    const timeUnits = {
-        s: 1000,
-        m: 1000 * 60,
-        h: 1000 * 60 * 60,
-        d: 1000 * 60 * 60 * 24,
-    };
-
-    const regex = /^(\d+)([smhd])$/;
-    const match = duration.match(regex);
-
-    if (!match) return null;
-
-    const value = parseInt(match[1]);
-    const unit = match[2];
-
-    return value * timeUnits[unit];
+function convertToMs(days, hours, minutes, seconds) {
+    const ms =
+        (days || 0) * 24 * 60 * 60 * 1000 +
+        (hours || 0) * 60 * 60 * 1000 +
+        (minutes || 0) * 60 * 1000 +
+        (seconds || 0) * 1000;
+    return ms > 0 ? ms : null;
 }
 
 module.exports = {
@@ -24,9 +14,10 @@ module.exports = {
         .setName("timeout")
         .setDescription("Timeout a member from this server")
         .addUserOption((option) => option.setName("user").setDescription("The user you want to timeout").setRequired(true))
-        .addStringOption((option) =>
-            option.setName("duration").setDescription("Timeout duration (10s, 30m, 1h, 5d...)").setRequired(true)
-        )
+        .addIntegerOption((option) => option.setName("days").setDescription("Days for the timeout").setRequired(false))
+        .addIntegerOption((option) => option.setName("hours").setDescription("Hours for the timeout").setRequired(false))
+        .addIntegerOption((option) => option.setName("minutes").setDescription("Minutes for the timeout").setRequired(false))
+        .addIntegerOption((option) => option.setName("seconds").setDescription("Seconds for the timeout").setRequired(false))
         .addStringOption((option) => option.setName("reason").setDescription("The reason for the timeout")),
 
     async execute(interaction) {
@@ -41,12 +32,17 @@ module.exports = {
             return;
         }
 
-        const duration = interaction.options.getString("duration");
-        const msDuration = convertToMs(duration);
+        const days = interaction.options.getInteger("days") || 0;
+        const hours = interaction.options.getInteger("hours") || 0;
+        const minutes = interaction.options.getInteger("minutes") || 0;
+        const seconds = interaction.options.getInteger("seconds") || 0;
+
+        const msDuration = convertToMs(days, hours, minutes, seconds);
 
         if (!msDuration) {
             await interaction.reply({
-                content: "Invalid duration format. Please use (e.g., 10s, 30m, 1h, 5d).",
+                content:
+                    "Please provide a valid duration using at least one of the options: days, hours, minutes, or seconds.",
                 ephemeral: true,
             });
             return;
@@ -57,7 +53,9 @@ module.exports = {
 
         try {
             await targetUser.timeout(msDuration, reason);
-            await interaction.reply(`${targetUser} was timed out for ${duration}.\nReason: ${reason}.`);
+            await interaction.reply(
+                `${targetUser} was timed out for ${days}d ${hours}h ${minutes}m ${seconds}s.\nReason: ${reason}.`
+            );
         } catch (error) {
             await interaction.reply({
                 content: `Sorry, I am unable to timeout ${targetUser}.`,
