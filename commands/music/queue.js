@@ -5,7 +5,12 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("queue")
         .setDescription("Show songs in the queue")
-        .addBooleanOption((option) => option.setName("last").setDescription("Show the last 10 songs instead of first 10")),
+        .addStringOption((option) =>
+            option
+                .setName("view")
+                .setDescription("Choose which songs to view")
+                .addChoices({ name: "First 10", value: "first" }, { name: "Last 10", value: "last" })
+        ),
 
     async execute(interaction) {
         const channel = interaction.member.voice.channel;
@@ -26,7 +31,8 @@ module.exports = {
             return;
         }
 
-        const showLast = interaction.options.getBoolean("last") ?? false;
+        const viewOption = interaction.options.getString("view") ?? "first";
+        const showLast = viewOption === "last";
         const track = queue.currentTrack;
         const tracksArray = Array.from(queue.tracks.toArray());
         const tracksToShow = showLast ? tracksArray.slice(Math.max(tracksArray.length - 10, 0)) : tracksArray.slice(0, 10);

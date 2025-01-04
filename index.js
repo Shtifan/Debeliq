@@ -1,5 +1,6 @@
 const { Client, GatewayIntentBits, Collection, REST, Routes } = require("discord.js");
 const { Player } = require("discord-player");
+const { DefaultExtractors } = require("@discord-player/extractor");
 const { YoutubeiExtractor } = require("discord-player-youtubei");
 const fs = require("fs");
 const path = require("path");
@@ -48,7 +49,7 @@ player.extractors.register(YoutubeiExtractor, {
     credentials: YT_credentials,
 });
 
-player.extractors.loadDefault((ext) => ext !== "YouTubeExtractor");
+player.extractors.loadMulti(DefaultExtractors);
 
 const eventsPath = path.join(__dirname, "events");
 
