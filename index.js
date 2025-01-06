@@ -51,8 +51,6 @@ player.extractors.register(YoutubeiExtractor, {
 
 player.extractors.loadMulti(DefaultExtractors);
 
-const eventsPath = path.join(__dirname, "events");
-
 function loadEventFiles(dir) {
     const files = fs.readdirSync(dir);
 
@@ -76,6 +74,6 @@ function loadEventFiles(dir) {
     }
 }
 
-loadEventFiles(eventsPath);
+loadEventFiles(path.join(__dirname, "events"));
 
 client.login(token);
