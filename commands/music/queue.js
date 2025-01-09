@@ -8,8 +8,12 @@ module.exports = {
         .addStringOption((option) =>
             option
                 .setName("view")
-                .setDescription("Choose which songs to view")
-                .addChoices({ name: "First 10", value: "first" }, { name: "Last 10", value: "last" })
+                .setDescription("Choose what to view")
+                .addChoices(
+                    { name: "First 10 songs", value: "first" },
+                    { name: "Last 10 songs", value: "last" },
+                    { name: "Queue size", value: "size" }
+                )
         ),
 
     async execute(interaction) {
@@ -32,9 +36,22 @@ module.exports = {
         }
 
         const viewOption = interaction.options.getString("view") ?? "first";
-        const showLast = viewOption === "last";
-        const track = queue.currentTrack;
         const tracksArray = Array.from(queue.tracks.toArray());
+        const track = queue.currentTrack;
+
+        if (viewOption === "size") {
+            const embed = new EmbedBuilder()
+                .setTitle("Queue Information")
+                .setDescription(
+                    `There are currently **${tracksArray.length}** songs in the queue\nNow playing: **${track.title}**`
+                )
+                .setThumbnail(track.thumbnail);
+
+            await interaction.reply({ embeds: [embed] });
+            return;
+        }
+
+        const showLast = viewOption === "last";
         const tracksToShow = showLast ? tracksArray.slice(Math.max(tracksArray.length - 10, 0)) : tracksArray.slice(0, 10);
 
         const embed = new EmbedBuilder()
