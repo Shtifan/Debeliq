@@ -44,11 +44,11 @@ const rest = new REST().setToken(token);
 rest.put(Routes.applicationCommands(clientId), { body: commands });
 
 const player = new Player(client);
-
+/*
 player.extractors.register(YoutubeiExtractor, {
     credentials: YT_credentials,
 });
-
+*/
 player.extractors.loadMulti(DefaultExtractors);
 
 function loadEventFiles(dir) {
