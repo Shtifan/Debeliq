@@ -1,10 +1,11 @@
 const { Client, GatewayIntentBits, Collection, REST, Routes } = require("discord.js");
 const { Player } = require("discord-player");
 const { DefaultExtractors } = require("@discord-player/extractor");
+const { DeezerExtractor } = require("discord-player-deezer");
 const { YoutubeiExtractor } = require("discord-player-youtubei");
 const fs = require("fs");
 const path = require("path");
-const { token, clientId, YT_credentials } = require("./config.json");
+const { token, clientId } = require("./config.json");
 
 const client = new Client({
     intents: [
@@ -44,12 +45,10 @@ const rest = new REST().setToken(token);
 rest.put(Routes.applicationCommands(clientId), { body: commands });
 
 const player = new Player(client);
-/*
-player.extractors.register(YoutubeiExtractor, {
-    credentials: YT_credentials,
-});
-*/
+
 player.extractors.loadMulti(DefaultExtractors);
+player.extractors.register(YoutubeiExtractor);
+player.extractors.register(DeezerExtractor);
 
 function loadEventFiles(dir) {
     const files = fs.readdirSync(dir);

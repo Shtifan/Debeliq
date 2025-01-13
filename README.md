@@ -22,12 +22,6 @@ Create a `config.json` file in the root directory with the following content:
 }
 ```
 
-For YouTube credentials, run:
-
-```bash
-npx --no discord-player-youtubei
-```
-
 ## Running the Bot
 
 Start the bot using:
