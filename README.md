@@ -17,8 +17,7 @@ Create a `config.json` file in the root directory with the following content:
 ```json
 {
     "clientId": "",
-    "token": "",
-    "YT_credentials": ""
+    "token": ""
 }
 ```
 
