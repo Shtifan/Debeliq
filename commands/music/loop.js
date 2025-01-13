@@ -9,12 +9,8 @@ module.exports = {
             option
                 .setName("action")
                 .setDescription("What action you want to perform on the loop")
-                .addChoices(
-                    { name: "Off", value: "0" },
-                    { name: "Track", value: "1" },
-                    { name: "Queue", value: "2" },
-                    { name: "Autoplay", value: "3" }
-                )
+                .setRequired(true)
+                .addChoices({ name: "Off", value: "0" }, { name: "Track", value: "1" }, { name: "Queue", value: "2" })
         ),
 
     async execute(interaction) {
@@ -38,27 +34,6 @@ module.exports = {
 
         const action = interaction.options.getString("action");
 
-        if (!action) {
-            const mode = queue.repeatMode;
-            let status = "unknown";
-            switch (mode) {
-                case QueueRepeatMode.OFF:
-                    status = "Repeat mode is currently **disabled**.";
-                    break;
-                case QueueRepeatMode.TRACK:
-                    status = "Repeat mode is currently **enabled** for the current track.";
-                    break;
-                case QueueRepeatMode.QUEUE:
-                    status = "Repeat mode is currently **enabled** for the whole queue.";
-                    break;
-                case QueueRepeatMode.AUTOPLAY:
-                    status = "Autoplay is currently **enabled**.";
-                    break;
-            }
-            await interaction.reply(status);
-            return;
-        }
-
         switch (action) {
             case "0": {
                 queue.setRepeatMode(QueueRepeatMode.OFF);
@@ -73,13 +48,6 @@ module.exports = {
             case "2": {
                 queue.setRepeatMode(QueueRepeatMode.QUEUE);
                 await interaction.reply("Repeat mode **enabled** for the whole queue.");
-                break;
-            }
-            case "3": {
-                queue.setRepeatMode(QueueRepeatMode.AUTOPLAY);
-                await interaction.reply(
-                    "The player will now play related songs automatically based on your existing queue."
-                );
                 break;
             }
         }
