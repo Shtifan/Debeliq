@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 const { useQueue } = require("discord-player");
 
 function timeToMs(hours, minutes, seconds) {
@@ -56,8 +56,16 @@ module.exports = {
 
         queue.node.seek(timestamp);
 
-        await interaction.reply({
-            content: `Seeked to ${formatDuration(timestamp)}.`,
-        });
+        const embed = new EmbedBuilder()
+            .setAuthor({ name: "Now Playing:" })
+            .setTitle(queue.currentTrack.title)
+            .setURL(queue.currentTrack.url)
+            .setDescription(queue.node.createProgressBar() + `\n\nSeeked to ${formatDuration(timestamp)}.`);
+
+        if (queue.currentTrack.thumbnail && queue.currentTrack.thumbnail.trim() !== "") {
+            embed.setThumbnail(queue.currentTrack.thumbnail);
+        }
+
+        await interaction.reply({ embeds: [embed] });
     },
 };
