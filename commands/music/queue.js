@@ -44,8 +44,11 @@ module.exports = {
                 .setTitle("Queue Information")
                 .setDescription(
                     `There are currently **${tracksArray.length}** songs in the queue\nNow playing: **${track.title}**`
-                )
-                .setThumbnail(track.thumbnail);
+                );
+
+            if (track.thumbnail && track.thumbnail.trim() !== "") {
+                embed.setThumbnail(track.thumbnail);
+            }
 
             await interaction.reply({ embeds: [embed] });
             return;
@@ -58,7 +61,6 @@ module.exports = {
             .setAuthor({ name: "Now Playing:" })
             .setTitle(track.title)
             .setURL(track.url)
-            .setThumbnail(track.thumbnail)
             .setDescription(
                 queue.node.createProgressBar() +
                     "\n\n" +
@@ -69,6 +71,10 @@ module.exports = {
                         })
                         .join("\n")
             );
+
+        if (track.thumbnail && track.thumbnail.trim() !== "") {
+            embed.setThumbnail(track.thumbnail);
+        }
 
         await interaction.reply({ embeds: [embed] });
     },
