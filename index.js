@@ -1,7 +1,7 @@
 const { Client, GatewayIntentBits, Collection, REST, Routes } = require("discord.js");
 const { Player } = require("discord-player");
 const { DefaultExtractors } = require("@discord-player/extractor");
-//const { YoutubeiExtractor } = require("discord-player-youtubei");
+const { YoutubeiExtractor } = require("discord-player-youtubei");
 const fs = require("fs");
 const path = require("path");
 const { token, clientId } = require("./config.json");
@@ -41,12 +41,23 @@ function loadCommandFiles(dir) {
 loadCommandFiles(path.join(__dirname, "commands"));
 
 const rest = new REST().setToken(token);
-rest.put(Routes.applicationCommands(clientId), { body: commands });
+
+(async () => {
+    try {
+        console.log("Started refreshing application (/) commands.");
+
+        await rest.put(Routes.applicationCommands(clientId), { body: commands });
+
+        console.log("Successfully reloaded application (/) commands.");
+    } catch (error) {
+        console.error(error);
+    }
+})();
 
 const player = new Player(client);
 
 player.extractors.loadMulti(DefaultExtractors);
-//player.extractors.register(YoutubeiExtractor);
+player.extractors.register(YoutubeiExtractor, {});
 
 function loadEventFiles(dir) {
     const files = fs.readdirSync(dir);
