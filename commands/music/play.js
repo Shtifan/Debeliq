@@ -5,7 +5,10 @@ module.exports = {
     data: new SlashCommandBuilder()
         .setName("play")
         .setDescription("Play a song")
-        .addStringOption((option) => option.setName("query").setDescription("Name or URL of the song or playlist").setRequired(true)),
+        .addStringOption((option) =>
+            option.setName("query").setDescription("Name or URL of the song or playlist").setRequired(true)
+        )
+        .addBooleanOption((option) => option.setName("next").setDescription("Add the song next in the queue")),
 
     async execute(interaction) {
         const player = useMainPlayer();
@@ -22,12 +25,35 @@ module.exports = {
         await interaction.deferReply();
 
         const query = interaction.options.getString("query", true);
+        const nextInQueue = interaction.options.getBoolean("next") ?? false;
 
-        await player.play(channel, query, {
-            nodeOptions: {
-                metadata: interaction,
-            },
+        const queue = player.nodes.create(interaction.guild, {
+            metadata: interaction,
         });
+
+        if (!queue.connection) {
+            await queue.connect(channel);
+        }
+
+        const result = await player.search(query, {
+            requestedBy: interaction.user,
+            searchEngine: "auto",
+        });
+
+        if (result.tracks.length === 0) {
+            await interaction.followUp("No results found.");
+            return;
+        }
+
+        if (nextInQueue) {
+            queue.insertTrack(result.tracks[0], 0);
+        } else {
+            queue.addTrack(result.tracks[0]);
+        }
+
+        if (!queue.isPlaying()) {
+            await queue.node.play();
+        }
 
         await interaction.followUp("Successfully completed your request.");
     },
