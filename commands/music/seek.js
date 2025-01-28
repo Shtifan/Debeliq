@@ -56,16 +56,25 @@ module.exports = {
 
         queue.node.seek(timestamp);
 
-        const embed = new EmbedBuilder()
-            .setAuthor({ name: "Now Playing:" })
-            .setTitle(queue.currentTrack.title)
-            .setURL(queue.currentTrack.url)
-            .setDescription(queue.node.createProgressBar() + `\n\nSeeked to ${formatDuration(timestamp)}.`);
+        await interaction.reply({
+            content: `Seeking to ${formatDuration(timestamp)}...`,
+            ephemeral: true,
+        });
 
-        if (queue.currentTrack.thumbnail && queue.currentTrack.thumbnail.trim() !== "") {
-            embed.setThumbnail(queue.currentTrack.thumbnail);
-        }
+        setTimeout(async () => {
+            const progressBar = queue.node.createProgressBar();
 
-        await interaction.reply({ embeds: [embed] });
+            const embed = new EmbedBuilder()
+                .setAuthor({ name: "Now Playing:" })
+                .setTitle(queue.currentTrack.title)
+                .setURL(queue.currentTrack.url)
+                .setDescription(progressBar + `\n\nSeeked to ${formatDuration(timestamp)}.`);
+
+            if (queue.currentTrack.thumbnail && queue.currentTrack.thumbnail.trim() !== "") {
+                embed.setThumbnail(queue.currentTrack.thumbnail);
+            }
+
+            await interaction.editReply({ content: "", embeds: [embed] });
+        }, 1000);
     },
 };
