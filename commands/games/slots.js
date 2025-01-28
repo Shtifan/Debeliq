@@ -34,146 +34,21 @@ function calculateWins(grid, bet) {
     let winningCombos = [];
 
     const paylines = [
-        [
-            [0, 0],
-            [0, 1],
-            [0, 2],
-            [0, 3],
-            [0, 4],
-        ],
-        [
-            [1, 0],
-            [1, 1],
-            [1, 2],
-            [1, 3],
-            [1, 4],
-        ],
-        [
-            [2, 0],
-            [2, 1],
-            [2, 2],
-            [2, 3],
-            [2, 4],
-        ],
-        [
-            [0, 0],
-            [1, 1],
-            [2, 2],
-            [1, 3],
-            [0, 4],
-        ],
-        [
-            [2, 0],
-            [1, 1],
-            [0, 2],
-            [1, 3],
-            [2, 4],
-        ],
-        [
-            [0, 0],
-            [0, 1],
-            [1, 2],
-            [2, 3],
-            [2, 4],
-        ],
-        [
-            [2, 0],
-            [2, 1],
-            [1, 2],
-            [0, 3],
-            [0, 4],
-        ],
-        [
-            [1, 0],
-            [0, 1],
-            [0, 2],
-            [0, 3],
-            [1, 4],
-        ],
-        [
-            [1, 0],
-            [2, 1],
-            [2, 2],
-            [2, 3],
-            [1, 4],
-        ],
-        [
-            [0, 0],
-            [1, 0],
-            [2, 1],
-            [1, 2],
-            [0, 3],
-        ],
-        [
-            [2, 0],
-            [1, 0],
-            [0, 1],
-            [1, 2],
-            [2, 3],
-        ],
-        [
-            [1, 0],
-            [2, 1],
-            [1, 2],
-            [0, 3],
-            [1, 4],
-        ],
-        [
-            [1, 0],
-            [0, 1],
-            [1, 2],
-            [2, 3],
-            [1, 4],
-        ],
-        [
-            [0, 0],
-            [1, 1],
-            [1, 2],
-            [1, 3],
-            [0, 4],
-        ],
-        [
-            [2, 0],
-            [1, 1],
-            [1, 2],
-            [1, 3],
-            [2, 4],
-        ],
-        [
-            [1, 0],
-            [1, 1],
-            [0, 2],
-            [1, 3],
-            [1, 4],
-        ],
-        [
-            [1, 0],
-            [1, 1],
-            [2, 2],
-            [1, 3],
-            [1, 4],
-        ],
-        [
-            [0, 0],
-            [2, 1],
-            [1, 2],
-            [2, 3],
-            [0, 4],
-        ],
-        [
-            [2, 0],
-            [0, 1],
-            [1, 2],
-            [0, 3],
-            [2, 4],
-        ],
-        [
-            [1, 0],
-            [0, 1],
-            [1, 2],
-            [2, 3],
-            [1, 4],
-        ],
+        [[0,0],[0,1],[0,2],[0,3],[0,4]],
+        [[1,0],[1,1],[1,2],[1,3],[1,4]],
+        [[2,0],[2,1],[2,2],[2,3],[2,4]],
+        [[0,0],[1,1],[2,2],[1,3],[0,4]],
+        [[2,0],[1,1],[0,2],[1,3],[2,4]],
+        [[0,0],[0,1],[1,2],[2,3],[2,4]],
+        [[2,0],[2,1],[1,2],[0,3],[0,4]],
+        [[1,0],[0,1],[0,2],[0,3],[1,4]],
+        [[1,0],[2,1],[2,2],[2,3],[1,4]],
+        [[0,0],[1,1],[2,2]],
+        [[2,0],[1,1],[0,2]],
+        [[1,1],[1,2],[1,3]],
+        [[0,2],[1,2],[2,2]],
+        [[1,0],[1,1],[1,4]],
+        [[0,3],[1,3],[2,3]]
     ];
 
     for (let paylineIndex = 0; paylineIndex < paylines.length; paylineIndex++) {
@@ -205,10 +80,10 @@ function calculateWins(grid, bet) {
             );
 
             if (symbolInfo) {
-                let multiplier = consecutiveCount >= 5 ? 15 : consecutiveCount >= 4 ? 5 : 2;
+                let multiplier = consecutiveCount >= 5 ? 5 : consecutiveCount >= 4 ? 3 : 2;
 
                 if (wildCount > 0) {
-                    multiplier *= 1 + wildCount * 0.5;
+                    multiplier *= 1 + wildCount * 0.25;
                 }
 
                 const win = bet * (symbolInfo.value / 100) * multiplier;
@@ -227,7 +102,7 @@ function calculateWins(grid, bet) {
 
     const scatterCount = grid.flat().filter((s) => s === specialSymbols.scatter.symbol).length;
     if (scatterCount >= 3) {
-        const scatterMultiplier = scatterCount >= 5 ? 50 : scatterCount >= 4 ? 20 : 10;
+        const scatterMultiplier = scatterCount >= 5 ? 20 : scatterCount >= 4 ? 10 : 5;
         const scatterWin = bet * scatterMultiplier;
         totalWin += scatterWin;
         winningCombos.push({
@@ -237,6 +112,9 @@ function calculateWins(grid, bet) {
         });
     }
 
+    const volatilityFactor = 0.85;
+    totalWin = Math.round(totalWin * volatilityFactor);
+
     return { totalWin, winningCombos };
 }
 
@@ -244,13 +122,13 @@ function generateGrid() {
     return Array.from({ length: 3 }, () =>
         Array.from({ length: 5 }, () => {
             const roll = Math.random() * 100;
-            if (roll < 1.5) return specialSymbols.wild.symbol;
-            if (roll < 2.5) return specialSymbols.scatter.symbol;
+            if (roll < 0.5) return specialSymbols.wild.symbol;
+            if (roll < 0.75) return specialSymbols.scatter.symbol;
 
-            const weightedRoll = Math.random() * 100;
+            const weightedRoll = Math.random() * 1000;
             let cumulative = 0;
             for (const symbol of standardSymbols) {
-                cumulative += 1000 / symbol.value;
+                cumulative += 5000 / symbol.value;
                 if (weightedRoll < cumulative) return symbol.symbol;
             }
             return standardSymbols[standardSymbols.length - 1].symbol;
@@ -337,13 +215,13 @@ async function updateUI(interaction, grid, bet, totalWin, balance, winningCombos
 }
 
 const standardSymbols = [
-    { symbol: "7️⃣", value: 200, name: "Seven" },
-    { symbol: "💎", value: 150, name: "Diamond" },
-    { symbol: "🔔", value: 100, name: "Bell" },
-    { symbol: "🍇", value: 75, name: "Grapes" },
-    { symbol: "🍊", value: 50, name: "Orange" },
-    { symbol: "🍋", value: 40, name: "Lemon" },
-    { symbol: "🍒", value: 30, name: "Cherry" },
+    { symbol: "7️⃣", value: 100, name: "Seven" },
+    { symbol: "💎", value: 75, name: "Diamond" },
+    { symbol: "🔔", value: 50, name: "Bell" },
+    { symbol: "🍇", value: 30, name: "Grapes" },
+    { symbol: "🍊", value: 25, name: "Orange" },
+    { symbol: "🍋", value: 20, name: "Lemon" },
+    { symbol: "🍒", value: 15, name: "Cherry" },
 ];
 
 const specialSymbols = {
