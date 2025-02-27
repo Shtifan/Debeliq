@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js");
-const { useMainPlayer } = require("discord-player");
+const { useMainPlayer, QueueRepeatMode } = require("discord-player");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -35,6 +35,10 @@ module.exports = {
             await queue.connect(channel);
         }
 
+        if (queue.repeatMode !== QueueRepeatMode.AUTOPLAY) {
+            queue.setRepeatMode(QueueRepeatMode.AUTOPLAY);
+        }
+
         const result = await player.search(query, {
             requestedBy: interaction.user,
             searchEngine: "auto",
@@ -55,6 +59,6 @@ module.exports = {
             await queue.node.play();
         }
 
-        await interaction.followUp("Successfully completed your request.");
+        await interaction.followUp("Successfully completed your request. Autoplay is enabled by default.");
     },
 };
