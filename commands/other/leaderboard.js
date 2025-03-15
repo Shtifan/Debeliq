@@ -30,16 +30,24 @@ module.exports = {
             });
         }
 
-        const leaderboardMessage = leaderboard
-            .map(
-                (entry, index) =>
-                    `**${index + 1}. <@${entry.userId}>** - ${entry.money.toLocaleString("en-US", {
-                        style: "currency",
-                        currency: "USD",
-                    })}`
-            )
-            .join("\n");
+        let leaderboardMessage = "**Balance Leaderboard**\n";
 
-        await interaction.reply(`**Leaderboard**\n${leaderboardMessage}`);
+        for (const [index, entry] of leaderboard.entries()) {
+            try {
+                const user = await interaction.client.users.fetch(entry.userId);
+                leaderboardMessage += `**${index + 1}. ${user.username}** - ${entry.money.toLocaleString("en-US", {
+                    style: "currency",
+                    currency: "USD",
+                })}\n`;
+            } catch (error) {
+                console.error(`Could not fetch user with ID ${entry.userId}:`, error);
+                leaderboardMessage += `**${index + 1}. Unknown User** - ${entry.money.toLocaleString("en-US", {
+                    style: "currency",
+                    currency: "USD",
+                })}\n`;
+            }
+        }
+
+        await interaction.reply(leaderboardMessage);
     },
 };
