@@ -1,10 +1,10 @@
 const { SlashCommandBuilder } = require("discord.js");
-const { useMainPlayer, QueueRepeatMode } = require("discord-player");
+const { useMainPlayer, QueryType } = require("discord-player");
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("play")
-        .setDescription("Play a song")
+        .setDescription("Play a song or playlist")
         .addStringOption((option) =>
             option.setName("query").setDescription("Name or URL of the song or playlist").setRequired(true)
         )
@@ -12,8 +12,8 @@ module.exports = {
 
     async execute(interaction) {
         const player = useMainPlayer();
-
         const channel = interaction.member.voice.channel;
+
         if (!channel) {
             await interaction.reply({
                 content: "You are not connected to a voice channel.",
@@ -35,13 +35,9 @@ module.exports = {
             await queue.connect(channel);
         }
 
-        if (queue.repeatMode !== QueueRepeatMode.AUTOPLAY) {
-            queue.setRepeatMode(QueueRepeatMode.AUTOPLAY);
-        }
-
         const result = await player.search(query, {
             requestedBy: interaction.user,
-            searchEngine: "auto",
+            searchEngine: QueryType.AUTO,
         });
 
         if (result.tracks.length === 0) {
@@ -49,16 +45,24 @@ module.exports = {
             return;
         }
 
-        if (nextInQueue) {
-            queue.insertTrack(result.tracks[0], 0);
+        if (result.playlist) {
+            if (nextInQueue) {
+                queue.insertTrack(result.tracks, 0);
+            } else {
+                queue.addTrack(result.tracks);
+            }
         } else {
-            queue.addTrack(result.tracks[0]);
+            if (nextInQueue) {
+                queue.insertTrack(result.tracks[0], 0);
+            } else {
+                queue.addTrack(result.tracks[0]);
+            }
         }
 
         if (!queue.isPlaying()) {
             await queue.node.play();
         }
 
-        await interaction.followUp("Successfully completed your request. Autoplay is enabled by default.");
+        await interaction.followUp(`Added ${result.tracks.length} track(s) to the queue.`);
     },
 };
