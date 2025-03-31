@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js");
-const { useMainPlayer, QueryType } = require("discord-player");
+const { useMainPlayer, QueryType, QueueRepeatMode } = require("discord-player");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -13,56 +13,22 @@ module.exports = {
     async execute(interaction) {
         const player = useMainPlayer();
         const channel = interaction.member.voice.channel;
-
-        if (!channel) {
-            await interaction.reply({
-                content: "You are not connected to a voice channel.",
-                ephemeral: true,
-            });
-            return;
-        }
+        if (!channel) return interaction.reply("You are not connected to a voice channel!");
+        const query = interaction.options.getString("query", true);
 
         await interaction.deferReply();
 
-        const query = interaction.options.getString("query", true);
-        const nextInQueue = interaction.options.getBoolean("next") ?? false;
+        try {
+            const { track, queue } = await player.play(channel, query, {
+                nodeOptions: {
+                    metadata: interaction,
+                    repeatMode: QueueRepeatMode.AUTOPLAY,
+                },
+            });
 
-        const queue = player.nodes.create(interaction.guild, {
-            metadata: interaction,
-        });
-
-        if (!queue.connection) {
-            await queue.connect(channel);
+            return interaction.followUp(`**${track.title}** enqueued! Autoplay is enabled.`);
+        } catch (e) {
+            return interaction.followUp(`Something went wrong: ${e}`);
         }
-
-        const result = await player.search(query, {
-            requestedBy: interaction.user,
-            searchEngine: QueryType.AUTO,
-        });
-
-        if (result.tracks.length === 0) {
-            await interaction.followUp("No results found.");
-            return;
-        }
-
-        if (result.playlist) {
-            if (nextInQueue) {
-                queue.insertTrack(result.tracks, 0);
-            } else {
-                queue.addTrack(result.tracks);
-            }
-        } else {
-            if (nextInQueue) {
-                queue.insertTrack(result.tracks[0], 0);
-            } else {
-                queue.addTrack(result.tracks[0]);
-            }
-        }
-
-        if (!queue.isPlaying()) {
-            await queue.node.play();
-        }
-
-        await interaction.followUp(`Added ${result.tracks.length} track(s) to the queue.`);
     },
 };

@@ -4,5 +4,4 @@ package-lock.json
 
 config.json
 
-data/*
-!data/.gitkeep
+data
