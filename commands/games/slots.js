@@ -1,14 +1,28 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require("discord.js");
 const { existsSync, mkdirSync } = require("fs");
 const fs = require("fs/promises");
+const path = require("path");
+
+const userDataPath = "./data/user_data.json";
+
+async function ensureDataDir() {
+    try {
+        const dataDir = "./data";
+        await fs.access(dataDir);
+    } catch {
+        await fs.mkdir(dataDir, { recursive: true });
+    }
+}
 
 async function loadBalances() {
     try {
-        if (!existsSync("./data/user_data.json")) {
-            await saveBalances({});
-            return {};
+        await ensureDataDir();
+        try {
+            await fs.access(userDataPath);
+        } catch {
+            await fs.writeFile(userDataPath, JSON.stringify({}));
         }
-        const data = await fs.readFile("./data/user_data.json", "utf8");
+        const data = await fs.readFile(userDataPath, "utf8");
         return JSON.parse(data || "{}");
     } catch (error) {
         console.error("Error loading balances:", error);
@@ -18,10 +32,11 @@ async function loadBalances() {
 
 async function saveBalances(balances) {
     try {
-        if (!existsSync("./data")) mkdirSync("./data", { recursive: true });
-        await fs.writeFile("./data/user_data.json", JSON.stringify(balances, null, 2));
+        await ensureDataDir();
+        await fs.writeFile(userDataPath, JSON.stringify(balances, null, 2));
     } catch (error) {
         console.error("Error saving balances:", error);
+        throw new Error("Failed to save balances");
     }
 }
 
@@ -34,21 +49,99 @@ function calculateWins(grid, bet) {
     let winningCombos = [];
 
     const paylines = [
-        [[0,0],[0,1],[0,2],[0,3],[0,4]],
-        [[1,0],[1,1],[1,2],[1,3],[1,4]],
-        [[2,0],[2,1],[2,2],[2,3],[2,4]],
-        [[0,0],[1,1],[2,2],[1,3],[0,4]],
-        [[2,0],[1,1],[0,2],[1,3],[2,4]],
-        [[0,0],[0,1],[1,2],[2,3],[2,4]],
-        [[2,0],[2,1],[1,2],[0,3],[0,4]],
-        [[1,0],[0,1],[0,2],[0,3],[1,4]],
-        [[1,0],[2,1],[2,2],[2,3],[1,4]],
-        [[0,0],[1,1],[2,2]],
-        [[2,0],[1,1],[0,2]],
-        [[1,1],[1,2],[1,3]],
-        [[0,2],[1,2],[2,2]],
-        [[1,0],[1,1],[1,4]],
-        [[0,3],[1,3],[2,3]]
+        [
+            [0, 0],
+            [0, 1],
+            [0, 2],
+            [0, 3],
+            [0, 4],
+        ],
+        [
+            [1, 0],
+            [1, 1],
+            [1, 2],
+            [1, 3],
+            [1, 4],
+        ],
+        [
+            [2, 0],
+            [2, 1],
+            [2, 2],
+            [2, 3],
+            [2, 4],
+        ],
+        [
+            [0, 0],
+            [1, 1],
+            [2, 2],
+            [1, 3],
+            [0, 4],
+        ],
+        [
+            [2, 0],
+            [1, 1],
+            [0, 2],
+            [1, 3],
+            [2, 4],
+        ],
+        [
+            [0, 0],
+            [0, 1],
+            [1, 2],
+            [2, 3],
+            [2, 4],
+        ],
+        [
+            [2, 0],
+            [2, 1],
+            [1, 2],
+            [0, 3],
+            [0, 4],
+        ],
+        [
+            [1, 0],
+            [0, 1],
+            [0, 2],
+            [0, 3],
+            [1, 4],
+        ],
+        [
+            [1, 0],
+            [2, 1],
+            [2, 2],
+            [2, 3],
+            [1, 4],
+        ],
+        [
+            [0, 0],
+            [1, 1],
+            [2, 2],
+        ],
+        [
+            [2, 0],
+            [1, 1],
+            [0, 2],
+        ],
+        [
+            [1, 1],
+            [1, 2],
+            [1, 3],
+        ],
+        [
+            [0, 2],
+            [1, 2],
+            [2, 2],
+        ],
+        [
+            [1, 0],
+            [1, 1],
+            [1, 4],
+        ],
+        [
+            [0, 3],
+            [1, 3],
+            [2, 3],
+        ],
     ];
 
     for (let paylineIndex = 0; paylineIndex < paylines.length; paylineIndex++) {
@@ -137,41 +230,67 @@ function generateGrid() {
 }
 
 async function performSpin(interaction, bet, isAutoSpin = false) {
-    const userId = interaction.user.id;
-    const balances = await loadBalances();
+    try {
+        const userId = interaction.user.id;
+        const balances = await loadBalances();
 
-    if (!balances[userId]) balances[userId] = { money: 0 };
-
-    if (bet > 0 && balances[userId].money < bet) {
-        if (isAutoSpin) {
-            autoSpinStates.delete(userId);
-            await interaction.followUp({
-                content: "Auto spin stopped due to insufficient funds!",
-                ephemeral: true,
-            });
-            const grid = generateGrid();
-            const { totalWin, winningCombos } = calculateWins(grid, bet);
-            await updateUI(interaction, grid, bet, totalWin, balances[userId].money, winningCombos, false);
-        } else {
-            await interaction.followUp({
-                content: "You don't have enough money to place this bet!",
-                ephemeral: true,
-            });
+        if (!balances[userId]) {
+            balances[userId] = { money: 0 };
         }
+
+        if (bet <= 0) {
+            const errorMessage = interaction.deferred ? interaction.editReply : interaction.reply;
+            await errorMessage({
+                content: "Please enter a valid bet amount greater than 0!",
+                ephemeral: true,
+            });
+            return false;
+        }
+
+        if (balances[userId].money < bet) {
+            if (isAutoSpin) {
+                autoSpinStates.delete(userId);
+                const errorMessage = interaction.deferred ? interaction.editReply : interaction.reply;
+                await errorMessage({
+                    content: "Auto spin stopped due to insufficient funds!",
+                    ephemeral: true,
+                });
+                const grid = generateGrid();
+                const { totalWin, winningCombos } = calculateWins(grid, bet);
+                await updateUI(interaction, grid, bet, totalWin, balances[userId].money, winningCombos, false);
+            } else {
+                const errorMessage = interaction.deferred ? interaction.editReply : interaction.reply;
+                await errorMessage({
+                    content: "You don't have enough money to place this bet!",
+                    ephemeral: true,
+                });
+            }
+            return false;
+        }
+
+        balances[userId].money -= bet;
+
+        const grid = generateGrid();
+        const { totalWin, winningCombos } = calculateWins(grid, bet);
+
+        if (totalWin > 0) {
+            balances[userId].money += totalWin;
+        }
+
+        await saveBalances(balances);
+
+        await updateUI(interaction, grid, bet, totalWin, balances[userId].money, winningCombos, autoSpinStates.has(userId));
+
+        return true;
+    } catch (error) {
+        console.error("Error in performSpin:", error);
+        const errorMessage = interaction.deferred ? interaction.editReply : interaction.reply;
+        await errorMessage({
+            content: "An error occurred while processing your spin. Please try again later.",
+            ephemeral: true,
+        });
         return false;
     }
-
-    if (bet > 0) balances[userId].money -= bet;
-
-    const grid = generateGrid();
-    const { totalWin, winningCombos } = calculateWins(grid, bet);
-
-    if (totalWin > 0) balances[userId].money += totalWin;
-    await saveBalances(balances);
-
-    await updateUI(interaction, grid, bet, totalWin, balances[userId].money, winningCombos, autoSpinStates.has(userId));
-
-    return true;
 }
 
 async function updateUI(interaction, grid, bet, totalWin, balance, winningCombos, isAutoSpinActive) {
@@ -234,13 +353,24 @@ const autoSpinStates = new Map();
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("slots")
-        .setDescription("Play Slots")
-        .addIntegerOption((option) => option.setName("bet").setDescription("Amount to bet").setRequired(true)),
+        .setDescription("Play the slots game")
+        .addIntegerOption((option) =>
+            option.setName("bet").setDescription("Amount to bet").setRequired(true).setMinValue(1)
+        ),
 
     async execute(interaction) {
-        const bet = interaction.options.getInteger("bet");
-        await interaction.deferReply();
-        await performSpin(interaction, bet);
+        try {
+            await interaction.deferReply();
+            const bet = interaction.options.getInteger("bet");
+            await performSpin(interaction, bet);
+        } catch (error) {
+            console.error("Error in slots command:", error);
+            const errorMessage = interaction.deferred ? interaction.editReply : interaction.reply;
+            await errorMessage({
+                content: "An error occurred while processing your request. Please try again later.",
+                ephemeral: true,
+            });
+        }
     },
 
     async handleButton(interaction) {
