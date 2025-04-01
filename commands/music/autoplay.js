@@ -32,9 +32,7 @@ module.exports = {
             await interaction.reply("Autoplay has been disabled.");
         } else {
             queue.setRepeatMode(QueueRepeatMode.AUTOPLAY);
-            await interaction.reply(
-                "Autoplay has been enabled. The player will now play related songs automatically based on your existing queue."
-            );
+            await interaction.reply("Autoplay has been enabled.");
         }
     },
 };
