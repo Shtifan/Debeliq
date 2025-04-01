@@ -99,7 +99,7 @@ async function initialize() {
         const rest = new REST().setToken(token);
         console.log("Started refreshing application (/) commands.");
         await rest.put(Routes.applicationCommands(clientId), { body: commands });
-        console.log(`Successfully reloaded ${commands.length} application (/) commands.`);
+        console.log(`Successfully loaded ${commands.length} application (/) commands.`);
 
         await client.login(token);
     } catch (error) {
