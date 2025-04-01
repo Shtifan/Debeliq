@@ -1,10 +1,17 @@
 const { SlashCommandBuilder } = require("discord.js");
 const fs = require("fs");
-const path = require("path");
 
-const userDataPath = path.join(__dirname, "../../data/user_data.json");
+const userDataPath = "./data/user_data.json";
+
+function ensureDataDir() {
+    const dataDir = "./data";
+    if (!fs.existsSync(dataDir)) {
+        fs.mkdirSync(dataDir, { recursive: true });
+    }
+}
 
 function loadUserData() {
+    ensureDataDir();
     if (!fs.existsSync(userDataPath)) {
         fs.writeFileSync(userDataPath, JSON.stringify({}));
     }
@@ -12,6 +19,7 @@ function loadUserData() {
 }
 
 function saveUserData(data) {
+    ensureDataDir();
     fs.writeFileSync(userDataPath, JSON.stringify(data, null, 4));
 }
 

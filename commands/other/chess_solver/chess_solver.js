@@ -1,93 +1,118 @@
 const { SlashCommandBuilder } = require("discord.js");
 const https = require("https");
-const fs = require("fs");
+const fs = require("fs").promises;
 const path = require("path");
 const util = require("util");
 const execAsync = util.promisify(require("child_process").exec);
 const client = require("../../../index.js");
 
+const dataDir = "./data";
+const imagePath = path.join(dataDir, "image.png");
+
+async function ensureDataDir() {
+    try {
+        await fs.access(dataDir);
+    } catch {
+        await fs.mkdir(dataDir, { recursive: true });
+    }
+}
+
 async function fetchImage(imageAttachment) {
     return new Promise((resolve, reject) => {
+        if (!imageAttachment || !imageAttachment.url) {
+            reject(new Error("Invalid image attachment"));
+            return;
+        }
+
         https
             .get(imageAttachment.url, (response) => {
                 if (response.statusCode !== 200) {
-                    return reject(new Error(`Failed to fetch image: ${response.statusMessage}`));
+                    reject(new Error(`Failed to fetch image: ${response.statusMessage}`));
+                    return;
                 }
 
                 const data = [];
                 response.on("data", (chunk) => data.push(chunk));
                 response.on("end", () => resolve(Buffer.concat(data)));
             })
-            .on("error", reject);
+            .on("error", (error) => reject(new Error(`Failed to fetch image: ${error.message}`)));
     });
 }
 
 async function executeChessSolver() {
     try {
-        const { stdout } = await execAsync("python ./commands/other/chess_solver/chess_solver.py");
-        if (!stdout) return [];
-
-        return stdout.trim().split("\r\n");
+        const { stdout, stderr } = await execAsync("python chess_solver.py");
+        if (stderr) {
+            throw new Error(`Chess solver error: ${stderr}`);
+        }
+        return stdout;
     } catch (error) {
-        console.error("Error executing chess solver:", error);
-        return [];
+        throw new Error(`Failed to execute chess solver: ${error.message}`);
     }
 }
 
 async function processImage(imageAttachment) {
     try {
         const image = await fetchImage(imageAttachment);
-        const imagePath = path.resolve("./data/image.png");
-
-        fs.writeFileSync(imagePath, image);
-
+        await ensureDataDir();
+        await fs.writeFile(imagePath, image);
         const result = await executeChessSolver();
         return { result, imagePath };
     } catch (error) {
         console.error("Error processing image:", error);
         throw error;
-    }
-}
-
-async function message_reply(imageAttachment) {
-    try {
-        const { result, imagePath } = await processImage(imageAttachment);
-
-        if (result.length === 0) {
-            return 0;
+    } finally {
+        try {
+            await fs.unlink(imagePath);
+        } catch (error) {
+            console.error("Error cleaning up image file:", error);
         }
-
-        const reply = `Best move for white: **${result[0]}**\nBest move for black: **${result[1]}**`;
-
-        return {
-            content: reply,
-            files: [imagePath],
-        };
-    } catch (error) {
-        return 0;
     }
 }
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("chess_solver")
-        .setDescription("Gives the best chess move based on an image using stockfish")
+        .setDescription("Solve a chess position from an image")
         .addAttachmentOption((option) =>
-            option.setName("image").setDescription("Attach a chess board image").setRequired(true)
+            option.setName("image").setDescription("The image containing the chess position").setRequired(true)
         ),
 
     async execute(interaction) {
-        await interaction.reply("This command is currently disabled.");
-        /*
-        await interaction.deferReply();
+        try {
+            const imageAttachment = interaction.options.getAttachment("image");
 
-        const imageAttachment = interaction.options.getAttachment("image");
+            if (!imageAttachment.contentType.startsWith("image/")) {
+                await interaction.reply({
+                    content: "Please provide a valid image file.",
+                    ephemeral: true,
+                });
+                return;
+            }
 
-        let reply = await message_reply(imageAttachment);
-        if (reply == 0) reply = "No valid chessboard detected.";
+            await interaction.deferReply();
 
-        await interaction.followUp(reply);
-        */
+            const { result } = await processImage(imageAttachment);
+
+            if (!result || result.trim() === "") {
+                await interaction.editReply({
+                    content: "No solution found for this position.",
+                    ephemeral: true,
+                });
+                return;
+            }
+
+            await interaction.editReply({
+                content: `Solution:\n\`\`\`\n${result}\n\`\`\``,
+            });
+        } catch (error) {
+            console.error("Error in chess_solver command:", error);
+            const errorMessage = interaction.deferred ? interaction.editReply : interaction.reply;
+            await errorMessage({
+                content: `An error occurred while processing your request: ${error.message}`,
+                ephemeral: true,
+            });
+        }
     },
 };
 

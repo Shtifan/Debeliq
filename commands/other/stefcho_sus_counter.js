@@ -6,6 +6,10 @@ const STEFCHO_ID = "568496102127566873";
 const COUNTER_FILE = "./data/stefcho_sus_counter.txt";
 const SUS_FILE = "./data/sus.txt";
 
+if (!fs.existsSync("./data")) {
+    fs.mkdirSync("./data", { recursive: true });
+}
+
 if (!fs.existsSync(COUNTER_FILE)) {
     fs.writeFileSync(COUNTER_FILE, "0", "utf8");
 }

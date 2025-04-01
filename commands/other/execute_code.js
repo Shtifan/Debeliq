@@ -1,6 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js");
 const fs = require("fs");
-const path = require("path");
 const util = require("util");
 const execAsync = util.promisify(require("child_process").exec);
 const client = require("../../index.js");
@@ -74,9 +73,9 @@ async function executeCode(code, language) {
     if (!fileExtension) return "Invalid language";
 
     const fileName = `temp.${fileExtension}`;
-    const filePath = path.resolve(fileName);
-    const executablePath = path.resolve("temp.exe");
-    const classFile = path.resolve("temp.class");
+    const filePath = fileName;
+    const executablePath = "temp.exe";
+    const classFile = "temp.class";
 
     fs.writeFileSync(filePath, code);
 
