@@ -90,8 +90,6 @@ async function loadEventFiles(dir, player) {
 
 async function initialize() {
     try {
-        console.log("Starting bot initialization...");
-
         const player = new Player(client);
         player.extractors.loadMulti(DefaultExtractors);
         player.extractors.register(YoutubeiExtractor, {});
