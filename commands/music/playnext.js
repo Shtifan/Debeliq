@@ -4,7 +4,7 @@ const { useMainPlayer } = require("discord-player");
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("playnext")
-        .setDescription("Add a song to the front of the queue")
+        .setDescription("Play a song next in the queue")
         .addStringOption((option) => option.setName("query").setDescription("Name or URL of the song").setRequired(true)),
 
     async execute(interaction) {
@@ -16,15 +16,29 @@ module.exports = {
         await interaction.deferReply();
 
         try {
-            const { track, queue } = await player.play(channel, query, {
-                nodeOptions: {
-                    metadata: interaction,
-                },
+            const searchResult = await player.search(query, {
+                requestedBy: interaction.user,
             });
 
-            queue.tracks.splice(0, 0, queue.tracks.pop());
+            if (!searchResult.hasTracks()) {
+                return interaction.followUp(`No tracks found for ${query}`);
+            }
 
-            return interaction.followUp(`**${track.title}** added to the front of the queue!`);
+            const track = searchResult.tracks[0];
+
+            const queue = player.nodes.get(interaction.guildId);
+
+            if (queue) {
+                queue.insertTrack(track, 0);
+                return interaction.followUp(`**${track.title}** added to the front of the queue!`);
+            } else {
+                await player.play(channel, track, {
+                    nodeOptions: {
+                        metadata: interaction,
+                    },
+                });
+                return interaction.followUp(`**${track.title}** is now playing!`);
+            }
         } catch (e) {
             return interaction.followUp(`Something went wrong: ${e}`);
         }
