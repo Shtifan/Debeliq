@@ -2,11 +2,17 @@ const { SlashCommandBuilder } = require("discord.js");
 const { useQueue } = require("discord-player");
 
 module.exports = {
-    data: new SlashCommandBuilder().setName("deepfry").setDescription("Toggles deepfry effect."),
+    data: new SlashCommandBuilder().setName("deepfry").setDescription("Toggles deepfry effect"),
 
     async execute(interaction) {
         const queue = useQueue(interaction.guild.id);
-        if (!queue || !queue.currentTrack) return interaction.reply("No song is playing!");
+        if (!queue || !queue.node.isPlaying()) {
+            await interaction.reply({
+                content: "There is no music currently playing.",
+                ephemeral: true,
+            });
+            return;
+        }
 
         const activeFilters = queue.filters.ffmpeg.filters;
         const isDeepfried = activeFilters.some((filter) => filter.includes("bass") || filter.includes("acrusher"));

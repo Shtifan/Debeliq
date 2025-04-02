@@ -25,14 +25,9 @@ module.exports = {
             return;
         }
 
-        const currentRepeatMode = queue.repeatMode;
+        const autoplay = queue.repeatMode === QueueRepeatMode.AUTOPLAY;
+        queue.setRepeatMode(autoplay ? QueueRepeatMode.OFF : QueueRepeatMode.AUTOPLAY);
 
-        if (currentRepeatMode === QueueRepeatMode.AUTOPLAY) {
-            queue.setRepeatMode(QueueRepeatMode.OFF);
-            await interaction.reply("Autoplay has been disabled.");
-        } else {
-            queue.setRepeatMode(QueueRepeatMode.AUTOPLAY);
-            await interaction.reply("Autoplay has been enabled.");
-        }
+        await interaction.reply(`Autoplay has been ${autoplay ? "disabled" : "enabled"}.`);
     },
 };
