@@ -1,10 +1,8 @@
 const { SlashCommandBuilder } = require("discord.js");
-const { useQueue, QueueRepeatMode } = require("discord-player");
+const { useQueue } = require("discord-player");
 
 module.exports = {
-    data: new SlashCommandBuilder()
-        .setName("autoplay")
-        .setDescription("Toggle autoplaying related songs based on your queue"),
+    data: new SlashCommandBuilder().setName("autoplay").setDescription("Toggle autoplay mode for related songs"),
 
     async execute(interaction) {
         const channel = interaction.member.voice.channel;
@@ -25,9 +23,12 @@ module.exports = {
             return;
         }
 
-        const autoplay = queue.repeatMode === QueueRepeatMode.AUTOPLAY;
-        queue.setRepeatMode(autoplay ? QueueRepeatMode.OFF : QueueRepeatMode.AUTOPLAY);
+        queue.setRepeatMode(queue.repeatMode === 3 ? 0 : 3);
 
-        await interaction.reply(`Autoplay has been ${autoplay ? "disabled" : "enabled"}.`);
+        await interaction.reply(
+            queue.repeatMode === 3
+                ? "Autoplay mode has been **enabled**. Related songs will be played automatically."
+                : "Autoplay mode has been **disabled**."
+        );
     },
 };
