@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js");
-const { useMainPlayer, QueryType } = require("discord-player");
+const { useMainPlayer } = require("discord-player");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -25,7 +25,12 @@ module.exports = {
                 },
             });
 
-            return interaction.followUp(`**${track.title}** enqueued!`);
+            const queue = player.nodes.get(interaction.guildId);
+            if (queue) {
+                queue.setRepeatMode(3);
+            }
+
+            return interaction.followUp(`**${track.title}** enqueued! Autoplay is enabled by default.`);
         } catch (e) {
             return interaction.followUp(`Something went wrong: ${e}`);
         }
