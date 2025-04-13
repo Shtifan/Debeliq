@@ -75,10 +75,16 @@ module.exports = {
         .setName("chess_solver")
         .setDescription("Solve a chess position from an image")
         .addAttachmentOption((option) =>
-            option.setName("image").setDescription("The image containing the chess position").setRequired(true)
+            option.setName("image").setDescription("The image of the chessboard").setRequired(true)
         ),
 
     async execute(interaction) {
+        await interaction.reply({
+            content: "This command is currently not working.",
+            ephemeral: true,
+        });
+
+        /*
         try {
             const imageAttachment = interaction.options.getAttachment("image");
 
@@ -113,6 +119,7 @@ module.exports = {
                 ephemeral: true,
             });
         }
+        */
     },
 };
 

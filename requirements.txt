@@ -1,4 +1,6 @@
+selenium==4.15.2
+webdriver-manager==4.0.1
 stockfish==3.28.0
-opencv-python==4.8.0.76
+opencv-python==4.8.1.78
 numpy==1.24.3
-board-to-fen==0.1.0 
+Pillow==10.0.0 
