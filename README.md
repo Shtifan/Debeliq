@@ -1,16 +1,10 @@
 # Debeliq Discord Bot
 
-A Discord bot built with Discord.js and Discord Player for music playback and other features.
-
-## Features
-
-- Music
-- Games
-- Moderation
+Debeliq is a discord bot that can play music, games and moderate your server.
 
 ## Prerequisites
 
--   Node.js (v16 or higher)
+-   Node.js
 -   Python 3.8–3.11 (required for chess solver functionality)
 -   FFmpeg (required for music playback)
 -   Docker (required for execute command functionality)
@@ -84,19 +78,3 @@ Run the container:
 ```bash
 docker run -d debeliq
 ```
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the ISC License.
-
-## Support
-
-For support, please open an issue in the GitHub repository or contact the maintainers.
