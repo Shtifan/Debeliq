@@ -1,0 +1,4 @@
+stockfish==3.28.0
+opencv-python==4.8.0.76
+numpy==1.24.3
+board-to-fen==0.1.0 
