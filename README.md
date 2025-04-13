@@ -4,17 +4,17 @@ A Discord bot built with Discord.js and Discord Player for music playback and ot
 
 ## Features
 
--   Music playback capabilities
--   Command-based interaction system
--   Event handling system
--   Docker support for easy deployment
+- Music
+- Games
+- Moderation
 
 ## Prerequisites
 
 -   Node.js (v16 or higher)
--   Python (for additional features)
+-   Python 3.8–3.11 (required for chess solver functionality)
+-   FFmpeg (required for music playback)
+-   Docker (required for execute command functionality)
 -   Discord Bot Token
--   npm or yarn package manager
 
 ## Installation
 
@@ -40,8 +40,8 @@ npm run install:all
 
 3. Configure the bot:
 
--   Copy `config.json.example` to `config.json` (if available)
--   Add your Discord bot token to the configuration
+-   Copy `config.json.example` to `config.json`
+-   Add your Discord bot token and client id to the configuration
 
 ## Usage
 
@@ -84,22 +84,6 @@ Run the container:
 ```bash
 docker run -d debeliq
 ```
-
-## Project Structure
-
--   `commands/` - Bot command implementations
--   `events/` - Discord event handlers
--   `data/` - Data storage and management
--   `index.js` - Main bot entry point
--   `config.json` - Bot configuration
--   `Dockerfile` - Docker container configuration
-
-## Dependencies
-
--   discord.js - Discord API wrapper
--   discord-player - Music playback functionality
--   bgutils-js - Utility functions
--   nodemon - Development auto-reload
 
 ## Contributing
 
