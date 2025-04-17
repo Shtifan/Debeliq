@@ -15,7 +15,7 @@ Debeliq is a discord bot that can play music, games and moderate your server.
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/debeliq.git
+git clone https://github.com/Shtifan/debeliq.git
 cd debeliq
 ```
 
