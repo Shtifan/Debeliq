@@ -2,7 +2,6 @@ const { SlashCommandBuilder } = require("discord.js");
 const fs = require("fs");
 const util = require("util");
 const execAsync = util.promisify(require("child_process").exec);
-const client = require("../../index.js");
 
 function isDocker() {
     if (fs.existsSync("/.dockerenv")) return true;
@@ -142,18 +141,3 @@ module.exports = {
         await interaction.followUp(result);
     },
 };
-
-client.on("messageCreate", async (message) => {
-    if (message.author.bot) return;
-
-    const match = message.content.match(/(\w{2,})\s*```([\s\S]+)```/);
-    if (!match) return;
-
-    const language = match[1].toLowerCase();
-    const code = match[2];
-
-    if (!["js", "py", "cpp", "c", "rs", "java"].includes(language)) return;
-
-    const result = await executeCode(code, language);
-    await message.reply(result);
-});
