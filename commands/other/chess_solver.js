@@ -7,7 +7,6 @@ const execAsync = util.promisify(require("child_process").exec);
 const client = require("../../index.js");
 
 const dataDir = "./data";
-const imagePath = path.join(dataDir, "chessboard.png");
 const solverDir = path.join(__dirname, "chess_solver");
 const pythonScript = path.join(solverDir, "chess_solve.py");
 
@@ -75,8 +74,9 @@ async function processImage(imageAttachment, invertFen = false) {
         const image = await fetchImage(imageAttachment);
         await ensureDataDir();
 
-        const absoluteImagePath = path.resolve(imagePath);
-        const outputImageName = invertFen ? "solved_chess_inverted.png" : "solved_chess.png";
+        const inputImageName = "chessboard.png";
+        const inputImagePath = path.join(solverDir, inputImageName);
+        const outputImageName = invertFen ? "solved_chessboard_inverted.png" : "solved_chessboard.png";
         const outputImagePath = path.join(solverDir, outputImageName);
 
         const configPath = path.join(solverDir, "config.py");
@@ -85,13 +85,13 @@ async function processImage(imageAttachment, invertFen = false) {
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 MODEL_PATH = os.path.join(ROOT_DIR, "saved_models")
 STOCKFISH_PATH = "stockfish"
-IMAGE_PATH = r"${absoluteImagePath}"
+IMAGE_PATH = r"${inputImageName}"
 OUTPUT_PATH = r"${outputImageName}"
 INVERT_COLORS = ${invertFen ? "True" : "False"}
 `;
         await fs.writeFile(configPath, configContent);
 
-        await fs.writeFile(imagePath, image);
+        await fs.writeFile(inputImagePath, image);
 
         const { stdout, outputPath, fen } = await executeChessSolver();
 
@@ -103,6 +103,12 @@ INVERT_COLORS = ${invertFen ? "True" : "False"}
 
         const resultImage = await fs.readFile(outputPath);
 
+        try {
+            await fs.unlink(inputImagePath).catch((err) => console.error("Error cleaning up input image:", err));
+        } catch (error) {
+            console.error("Error cleaning up image file:", error);
+        }
+
         return {
             result: stdout,
             outputPath,
@@ -112,12 +118,6 @@ INVERT_COLORS = ${invertFen ? "True" : "False"}
     } catch (error) {
         console.error("Error processing image:", error);
         throw error;
-    } finally {
-        try {
-            await fs.unlink(imagePath).catch((err) => console.error("Error cleaning up input image:", err));
-        } catch (error) {
-            console.error("Error cleaning up image file:", error);
-        }
     }
 }
 
@@ -198,7 +198,7 @@ module.exports = {
             try {
                 const { result, resultImage, fen } = await processImage(imageAttachment, invertFen);
 
-                const attachment = new AttachmentBuilder(resultImage, { name: "solved_chess.png" });
+                const attachment = new AttachmentBuilder(resultImage, { name: "solved_chessboard.png" });
 
                 const fenMatch = result.match(/Predicted FEN: (.+)/);
                 const whiteMoveMatch = result.match(/Best move for White: (.+)/);
@@ -252,7 +252,7 @@ client.on("messageCreate", async (message) => {
         // Process image with white on bottom (normal)
         const whiteBottomProcessed = await processImage(imageAttachment, false);
         const whiteBottomAttachment = new AttachmentBuilder(whiteBottomProcessed.resultImage, {
-            name: "white_bottom_chess.png",
+            name: "white_bottom_chessboard.png",
         });
 
         const fenMatchWhite = whiteBottomProcessed.result.match(/Predicted FEN: (.+)/);
@@ -266,7 +266,7 @@ client.on("messageCreate", async (message) => {
         // Process image with black on bottom (inverted)
         const blackBottomProcessed = await processImage(imageAttachment, true);
         const blackBottomAttachment = new AttachmentBuilder(blackBottomProcessed.resultImage, {
-            name: "black_bottom_chess.png",
+            name: "black_bottom_chessboard.png",
         });
 
         const fenMatchBlack = blackBottomProcessed.result.match(/Predicted FEN: (.+)/);

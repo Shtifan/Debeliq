@@ -31,12 +31,13 @@ try:
         parts = fen.split(' ')
         boardPart = parts[0]
         
-        # Split the board part by ranks, reverse each rank and swap case of pieces
+        # Split the board part by ranks
         ranks = boardPart.split('/')
         invertedRanks = []
         for rank in ranks:
             invRank = ''
-            for char in reversed(rank):
+            # Process each character but DON'T reverse the rank
+            for char in rank:
                 if char.isdigit():
                     invRank += char
                 elif char.isupper():
@@ -45,7 +46,7 @@ try:
                     invRank += char.upper()
             invertedRanks.append(invRank)
         
-        # Reverse the order of ranks and join them
+        # Reverse the order of ranks (flip board vertically) and join them
         invertedBoardPart = '/'.join(invertedRanks[::-1])
         
         # Handle turn (w/b) inversion
