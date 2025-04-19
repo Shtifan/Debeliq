@@ -1,7 +1,13 @@
 node_modules
-
 package-lock.json
-
 config.json
-
-data
+data/
+__pycache__/
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.tiff
+*.svg
+stockfish.exe
