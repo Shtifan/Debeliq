@@ -4,7 +4,7 @@ const { useQueue } = require("discord-player");
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("queue")
-        .setDescription("Show songs in the queue")
+        .setDescription("Show songs in the queue and current track")
         .addStringOption((option) =>
             option
                 .setName("view")

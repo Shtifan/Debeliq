@@ -1,80 +1,67 @@
-const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+const { SlashCommandBuilder } = require("discord.js");
 const { useQueue } = require("discord-player");
-
-function timeToMs(hours, minutes, seconds) {
-    const h = parseInt(hours, 10) || 0;
-    const m = parseInt(minutes, 10) || 0;
-    const s = parseInt(seconds, 10) || 0;
-
-    if (isNaN(h) || isNaN(m) || isNaN(s)) return null;
-
-    return h * 60 * 60 * 1000 + m * 60 * 1000 + s * 1000;
-}
-
-function formatDuration(ms) {
-    const totalSeconds = Math.floor(ms / 1000);
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const seconds = totalSeconds % 60;
-
-    return hours > 0
-        ? `${hours}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
-        : `${minutes}:${seconds.toString().padStart(2, "0")}`;
-}
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("seek")
-        .setDescription("Seek the player to a specific timestamp")
-        .addIntegerOption((option) => option.setName("hours").setDescription("Hours to seek to"))
-        .addIntegerOption((option) => option.setName("minutes").setDescription("Minutes to seek to"))
-        .addIntegerOption((option) => option.setName("seconds").setDescription("Seconds to seek to")),
+        .setDescription("Seek to a specific timestamp in the current song.")
+        .addStringOption((option) =>
+            option
+                .setName("timestamp")
+                .setDescription("The timestamp to seek to (e.g. 1:23 or 83)")
+                .setRequired(true)
+        ),
 
     async execute(interaction) {
         const queue = useQueue(interaction.guild.id);
-        const hours = interaction.options.getInteger("hours") || 0;
-        const minutes = interaction.options.getInteger("minutes") || 0;
-        const seconds = interaction.options.getInteger("seconds") || 0;
-
-        const timestamp = timeToMs(hours, minutes, seconds);
-
-        if (!queue || !queue.currentTrack) {
+        if (!queue || !queue.node.isPlaying()) {
             await interaction.reply({
-                content: "No song is currently playing.",
+                content: "There is no music currently playing.",
                 ephemeral: true,
             });
             return;
         }
 
-        if (timestamp === null || timestamp > queue.currentTrack.durationMS) {
+        const timestampInput = interaction.options.getString("timestamp");
+        let seconds = 0;
+        const match = timestampInput.match(/^(?:(\d+):(\d{1,2}))$|^(\d+)$/);
+        if (!match) {
             await interaction.reply({
-                content: `Provide a valid timestamp within 00:00 and ${formatDuration(queue.currentTrack.durationMS)}.`,
+                content: "Invalid timestamp format. Use mm:ss or seconds (e.g. 1:23 or 83).",
+                ephemeral: true,
+            });
+            return;
+        }
+        if (match[1] && match[2]) {
+            seconds = parseInt(match[1], 10) * 60 + parseInt(match[2], 10);
+        } else if (match[3]) {
+            seconds = parseInt(match[3], 10);
+        }
+
+        const currentTrack = queue.currentTrack;
+        if (!currentTrack || typeof currentTrack.durationMS !== "number") {
+            await interaction.reply({
+                content: "Could not determine the current track duration.",
+                ephemeral: true,
+            });
+            return;
+        }
+        if (seconds < 0 || seconds * 1000 > currentTrack.durationMS) {
+            await interaction.reply({
+                content: `Timestamp out of range. The current track is ${(currentTrack.durationMS / 1000).toFixed(0)} seconds long.`,
                 ephemeral: true,
             });
             return;
         }
 
-        queue.node.seek(timestamp);
-
-        await interaction.reply({
-            content: `Seeking to ${formatDuration(timestamp)}...`,
-            ephemeral: true,
-        });
-
-        setTimeout(async () => {
-            const progressBar = queue.node.createProgressBar();
-
-            const embed = new EmbedBuilder()
-                .setAuthor({ name: "Now Playing:" })
-                .setTitle(queue.currentTrack.title)
-                .setURL(queue.currentTrack.url)
-                .setDescription(progressBar + `\n\nSeeked to ${formatDuration(timestamp)}.`);
-
-            if (queue.currentTrack.thumbnail && queue.currentTrack.thumbnail.trim() !== "") {
-                embed.setThumbnail(queue.currentTrack.thumbnail);
-            }
-
-            await interaction.editReply({ content: "", embeds: [embed] });
-        }, 1000);
+        try {
+            await queue.node.seek(seconds * 1000);
+            await interaction.reply(`Seeked to ${new Date(seconds * 1000).toISOString().substr(14, 5)} in **${currentTrack.title}**.`);
+        } catch (err) {
+            await interaction.reply({
+                content: `Failed to seek: ${err}`,
+                ephemeral: true,
+            });
+        }
     },
 };

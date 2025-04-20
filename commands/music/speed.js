@@ -1,29 +1,20 @@
-const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+const { SlashCommandBuilder } = require("discord.js");
 const { useQueue } = require("discord-player");
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("speed")
-        .setDescription("Speed up or slow down the currently playing song")
-        .addNumberOption((option) =>
+        .setDescription("Change the playback speed of the current song.")
+        .addNumberOption(option =>
             option
-                .setName("multiplier")
-                .setDescription("The speed multiplier (e.g., 1.5 for 1.5x speed)")
-                .setRequired(true)
+                .setName("factor")
+                .setDescription("Speed factor (e.g., 1.5 for 1.5x speed)")
                 .setMinValue(0.5)
-                .setMaxValue(2.0)
+                .setMaxValue(3.0)
+                .setRequired(true)
         ),
 
     async execute(interaction) {
-        const channel = interaction.member.voice.channel;
-        if (!channel) {
-            await interaction.reply({
-                content: "You are not connected to a voice channel.",
-                ephemeral: true,
-            });
-            return;
-        }
-
         const queue = useQueue(interaction.guild.id);
         if (!queue || !queue.node.isPlaying()) {
             await interaction.reply({
@@ -33,14 +24,23 @@ module.exports = {
             return;
         }
 
-        const speedMultiplier = interaction.options.getNumber("multiplier");
+        const speed = interaction.options.getNumber("factor");
+        if (speed < 0.5 || speed > 3.0) {
+            await interaction.reply({
+                content: "Speed factor must be between 0.5 and 3.0.",
+                ephemeral: true,
+            });
+            return;
+        }
 
-        queue.filters.ffmpeg.setFilters(["atempo=" + speedMultiplier]);
-
-        const embed = new EmbedBuilder()
-            .setTitle("Playback Speed Changed")
-            .setDescription(`The playback speed has been set to **${speedMultiplier}x**.`)
-
-        await interaction.reply({ embeds: [embed] });
+        try {
+            await queue.filters.ffmpeg.setFilters({ atempo: speed.toString() });
+            await interaction.reply(`Playback speed set to ${speed}x.`);
+        } catch (err) {
+            await interaction.reply({
+                content: `Failed to change speed: ${err}`,
+                ephemeral: true,
+            });
+        }
     },
 };
