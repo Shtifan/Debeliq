@@ -1,20 +1,16 @@
-# Use an official Node.js runtime as a parent image
-FROM node:20
+FROM node:20-bullseye
 
-# Set the working directory to /app
-WORKDIR /app
+RUN apt-get update && \
+    apt-get install -y python3 python3-pip && \
+    rm -rf /var/lib/apt/lists/*
 
-# Copy package.json and package-lock.json to the working directory
+WORKDIR /usr/src/app
+
 COPY package*.json ./
-
-# Install any needed packages specified in package.json
 RUN npm install
 
-# Copy the rest of the application code to the working directory
 COPY . .
 
-# Specify the command to run on container start
-CMD ["node", "./index.js"]
+RUN pip3 install --no-cache-dir -r ./commands/other/chess_solver/requirements.txt
 
-# docker build -t debeliq .
-# docker run debeliq
+CMD ["npm", "start"]
