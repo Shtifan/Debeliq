@@ -1,110 +1,74 @@
-const { SlashCommandBuilder } = require("discord.js");
-
-function convertToMs(days, hours, minutes, seconds) {
-    return days * 24 * 60 * 60 * 1000 + hours * 60 * 60 * 1000 + minutes * 60 * 1000 + seconds * 1000;
-}
-
-function formatDuration(days, hours, minutes, seconds) {
-    const parts = [];
-    if (days > 0) parts.push(`${days}d`);
-    if (hours > 0) parts.push(`${hours}h`);
-    if (minutes > 0) parts.push(`${minutes}m`);
-    if (seconds > 0) parts.push(`${seconds}s`);
-    return parts.join(" ");
-}
+const { SlashCommandBuilder, PermissionFlagsBits } = require("discord.js");
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName("timeout")
-        .setDescription("Timeout a user")
-        .addUserOption((option) => option.setName("user").setDescription("The user to timeout").setRequired(true))
-        .addIntegerOption((option) => option.setName("days").setDescription("Number of days").setMinValue(0).setMaxValue(28))
-        .addIntegerOption((option) =>
-            option.setName("hours").setDescription("Number of hours").setMinValue(0).setMaxValue(24)
+        .setDescription("Timeout a member for a specified duration.")
+        .addUserOption(option =>
+            option
+                .setName("target")
+                .setDescription("The member to timeout.")
+                .setRequired(true)
         )
-        .addIntegerOption((option) =>
-            option.setName("minutes").setDescription("Number of minutes").setMinValue(0).setMaxValue(60)
+        .addStringOption(option =>
+            option
+                .setName("duration")
+                .setDescription("Timeout duration (e.g. 1m, 10m, 1h, 1d)")
+                .setRequired(true)
         )
-        .addIntegerOption((option) =>
-            option.setName("seconds").setDescription("Number of seconds").setMinValue(0).setMaxValue(60)
+        .addStringOption(option =>
+            option
+                .setName("reason")
+                .setDescription("Reason for timeout.")
+                .setRequired(false)
         )
-        .addStringOption((option) => option.setName("reason").setDescription("Reason for the timeout").setMaxLength(1000)),
+        .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers),
 
     async execute(interaction) {
-        try {
-            if (!interaction.member.permissions.has("ModerateMembers")) {
-                await interaction.reply({
-                    content: "You don't have permission to timeout members.",
-                    ephemeral: true,
-                });
-                return;
-            }
+        const member = interaction.options.getMember("target");
+        const durationStr = interaction.options.getString("duration");
+        const reason = interaction.options.getString("reason") || "No reason provided.";
 
-            const targetUser = interaction.options.getMember("user");
-            if (!targetUser) {
-                await interaction.reply({
-                    content: "That user doesn't exist in this server.",
-                    ephemeral: true,
-                });
-                return;
-            }
-
-            if (!targetUser.moderatable) {
-                await interaction.reply({
-                    content: "I cannot timeout this user. They may have a higher role than me or be the server owner.",
-                    ephemeral: true,
-                });
-                return;
-            }
-
-            const days = interaction.options.getInteger("days") || 0;
-            const hours = interaction.options.getInteger("hours") || 0;
-            const minutes = interaction.options.getInteger("minutes") || 0;
-            const seconds = interaction.options.getInteger("seconds") || 0;
-
-            const msDuration = convertToMs(days, hours, minutes, seconds);
-
-            if (!msDuration) {
-                await interaction.reply({
-                    content:
-                        "Please provide a valid duration using at least one of the options: days, hours, minutes, or seconds.",
-                    ephemeral: true,
-                });
-                return;
-            }
-
-            if (msDuration > 28 * 24 * 60 * 60 * 1000) {
-                await interaction.reply({
-                    content: "Timeout duration cannot exceed 28 days.",
-                    ephemeral: true,
-                });
-                return;
-            }
-
-            let reason = interaction.options.getString("reason");
-            if (!reason) reason = "No reason provided";
-
-            reason = `${reason} (Timeout by ${interaction.user.tag})`;
-
-            try {
-                await targetUser.timeout(msDuration, reason);
-                const formattedDuration = formatDuration(days, hours, minutes, seconds);
-
-                await interaction.reply({
-                    content: `${targetUser} has been timed out for ${formattedDuration}.\nReason: ${reason}`,
-                    ephemeral: true,
-                });
-            } catch (error) {
-                console.error("Error applying timeout:", error);
-                await interaction.reply({
-                    content: `Failed to timeout ${targetUser}. Please check my permissions and try again.`,
-                    ephemeral: true,
-                });
-            }
-        } catch (error) {
-            console.error("Error in timeout command:", error);
+        const regex = /^(\d+)([smhd])$/i;
+        const match = durationStr.match(regex);
+        if (!match) {
             await interaction.reply({
-                content: "An error occurred while processing your request. Please try again later.",
+                content: "Invalid duration format. Use s, m, h, or d (e.g. 10m, 1h, 1d).",
+                ephemeral: true,
+            });
+            return;
+        }
+        const value = parseInt(match[1], 10);
+        const unit = match[2].toLowerCase();
+        let ms = 0;
+        switch (unit) {
+            case 's': ms = value * 1000; break;
+            case 'm': ms = value * 60 * 1000; break;
+            case 'h': ms = value * 60 * 60 * 1000; break;
+            case 'd': ms = value * 24 * 60 * 60 * 1000; break;
+            default:
+                await interaction.reply({
+                    content: "Invalid duration unit. Use s, m, h, or d.",
+                    ephemeral: true,
+                });
+                return;
+        }
+        if (!member.moderatable || member.user.bot) {
+            await interaction.reply({
+                content: "I cannot timeout this member.",
+                ephemeral: true,
+            });
+            return;
+        }
+        try {
+            await member.timeout(ms, reason);
+            await interaction.reply({
+                content: `⏳ ${member.user.tag} has been timed out for ${durationStr}. Reason: ${reason}`,
+                ephemeral: false,
+            });
+        } catch (error) {
+            await interaction.reply({
+                content: `Failed to timeout member: ${error}`,
                 ephemeral: true,
             });
         }
