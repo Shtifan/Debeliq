@@ -11,6 +11,6 @@ RUN npm install
 
 COPY . .
 
-RUN pip3 install --no-cache-dir -r ./commands/other/chess_solver/requirements.txt
+RUN pip3 install --no-cache-dir -r ./requirements.txt
 
 CMD ["npm", "start"]
