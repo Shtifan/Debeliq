@@ -136,22 +136,22 @@ module.exports = {
             let resultMessage;
             switch (correctGuesses) {
                 case 6:
-                    resultMessage = `🎉 Congratulations! You've won the jackpot of **${formattedPrize}**!`;
+                    resultMessage = `Congratulations! You've won the jackpot of **${formattedPrize}**!`;
                     break;
                 case 5:
-                    resultMessage = `🎉 Congratulations! You've won **${formattedPrize}**!`;
+                    resultMessage = `Congratulations! You've won **${formattedPrize}**!`;
                     break;
                 case 4:
-                    resultMessage = `🎉 Congratulations! You've won **${formattedPrize}**!`;
+                    resultMessage = `Congratulations! You've won **${formattedPrize}**!`;
                     break;
                 case 3:
-                    resultMessage = `🎉 Congratulations! You've won **${formattedPrize}**!`;
+                    resultMessage = `Congratulations! You've won **${formattedPrize}**!`;
                     break;
                 case 2:
-                    resultMessage = `🎉 Congratulations! You've won **${formattedPrize}**!`;
+                    resultMessage = `Congratulations! You've won **${formattedPrize}**!`;
                     break;
                 case 1:
-                    resultMessage = `🎉 Congratulations! You've won **${formattedPrize}**!`;
+                    resultMessage = `Congratulations! You've won **${formattedPrize}**!`;
                     break;
                 default:
                     resultMessage = `Sorry, you didn't win anything this time.`;
