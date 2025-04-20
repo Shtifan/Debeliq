@@ -335,17 +335,17 @@ async function updateUI(interaction, grid, bet, totalWin, balance, winningCombos
 
 const standardSymbols = [
     { symbol: "7️⃣", value: 100, name: "Seven" },
-    { symbol: "💎", value: 75, name: "Diamond" },
-    { symbol: "🔔", value: 50, name: "Bell" },
-    { symbol: "🍇", value: 30, name: "Grapes" },
-    { symbol: "🍊", value: 25, name: "Orange" },
-    { symbol: "🍋", value: 20, name: "Lemon" },
-    { symbol: "🍒", value: 15, name: "Cherry" },
+    { symbol: "", value: 75, name: "Diamond" },
+    { symbol: "", value: 50, name: "Bell" },
+    { symbol: "", value: 30, name: "Grapes" },
+    { symbol: "", value: 25, name: "Orange" },
+    { symbol: "", value: 20, name: "Lemon" },
+    { symbol: "", value: 15, name: "Cherry" },
 ];
 
 const specialSymbols = {
     wild: { symbol: "⭐", value: 500, name: "Wild" },
-    scatter: { symbol: "🎰", value: 200, name: "Scatter" },
+    scatter: { symbol: "", value: 200, name: "Scatter" },
 };
 
 const autoSpinStates = new Map();

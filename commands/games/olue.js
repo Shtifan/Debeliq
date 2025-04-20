@@ -64,36 +64,42 @@ function generateSpecialNumbers() {
 
 function createGameGrid(score = 0, specialNumbers = null, selectedCells = new Set()) {
     const currentSpecialNumbers = specialNumbers || generateSpecialNumbers();
+    const totalColumns = 10;
+    const maxColumnsPerRow = 5;
+    const useCompact = true;
 
+    let gridChunks = [];
+    for (let startCol = 0; startCol < totalColumns; startCol += maxColumnsPerRow) {
+        const endCol = Math.min(startCol + maxColumnsPerRow, totalColumns);
+        let chunk = `  _____  `.repeat(endCol - startCol) + "\n";
+        for (let row = 0; row < 3; row++) {
+            chunk += Array.from({ length: endCol - startCol }, (_, colIndex) => {
+                const col = startCol + colIndex + 1;
+                if (selectedCells.has(col)) return " |XXXXX| ";
+                if (currentSpecialNumbers.includes(col)) return " |OOOOO| ";
+                return " |     | ";
+            }).join("") + "\n";
+        }
+        chunk += `  ‾‾‾‾‾  `.repeat(endCol - startCol) + "\n";
+        chunk += Array.from({ length: endCol - startCol }, (_, i) => `    ${startCol + i + 1}    `).join("") + "\n";
+        gridChunks.push(chunk);
+    }
     const gridOutput = [
         `Score: ${score}`,
-        `${"  _____  ".repeat(10)}`,
-        `${Array.from({ length: 3 }, () =>
-            Array.from({ length: 10 }, (_, colIndex) =>
-                selectedCells.has(colIndex + 1)
-                    ? " |XXXXX| "
-                    : currentSpecialNumbers.includes(colIndex + 1)
-                    ? " |OOOOO| "
-                    : " |     | "
-            ).join("")
-        ).join("\n")}`,
-        `${"  ‾‾‾‾‾  ".repeat(10)}`,
-        `${Array.from({ length: 10 }, (_, i) => `    ${i + 1}    `).join("")}`,
+        ...gridChunks
     ].join("\n");
 
-    const numberButtons = Array.from({ length: 10 }, (_, index) =>
+    const numberButtons = Array.from({ length: totalColumns }, (_, index) =>
         new ButtonBuilder()
             .setCustomId(`number_${index + 1}`)
             .setLabel(`${index + 1}`)
             .setStyle(ButtonStyle.Primary)
             .setDisabled(selectedCells.has(index + 1))
     );
-
     const buttonRows = [
         new ActionRowBuilder().addComponents(...numberButtons.slice(0, 5)),
         new ActionRowBuilder().addComponents(...numberButtons.slice(5)),
     ];
-
     return {
         content: "```" + gridOutput + "```",
         components: buttonRows,
