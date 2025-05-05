@@ -25,12 +25,7 @@ module.exports = {
                 },
             });
 
-            const queue = player.nodes.get(interaction.guildId);
-            if (queue) {
-                queue.setRepeatMode(3);
-            }
-
-            return interaction.followUp(`**${track.title}** enqueued! Autoplay is enabled by default.`);
+            return interaction.followUp(`**${track.title}** enqueued!`);
         } catch (e) {
             return interaction.followUp(`Something went wrong: ${e}`);
         }
