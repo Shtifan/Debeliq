@@ -26,12 +26,6 @@ npm install
 pip install -r requirements.txt
 ```
 
-Or use the provided script:
-
-```bash
-npm run install:all
-```
-
 3. Configure the bot:
 
 -   Copy `config.json.example` to `config.json`
@@ -43,12 +37,6 @@ npm run install:all
 
 ```bash
 npm start
-```
-
-For development with auto-reload:
-
-```bash
-npm run dev
 ```
 
 ### Updating Dependencies
