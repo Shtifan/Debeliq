@@ -5,23 +5,17 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js",
-    "update": "npm update && npm audit fix",
-    "update:force": "npm update --force && npm audit fix --force",
-    "install:all": "npm install && pip install -r requirements.txt"
+    "update": "npm update",
+    "update:force": "npm update --force"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@discord-player/extractor": "^7.0.0",
-    "axios": "^1.8.4",
     "bgutils-js": "^3.2.0",
     "discord-player": "^7.0.0",
     "discord-player-youtubei": "^1.4.2",
     "discord.js": "^14.17.3"
-  },
-  "devDependencies": {
-    "nodemon": "^3.0.2"
   }
 }
