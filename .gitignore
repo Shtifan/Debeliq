@@ -1,8 +1,32 @@
-node_modules
+# Dependencies
+node_modules/
 package-lock.json
-config.json
-data/
 __pycache__/
+*.py[cod]
+*$py.class
+
+# Environment variables and config
+.env
+config.json
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+data/
+*.sqlite
+*.db
+
+# Binary files
+stockfish.exe
+
+# Images (unless needed for the project)
 *.jpg
 *.jpeg
 *.png
@@ -10,4 +34,14 @@ __pycache__/
 *.bmp
 *.tiff
 *.svg
-stockfish.exe
+
+# VS Code settings
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Operating System
+.DS_Store
+Thumbs.db

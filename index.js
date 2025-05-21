@@ -2,8 +2,11 @@ const { Client, GatewayIntentBits, Collection, REST, Routes } = require("discord
 const { Player } = require("discord-player");
 const { DefaultExtractors } = require("@discord-player/extractor");
 const { YoutubeiExtractor } = require("discord-player-youtubei");
-const fs = require("fs").promises;
-const { token, clientId } = require("./config.json");
+const fs = require("node:fs");
+const path = require("node:path");
+
+require("dotenv").config();
+const { TOKEN, CLIENT_ID } = process.env;
 
 const client = new Client({
     intents: [
@@ -15,97 +18,83 @@ const client = new Client({
     ],
 });
 
-module.exports = client;
-
 client.commands = new Collection();
-const commands = [];
+client.activeGames = new Collection();
 
-async function loadCommandFiles(dir) {
-    try {
-        const files = await fs.readdir(dir);
+const commandsToRegister = [];
+const commandsPath = path.join(__dirname, "commands");
 
-        for (const file of files) {
-            const filePath = `${dir}/${file}`;
-            const stat = await fs.stat(filePath);
-
-            if (stat.isDirectory()) {
-                await loadCommandFiles(filePath);
-            } else if (file.endsWith(".js")) {
-                try {
-                    const command = require(filePath);
-                    if (!command.data || !command.execute) {
-                        console.warn(`[WARNING] Command at ${filePath} is missing required properties`);
-                        continue;
-                    }
+function loadCommands(directory) {
+    const commandFiles = fs.readdirSync(directory, { withFileTypes: true });
+    for (const file of commandFiles) {
+        const filePath = path.join(directory, file.name);
+        if (file.isDirectory()) {
+            loadCommands(filePath);
+        } else if (file.name.endsWith(".js")) {
+            try {
+                const command = require(filePath);
+                if ("data" in command && "execute" in command) {
                     client.commands.set(command.data.name, command);
-                    commands.push(command.data.toJSON());
-                } catch (error) {
-                    console.error(`[ERROR] Failed to load command at ${filePath}:`, error);
+                    commandsToRegister.push(command.data.toJSON());
+                    console.log(`[INFO] Loaded command: ${command.data.name} from ${file.name}`);
+                } else {
+                    console.warn(`[WARNING] The command at ${filePath} is missing "data" or "execute".`);
                 }
+            } catch (error) {
+                console.error(`[ERROR] Could not load command at ${filePath}:`, error);
             }
         }
-    } catch (error) {
-        console.error(`[ERROR] Failed to read directory ${dir}:`, error);
     }
 }
+loadCommands(commandsPath);
+console.log(`[INFO] Successfully loaded ${client.commands.size} command(s).`);
 
-async function loadEventFiles(dir, player) {
-    try {
-        const files = await fs.readdir(dir);
+const player = new Player(client);
+player.extractors.loadMulti(DefaultExtractors);
+player.extractors.register(YoutubeiExtractor, {});
+console.log("[INFO] Player initialized.");
 
-        for (const file of files) {
-            const filePath = `${dir}/${file}`;
-            const stat = await fs.stat(filePath);
+const eventsPath = path.join(__dirname, "events");
 
-            if (stat.isDirectory()) {
-                await loadEventFiles(filePath, player);
-            } else if (file.endsWith(".js")) {
-                try {
-                    const event = require(filePath);
-                    if (!event.name || !event.execute) {
-                        console.warn(`[WARNING] Event at ${filePath} is missing required properties`);
-                        continue;
-                    }
-
-                    if (event.type === "player") {
-                        if (!player) {
-                            console.warn(`[WARNING] Player events skipped - player not initialized`);
-                            continue;
-                        }
-                        player.events.on(event.name, (...args) => event.execute(...args));
-                    } else if (event.once) {
-                        client.once(event.name, (...args) => event.execute(...args));
-                    } else {
-                        client.on(event.name, (...args) => event.execute(...args));
-                    }
-                } catch (error) {
-                    console.error(`[ERROR] Failed to load event at ${filePath}:`, error);
+function loadEvents(directory) {
+    const eventFiles = fs.readdirSync(directory, { withFileTypes: true });
+    for (const file of eventFiles) {
+        const filePath = path.join(directory, file.name);
+        if (file.isDirectory()) {
+            loadEvents(filePath);
+        } else if (file.name.endsWith(".js")) {
+            try {
+                const event = require(filePath);
+                if (event.type === "player") {
+                    player.events.on(event.name, (...args) => event.execute(...args));
                 }
+                if (event.once) {
+                    client.once(event.name, (...args) => event.execute(...args, client));
+                } else {
+                    client.on(event.name, (...args) => event.execute(...args, client));
+                }
+                console.log(`[INFO] Loaded event: ${event.name} from ${file.name}`);
+            } catch (error) {
+                console.error(`[ERROR] Could not load event at ${filePath}:`, error);
             }
         }
-    } catch (error) {
-        console.error(`[ERROR] Failed to read directory ${dir}:`, error);
     }
 }
+loadEvents(eventsPath);
+console.log(`[INFO] Successfully loaded event handlers.`);
 
-async function initialize() {
+const rest = new REST({ version: "10" }).setToken(TOKEN);
+(async () => {
     try {
-        const player = new Player(client);
-        player.extractors.loadMulti(DefaultExtractors);
-        player.extractors.register(YoutubeiExtractor, {});
-
-        await Promise.all([loadCommandFiles(`${__dirname}/commands`), loadEventFiles(`${__dirname}/events`, player)]);
-
-        const rest = new REST().setToken(token);
-        console.log("Started refreshing application (/) commands.");
-        await rest.put(Routes.applicationCommands(clientId), { body: commands });
-        console.log(`Successfully loaded ${commands.length} application (/) commands.`);
-
-        await client.login(token);
+        console.log(`[INFO] Started refreshing ${commandsToRegister.length} application (/) commands.`);
+        const data = await rest.put(Routes.applicationCommands(CLIENT_ID), { body: commandsToRegister });
+        console.log(`[INFO] Successfully reloaded ${data.length} application (/) commands globally.`);
     } catch (error) {
-        console.error("Failed to initialize bot:", error);
-        process.exit(1);
+        console.error("[ERROR] Failed to refresh application commands:", error);
     }
-}
+})();
 
-initialize();
+client
+    .login(TOKEN)
+    .then(() => console.log("[INFO] Bot logged in successfully!"))
+    .catch((error) => console.error("[ERROR] Bot login failed:", error));
