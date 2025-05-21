@@ -67,8 +67,7 @@ function loadEvents(directory) {
                 const event = require(filePath);
                 if (event.type === "player") {
                     player.events.on(event.name, (...args) => event.execute(...args));
-                }
-                if (event.once) {
+                } else if (event.once) {
                     client.once(event.name, (...args) => event.execute(...args, client));
                 } else {
                     client.on(event.name, (...args) => event.execute(...args, client));
