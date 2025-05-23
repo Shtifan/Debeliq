@@ -4,14 +4,14 @@ Debeliq is a feature-rich Discord bot that provides music playback, fun games, m
 
 ## Features
 
-### 🎵 Music Commands
+### Music Commands
 
 -   Play music from YouTube and other sources
 -   Queue management and playback controls
 -   Autoplay functionality
 -   Advanced features like speed control and seeking
 
-### 🎮 Games
+### Games
 
 -   Blackjack
 -   Cows and Bulls
@@ -20,14 +20,14 @@ Debeliq is a feature-rich Discord bot that provides music playback, fun games, m
 -   Toto
 -   And more!
 
-### 🛡️ Moderation
+### Moderation
 
 -   Ban/Kick users
 -   Timeout management
 -   Message deletion
 -   Server management tools
 
-### 🔧 Other Features
+### Other Features
 
 -   Chess problem solver with AI
 -   Code execution capability
@@ -36,11 +36,16 @@ Debeliq is a feature-rich Discord bot that provides music playback, fun games, m
 
 ## Prerequisites
 
--   Node.js (v16 or higher)
--   Python 3.8–3.11 (required for chess solver functionality)
--   FFmpeg (required for music playback)
--   Docker (required for code execution functionality)
--   Discord Bot Token
+### Required
+
+- Node.js (v16 or higher)
+- Python 3.8–3.11 (required for chess solver functionality)
+- Discord Bot Token and Client ID
+
+### Optional
+
+- FFmpeg (for better music playback)
+- Docker (required for code execution functionality)
 
 ## Installation
 
