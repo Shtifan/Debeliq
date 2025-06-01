@@ -161,6 +161,25 @@ function createDealButtons() {
     ];
 }
 
+function displayAllValues(gameState) {
+    const allValues = [
+        0.01, 1, 5, 10, 25, 50, 75, 100, 200, 300, 400, 500, 750, 1000, 5000, 10000, 25000, 50000, 75000, 100000, 200000,
+        300000, 400000, 500000, 750000, 1000000,
+    ];
+    const remaining = gameState.cases.map((c) => c.value);
+    const formatted = allValues.map((v) =>
+        remaining.includes(v) ? `**${formatCurrency(v)}**` : `~~${formatCurrency(v)}~~`
+    );
+    const half = Math.ceil(formatted.length / 2);
+    const lines = [];
+    for (let i = 0; i < half; i++) {
+        const leftValue = formatted[i];
+        const rightValue = formatted[i + half] || "";
+        lines.push(`${leftValue.padEnd(20)}${rightValue}`);
+    }
+    return `Values:\n${lines.join("\n")}`;
+}
+
 function createGameEmbed(gameState, additionalInfo = "") {
     const embed = new EmbedBuilder().setTitle("Deal or No Deal");
 
@@ -175,8 +194,8 @@ function createGameEmbed(gameState, additionalInfo = "") {
             embed.addFields({ name: "Last Action", value: additionalInfo });
         }
         embed.addFields({
-            name: "Remaining Values",
-            value: displayRemainingValues(gameState.cases).split("\n").slice(1).join("\n"),
+            name: "Values",
+            value: displayAllValues(gameState),
         });
     }
 
