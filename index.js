@@ -1,7 +1,4 @@
 const { Client, GatewayIntentBits, Collection, REST, Routes } = require("discord.js");
-const { Player } = require("discord-player");
-const { DefaultExtractors } = require("@discord-player/extractor");
-const { YoutubeiExtractor } = require("discord-player-youtubei");
 const fs = require("node:fs");
 const path = require("node:path");
 
@@ -49,11 +46,6 @@ function loadCommands(directory) {
 loadCommands(commandsPath);
 console.log(`[INFO] Successfully loaded ${client.commands.size} command(s).`);
 
-const player = new Player(client);
-player.extractors.loadMulti(DefaultExtractors);
-player.extractors.register(YoutubeiExtractor, {});
-console.log("[INFO] Player initialized.");
-
 const eventsPath = path.join(__dirname, "events");
 
 function loadEvents(directory) {
@@ -65,9 +57,7 @@ function loadEvents(directory) {
         } else if (file.name.endsWith(".js")) {
             try {
                 const event = require(filePath);
-                if (event.type === "player") {
-                    player.events.on(event.name, (...args) => event.execute(...args));
-                } else if (event.once) {
+                if (event.once) {
                     client.once(event.name, (...args) => event.execute(...args, client));
                 } else {
                     client.on(event.name, (...args) => event.execute(...args, client));
