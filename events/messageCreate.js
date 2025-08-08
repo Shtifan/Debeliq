@@ -15,7 +15,7 @@ try {
 }
 
 const STEFCHO_ID = "568496102127566873";
-const dataDir = path.join(__dirname, "..", "..", "data");
+const dataDir = path.join(__dirname, "..", "data");
 const COUNTER_FILE_STEFCHO = path.join(dataDir, "stefcho_sus_counter.txt");
 const SUS_FILE_STEFCHO = path.join(dataDir, "sus.txt");
 
