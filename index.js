@@ -80,7 +80,7 @@ client.once("ready", async () => {
         console.log(`[INFO] Started refreshing ${commandsToRegister.length} application (/) commands for all guilds.`);
 
         // Get all the guilds the bot is in
-        const guilds = client.guilds.cache.map((guild) => guild.id);
+        const guilds = client.guilds.cache.map((guild) => guild.id)
 
         // Loop through each guild and register the commands
         for (const guildId of guilds) {
