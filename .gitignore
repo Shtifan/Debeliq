@@ -6,3 +6,4 @@ chessboard.png
 __pycache__
 stockfish.exe
 solved_chessboard.png
+config.json
