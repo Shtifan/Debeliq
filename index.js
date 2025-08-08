@@ -2,8 +2,9 @@ const { Client, GatewayIntentBits, Collection, REST, Routes } = require("discord
 const fs = require("node:fs");
 const path = require("node:path");
 
-require("dotenv").config();
-const { TOKEN, CLIENT_ID } = process.env;
+const config = require("./config.json");
+const TOKEN = config.token;
+const CLIENT_ID = config.client_id;
 
 const client = new Client({
     intents: [
@@ -73,15 +74,24 @@ loadEvents(eventsPath);
 console.log(`[INFO] Successfully loaded event handlers.`);
 
 const rest = new REST({ version: "10" }).setToken(TOKEN);
-(async () => {
+
+client.once("ready", async () => {
     try {
-        console.log(`[INFO] Started refreshing ${commandsToRegister.length} application (/) commands.`);
-        const data = await rest.put(Routes.applicationCommands(CLIENT_ID), { body: commandsToRegister });
-        console.log(`[INFO] Successfully reloaded ${data.length} application (/) commands globally.`);
+        console.log(`[INFO] Started refreshing ${commandsToRegister.length} application (/) commands for all guilds.`);
+
+        // Get all the guilds the bot is in
+        const guilds = client.guilds.cache.map((guild) => guild.id);
+
+        // Loop through each guild and register the commands
+        for (const guildId of guilds) {
+            await rest.put(Routes.applicationGuildCommands(CLIENT_ID, guildId), { body: commandsToRegister });
+        }
+
+        console.log(`[INFO] Successfully reloaded application (/) commands for all ${guilds.length} guild(s).`);
     } catch (error) {
         console.error("[ERROR] Failed to refresh application commands:", error);
     }
-})();
+});
 
 client
     .login(TOKEN)

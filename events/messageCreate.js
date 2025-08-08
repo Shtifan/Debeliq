@@ -4,7 +4,7 @@ const path = require("node:path");
 
 let cowsAndBullsUtils;
 try {
-    const cowsBullsCommand = require("../../commands/games/cows_bulls.js");
+    const cowsBullsCommand = require("../commands/games/cows_bulls.js");
     if (cowsBullsCommand && cowsBullsCommand.utils) {
         cowsAndBullsUtils = cowsBullsCommand.utils;
     } else {
