@@ -34,7 +34,6 @@ function loadCommands(directory) {
                 if ("data" in command && "execute" in command) {
                     client.commands.set(command.data.name, command);
                     commandsToRegister.push(command.data.toJSON());
-                    console.log(`[INFO] Loaded command: ${command.data.name} from ${file.name}`);
                 } else {
                     console.warn(`[WARNING] The command at ${filePath} is missing "data" or "execute".`);
                 }
@@ -63,7 +62,6 @@ function loadEvents(directory) {
                 } else {
                     client.on(event.name, (...args) => event.execute(...args, client));
                 }
-                console.log(`[INFO] Loaded event: ${event.name} from ${file.name}`);
             } catch (error) {
                 console.error(`[ERROR] Could not load event at ${filePath}:`, error);
             }
@@ -77,7 +75,7 @@ const rest = new REST({ version: "10" }).setToken(TOKEN);
 
 client.once("ready", async () => {
     try {
-        console.log(`[INFO] Started refreshing ${commandsToRegister.length} application (/) commands globally.`);
+        console.log(`[INFO] Started refreshing application (/) commands globally.`);
 
         await rest.put(Routes.applicationCommands(CLIENT_ID), { body: commandsToRegister });
 
