@@ -77,19 +77,13 @@ const rest = new REST({ version: "10" }).setToken(TOKEN);
 
 client.once("ready", async () => {
     try {
-        console.log(`[INFO] Started refreshing ${commandsToRegister.length} application (/) commands for all guilds.`);
+        console.log(`[INFO] Started refreshing ${commandsToRegister.length} application (/) commands globally.`);
 
-        // Get all the guilds the bot is in
-        const guilds = client.guilds.cache.map((guild) => guild.id);
+        await rest.put(Routes.applicationCommands(CLIENT_ID), { body: commandsToRegister });
 
-        // Loop through each guild and register the commands
-        for (const guildId of guilds) {
-            await rest.put(Routes.applicationGuildCommands(CLIENT_ID, guildId), { body: commandsToRegister });
-        }
-
-        console.log(`[INFO] Successfully reloaded application (/) commands for all ${guilds.length} guild(s).`);
+        console.log(`[INFO] Successfully reloaded ${commandsToRegister.length} application (/) commands globally.`);
     } catch (error) {
-        console.error("[ERROR] Failed to refresh application commands:", error);
+        console.error("[ERROR] Failed to refresh global application commands:", error);
     }
 });
 
