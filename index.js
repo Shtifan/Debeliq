@@ -22,7 +22,6 @@ client.activeGames = new Collection();
 const commandsToRegister = [];
 const commandsPath = path.join(__dirname, "commands");
 
-// Recursive function to load command files
 function loadCommands(directory) {
     const commandFiles = fs.readdirSync(directory, { withFileTypes: true });
     for (const file of commandFiles) {
@@ -49,7 +48,6 @@ loadCommands(commandsPath);
 const eventsPath = path.join(__dirname, "events");
 let eventCount = 0;
 
-// Recursive function to load event files
 function loadEvents(directory) {
     const eventFiles = fs.readdirSync(directory, { withFileTypes: true });
     for (const file of eventFiles) {
@@ -73,24 +71,20 @@ function loadEvents(directory) {
 }
 loadEvents(eventsPath);
 
-// Register commands with Discord API
 const rest = new REST().setToken(TOKEN);
 
-(async () => {
+client.once("ready", async () => {
     try {
-        // The put method is used to fully refresh all commands with the current set.
-        const data = await rest.put(Routes.applicationCommands(CLIENT_ID), { body: commandsToRegister });
+        const guilds = client.guilds.cache.map((guild) => guild.id);
 
-        // This log will execute after the commands are successfully synced.
-        console.log(`Loaded and synced ${data.length} global commands.`);
+        for (const guildId of guilds) {
+            await rest.put(Routes.applicationGuildCommands(CLIENT_ID, guildId), { body: commandsToRegister });
+        }
 
-        // This log shows the number of events loaded.
-        console.log(`Loaded ${eventCount} events.`);
+        console.log(`Loaded and synced ${commandsToRegister.length} commands.`);
     } catch (error) {
-        // And of course, make sure you catch and log any errors!
         console.error(error);
     }
-})();
+});
 
-// Log in to Discord with your client's token
 client.login(TOKEN);

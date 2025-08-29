@@ -1,16 +1,23 @@
-FROM node:20-bullseye
+FROM node:20-alpine
 
-RUN apt-get update && \
-    apt-get install -y python3 python3-pip && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache python3 py3-pip
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 COPY package*.json ./
-RUN npm install
+
+RUN npm install --production
 
 COPY . .
 
-RUN pip3 install --no-cache-dir -r ./requirements.txt
+WORKDIR /app/commands/other/chess_solver
+COPY commands/other/chess_solver/requirements.txt ./
+RUN pip3 install --no-cache-dir -r requirements.txt
 
-CMD ["npm", "start"]
+COPY commands/other/chess_solver .
+
+WORKDIR /app
+
+EXPOSE 3000
+
+CMD ["node", "index.js"]

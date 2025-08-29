@@ -1,26 +1,40 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder } = require("discord.js");
-const fs = require("fs");
+const fs = require("fs").promises;
+const path = require("path");
 
-const userDataPath = "./data/user_data.json";
+const dataDir = path.join(__dirname, "..", "..", "data");
+const userDataPath = path.join(dataDir, "user_data.json");
 
-function ensureDataDir() {
-    const dataDir = "./data";
-    if (!fs.existsSync(dataDir)) {
-        fs.mkdirSync(dataDir, { recursive: true });
+async function ensureDataDir() {
+    try {
+        await fs.mkdir(dataDir, { recursive: true });
+    } catch {}
+}
+
+async function loadUserData() {
+    try {
+        await ensureDataDir();
+        try {
+            await fs.access(userDataPath);
+        } catch {
+            await fs.writeFile(userDataPath, JSON.stringify({}), "utf8");
+        }
+        const data = await fs.readFile(userDataPath, "utf8");
+        return JSON.parse(data || "{}");
+    } catch (error) {
+        console.error("Error loading user data:", error);
+        return {};
     }
 }
 
-function loadUserData() {
-    ensureDataDir();
-    if (!fs.existsSync(userDataPath)) {
-        fs.writeFileSync(userDataPath, JSON.stringify({}));
+async function saveUserData(data) {
+    try {
+        await ensureDataDir();
+        await fs.writeFile(userDataPath, JSON.stringify(data, null, 4), "utf8");
+    } catch (error) {
+        console.error("Error saving user data:", error);
+        throw new Error("Failed to save user data");
     }
-    return JSON.parse(fs.readFileSync(userDataPath, "utf8"));
-}
-
-function saveUserData(data) {
-    ensureDataDir();
-    fs.writeFileSync(userDataPath, JSON.stringify(data, null, 4));
 }
 
 function shuffleCases(cases) {
@@ -37,14 +51,6 @@ function removeCase(caseNumber, cases) {
 
 function formatCurrency(amount) {
     return amount.toLocaleString("en-US", { style: "currency", currency: "USD" });
-}
-
-function displayRemainingValues(cases) {
-    const sortedValues = cases
-        .map((c) => c.value)
-        .sort((a, b) => a - b)
-        .map((value) => formatCurrency(value));
-    return `Remaining values:\n${sortedValues.join("\n")}`;
 }
 
 function calculateBankerOffer(cases) {
@@ -226,7 +232,7 @@ module.exports = {
         let components;
         let additionalInfo = "";
 
-        const userData = loadUserData();
+        const userData = await loadUserData();
 
         if (interaction.customId.startsWith("page_")) {
             const [_, direction, currentPage] = interaction.customId.split("_");
@@ -303,7 +309,7 @@ module.exports = {
             }
             gameState.isAwaitingDeal = false;
             embed = createGameEmbed(gameState, additionalInfo);
-            saveUserData(userData);
+            await saveUserData(userData);
         }
 
         await interaction.update({ embeds: [embed], components: components || [] });

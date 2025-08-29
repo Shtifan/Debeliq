@@ -1,16 +1,14 @@
 const { SlashCommandBuilder } = require("discord.js");
 const fs = require("fs").promises;
-const path = require("path");
 
-const userDataPath = "./data/user_data.json";
+const path = require("path");
+const dataDir = path.join(__dirname, "..", "..", "data");
+const userDataPath = path.join(dataDir, "user_data.json");
 
 async function ensureDataDir() {
     try {
-        const dataDir = "./data";
-        await fs.access(dataDir);
-    } catch {
         await fs.mkdir(dataDir, { recursive: true });
-    }
+    } catch {}
 }
 
 async function loadUserData() {
@@ -19,7 +17,7 @@ async function loadUserData() {
         try {
             await fs.access(userDataPath);
         } catch {
-            await fs.writeFile(userDataPath, JSON.stringify({}));
+            await fs.writeFile(userDataPath, JSON.stringify({}), "utf8");
         }
         const data = await fs.readFile(userDataPath, "utf8");
         return JSON.parse(data || "{}");
@@ -32,7 +30,7 @@ async function loadUserData() {
 async function saveUserData(data) {
     try {
         await ensureDataDir();
-        await fs.writeFile(userDataPath, JSON.stringify(data, null, 4));
+        await fs.writeFile(userDataPath, JSON.stringify(data, null, 4), "utf8");
     } catch (error) {
         console.error("Error saving user data:", error);
         throw new Error("Failed to save user data");
@@ -105,53 +103,51 @@ module.exports = {
                 userNumbers.includes(number) ? `**${number}**` : `${number}`
             );
 
-            let prizeMoney = 0;
+            let prize = 0;
             switch (correctGuesses) {
                 case 6:
-                    prizeMoney = 7000000;
+                    prize = 7000000;
                     break;
                 case 5:
-                    prizeMoney = 10000;
+                    prize = 10000;
                     break;
                 case 4:
-                    prizeMoney = 100;
+                    prize = 100;
                     break;
                 case 3:
-                    prizeMoney = 10;
+                    prize = 10;
                     break;
                 case 2:
-                    prizeMoney = 1;
+                    prize = 1;
                     break;
                 case 1:
-                    prizeMoney = 0.01;
+                    prize = 0.01;
                     break;
             }
 
-            const formattedPrize = prizeMoney.toLocaleString("en-US", { style: "currency", currency: "USD" });
-
-            userData[userId].money += prizeMoney;
+            userData[userId].money += prize;
 
             await saveUserData(userData);
 
             let resultMessage;
             switch (correctGuesses) {
                 case 6:
-                    resultMessage = `Congratulations! You've won the jackpot of **${formattedPrize}**!`;
+                    resultMessage = `Congratulations! You've won the jackpot of **${prize}**!`;
                     break;
                 case 5:
-                    resultMessage = `Congratulations! You've won **${formattedPrize}**!`;
+                    resultMessage = `Congratulations! You've won **${prize}**!`;
                     break;
                 case 4:
-                    resultMessage = `Congratulations! You've won **${formattedPrize}**!`;
+                    resultMessage = `Congratulations! You've won **${prize}**!`;
                     break;
                 case 3:
-                    resultMessage = `Congratulations! You've won **${formattedPrize}**!`;
+                    resultMessage = `Congratulations! You've won **${prize}**!`;
                     break;
                 case 2:
-                    resultMessage = `Congratulations! You've won **${formattedPrize}**!`;
+                    resultMessage = `Congratulations! You've won **${prize}**!`;
                     break;
                 case 1:
-                    resultMessage = `Congratulations! You've won **${formattedPrize}**!`;
+                    resultMessage = `Congratulations! You've won **${prize}**!`;
                     break;
                 default:
                     resultMessage = `Sorry, you didn't win anything this time.`;

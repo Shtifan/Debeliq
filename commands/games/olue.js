@@ -1,47 +1,50 @@
 const { SlashCommandBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
-const { existsSync, mkdirSync } = require("fs");
-const fs = require("fs/promises");
+const fs = require("fs").promises;
+const path = require("path");
+
+const dataDir = path.join(__dirname, "..", "..", "data");
+const userDataPath = path.join(dataDir, "user_data.json");
+
+async function ensureDataDir() {
+    try {
+        await fs.mkdir(dataDir, { recursive: true });
+    } catch {}
+}
 
 async function loadUserData() {
     try {
-        if (!existsSync("./data/user_data.json")) {
-            await saveUserData({});
-            return {};
+        await ensureDataDir();
+        try {
+            await fs.access(userDataPath);
+        } catch {
+            await fs.writeFile(userDataPath, JSON.stringify({}), "utf8");
         }
-
-        const data = await fs.readFile("./data/user_data.json", "utf8");
-
+        const data = await fs.readFile(userDataPath, "utf8");
         if (!data.trim()) {
-            await saveUserData({});
+            await fs.writeFile(userDataPath, JSON.stringify({}), "utf8");
             return {};
         }
-
         const parsedData = JSON.parse(data);
         return parsedData.olue_game || {};
     } catch (error) {
         console.error("Error loading user data:", error);
-        await saveUserData({});
+        await fs.writeFile(userDataPath, JSON.stringify({}), "utf8");
         return {};
     }
 }
 
 async function saveUserData(userData) {
     try {
-        if (!existsSync("./data")) {
-            mkdirSync("./data", { recursive: true });
-        }
-
+        await ensureDataDir();
         let existingData = {};
-        if (existsSync("./data/user_data.json")) {
-            const fileContent = await fs.readFile("./data/user_data.json", "utf8");
+        try {
+            const fileContent = await fs.readFile(userDataPath, "utf8");
             if (fileContent.trim()) {
                 existingData = JSON.parse(fileContent);
             }
-        }
-
+        } catch {}
         existingData.olue_game = userData;
-
-        await fs.writeFile("./data/user_data.json", JSON.stringify(existingData, null, 2), "utf8");
+        await fs.writeFile(userDataPath, JSON.stringify(existingData, null, 2), "utf8");
     } catch (error) {
         console.error("Error saving user data:", error);
     }
@@ -73,21 +76,19 @@ function createGameGrid(score = 0, specialNumbers = null, selectedCells = new Se
         const endCol = Math.min(startCol + maxColumnsPerRow, totalColumns);
         let chunk = `  _____  `.repeat(endCol - startCol) + "\n";
         for (let row = 0; row < 3; row++) {
-            chunk += Array.from({ length: endCol - startCol }, (_, colIndex) => {
-                const col = startCol + colIndex + 1;
-                if (selectedCells.has(col)) return " |XXXXX| ";
-                if (currentSpecialNumbers.includes(col)) return " |OOOOO| ";
-                return " |     | ";
-            }).join("") + "\n";
+            chunk +=
+                Array.from({ length: endCol - startCol }, (_, colIndex) => {
+                    const col = startCol + colIndex + 1;
+                    if (selectedCells.has(col)) return " |XXXXX| ";
+                    if (currentSpecialNumbers.includes(col)) return " |OOOOO| ";
+                    return " |     | ";
+                }).join("") + "\n";
         }
         chunk += `  ‾‾‾‾‾  `.repeat(endCol - startCol) + "\n";
         chunk += Array.from({ length: endCol - startCol }, (_, i) => `    ${startCol + i + 1}    `).join("") + "\n";
         gridChunks.push(chunk);
     }
-    const gridOutput = [
-        `Score: ${score}`,
-        ...gridChunks
-    ].join("\n");
+    const gridOutput = [`Score: ${score}`, ...gridChunks].join("\n");
 
     const numberButtons = Array.from({ length: totalColumns }, (_, index) =>
         new ButtonBuilder()

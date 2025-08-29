@@ -63,7 +63,7 @@ module.exports = {
         try {
             await member.timeout(ms, reason);
             await interaction.reply({
-                content: `⏳ ${member.user.tag} has been timed out for ${durationStr}. Reason: ${reason}`,
+                content: `${member.user.tag} has been timed out for ${durationStr}. Reason: ${reason}`,
                 ephemeral: false,
             });
         } catch (error) {
